@@ -22,7 +22,8 @@ from pathlib import Path
 # 策略: 'folder' = 文件夹级全量覆盖, 'file' = 文件级同名覆盖
 DIRECTORIES = {
     "skills": ("skills", "folder"),
-    "rules": ("rules", "file")
+    "rules": ("rules", "file"),
+    "commands": ("commands", "file")
 }
 
 
