@@ -1,49 +1,70 @@
 ---
-description: 智能 Git 工作流：自动分支命名、生成 commit 信息并推送
-
+description: 智能 Git 工作流：分支创建、提交、推送、PR 一步完成
 ---
 
-## 核心要点
+## 流程
 
-1. 使用中文
-2. 简短
-3. 自动化执行，减少人工干预
+```
+分析变更 → 确定分支 → 执行推送 → 打开 PR
+```
 
-## 工作流程
+### 1. 分析 → 确定分支前缀
 
-### 1. 分析变更
-- 执行 `git status` 查看当前变更
-- 分析变更类型（新功能、修复、重构、文档等）
+根据变更类型选择前缀：
 
-### 2. 智能分支命名
-基于变更类型自动创建分支名：
-- **feature/**: 新功能开发
-- **fix/**: Bug 修复
-- **refactor/**: 代码重构
-- **docs/**: 文档更新
-- **style/**: 代码格式调整
-- **test/**: 测试相关
-- **chore/**: 构建/工具/配置
+| 变更类型 | 分支前缀 | 示例 |
+|---------|---------|------|
+| 新功能 | feature/ | feature/user-auth-0414 |
+| Bug 修复 | fix/ | fix/login-crash-0414 |
+| 重构 | refactor/ | refactor/api-cleanup-0414 |
+| 文档 | docs/ | docs/readme-0414 |
+| 格式调整 | style/ | style/formatting-0414 |
+| 测试 | test/ | test/add-tests-0414 |
+| 构建/工具 | chore/ | chore/deps-upgrade-0414 |
 
-命名规则：`{类型}/{简短描述}-{日期}`，例如：`feature/add-login-0305`
+### 2. 执行 Git 操作
 
-### 3. 分支管理
-- 从当前分支创建新分支
-- 自动创建新分支并切换
+```bash
+# 创建并切换分支
+git checkout -b {前缀}{简短描述-月日}
 
-### 4. 提交代码
-- `git add .`
-- 生成符合 commitizen 格式的 commit message
-- `git commit`
+# 暂存所有变更
+git add .
 
-### 5. 自动推送
-- 自动设置 upstream：`git push -u origin {分支名}`
-- 推送完成后显示分支链接
-- 使用 chrome devtools 自动打开浏览器这个分支链接
+# 提交（commitizen 格式）
+git commit -m "type(scope): 简短描述"
+```
 
-## 特殊情况处理
+**Commit 格式：**
+- `type`: feat | fix | refactor | docs | style | test | chore
+- `scope`: 模块/功能名（可选）
+- `描述`: ≤50字，动词开头
 
-- **分支已存在**：自动切换到已有分支
-- **冲突处理**：如遇到冲突，提示用户解决
-- **空提交**：如无变更，提示用户
-- **推送失败**：自动重试一次，仍失败则提示手动处理
+**示例：**
+```
+feat(auth): 添加 JWT 登录
+fix(order): 修复订单页面白屏问题
+```
+
+### 3. 推送 → 打开 PR
+
+```bash
+# 推送分支
+git push -u origin HEAD
+```
+
+**自动打开 PR：**
+推送成功后，使用 chrome devtools 打开 PR 页面：
+
+```javascript
+mcp__chrome-devtools__new_page("https://github.com/carl10086/{repo}/pull/new/{branch}")
+```
+
+## 特殊情况
+
+| 情况 | 处理 |
+|------|------|
+| 分支已存在 | `git checkout {分支名}` 切换 |
+| 推送失败 | 重试一次，仍失败提示用户 |
+| 无变更 | 提示"无变更可提交" |
+| 冲突 | 提示用户解决后继续 |
