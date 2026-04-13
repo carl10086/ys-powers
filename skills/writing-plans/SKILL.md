@@ -118,6 +118,8 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - Complete code in every step — if a step changes code, show the code
 - Exact commands with expected output
 - DRY, YAGNI, TDD, frequent commits
+- You must use chinese to write the plan
+- Before write plan, You must read ./claude/rules/*.md to remind the engineer to follow the rules
 
 ## Self-Review
 
