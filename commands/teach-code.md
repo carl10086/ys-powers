@@ -32,7 +32,7 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 
 ---
 
-## 讲解内容：从功能到实现
+## 讲解规则：从功能到实现
 
 ### 层级一：模块是做什么的
 
@@ -56,17 +56,6 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 
 ---
 
-## 讲解格式
-
-每个概念/模块，用这个格式讲：
-
-```
-📍 是什么：它的功能
-🔧 怎么组织：设计思路
-⚙️ 怎么做：用伪代码讲逻辑
-```
-
----
 
 ## 问什么问题
 
