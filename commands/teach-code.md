@@ -1,6 +1,6 @@
 ---
-description: 使用 brainstorming skill 进行交互式代码理解，带你一步步理解任意代码模块的源码
-requires: brainstorming
+description: 带你一步步理解任意代码模块的源码，通过交互式问答由浅入深引导
+requires: teach-code
 ---
 
 # teach-code
@@ -43,9 +43,6 @@ requires: brainstorming
 
 保存到 `docs/superpowers/specs/YYYY-MM-DD-<模块名>-read.md`
 
-## brainstorming skill 的角色
+## teach-code skill
 
-本命令借助 brainstorming skill 的：
-- 交互式问答框架（一次一问，循序渐进）
-- 用户意图澄清能力
-- 文档产出流程（生成理解笔记）
+本命令使用独立的 `teach-code` skill，通过交互式问答框架带你由浅入深理解代码。
