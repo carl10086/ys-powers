@@ -2,84 +2,63 @@
 
 ## 背景
 
-用户希望创建一个交互式代码理解命令，能够通过文档说明 + 交互式提问的方式，带你一步步理解任意代码模块的源码。命令取名 `teach-code`。
+用户希望创建一个交互式代码理解命令，带你由浅入深理解任意代码模块的源码。
 
-## 目标
+核心定位：**不是帮你复习看过的代码，而是带你理解你没看过的代码**。
 
-- 用户随意指定文件/目录/模块作为起点
-- AI 根据代码复杂度自动决定深入程度
-- 通过独立的 `teach-code` skill 进行"由浅入深"的交互式问答引导
-- 复杂场景支持可视化辅助（chrome-devtools MCP）
-- 最终产出代码理解笔记
+## 核心原则
 
-## 设计决策
+### 讲什么
 
-### 核心结构
+- **功能**：这个代码是做什么的
+- **设计**：它是怎么组织的，为什么这样组织
+- **实现**：用伪代码/文字描述讲逻辑，不讲语法细节
 
-1. **`skills/teach-code/`** — 独立的 skill，基于 `skills/brainstorming/` 改造，专注于"由浅入深理解代码"流程
-2. **`commands/teach-code.md`** — command 文件，指定 `requires: teach-code`
+### 怎么讲
 
-### skill 改造要点
+- 从宏观到细节，拆成一个个点
+- 用伪代码代替逐行语法讲解
+- 每个模块用固定格式：是什么 → 怎么组织 → 怎么做
 
-brainstorming 的 CheckList（9步）改造为"代码理解"版本：
+### 问什么
 
-| 原 brainstorming 步骤 | 改造后步骤 |
-|----------------------|------------|
-| Explore project context | 读取并分析代码，生成整体概览 |
-| Offer visual companion | 提供可视化辅助（可选） |
-| Ask clarifying questions | 提出关键理解问题（一次一问） |
-| ~~Propose 2-3 approaches~~ | **删除**（无方案选择环节） |
-| ~~Present design~~ | **删除**（无设计方案产出） |
-| ~~Write design doc~~ | **替换为** 生成代码理解笔记 |
-| Spec self-review | 自我检查笔记完整性 |
-| User reviews spec | 用户确认理解笔记 |
-| ~~Transition to implementation~~ | **删除**（不需要 implementation plan） |
+- 追问设计动机："为什么要这样设计？"
+- 追问权衡："这样设计有什么缺点？"
+- 追问替代："有什么其他方案？"
 
-**最终产物**：代码理解笔记（而非设计文档）
+## 讲解层级
 
-### brainstorming skill 的角色
+| 层级 | 内容 | 重点 |
+|------|------|------|
+| 模块是做什么的 | 核心功能、系统角色 | 功能 |
+| 怎么组织的 | 组成部分、关系、数据流动 | 设计 |
+| 具体怎么实现的 | 伪代码/文字讲逻辑 | 实现 |
 
-以 brainstorming 为框架，复用其：
-- 交互式问答框架（一次一问，循序渐进）
-- 用户意图澄清能力
-- 文档产出流程
+## 讲解格式
 
-### 命令调用流程
+每个概念/模块，用这个格式讲：
 
 ```
-用户输入：/teach-code <文件/目录/模块路径>
-
-Step 1: 探索上下文
-  → AI 读取指定路径代码，分析文件结构、核心模块、依赖关系
-  → 生成整体概览（中文输出）
-
-Step 2: 交互式问答引导
-  → AI 根据代码复杂度提出关键问题
-  → 一次一问，用户回答后逐步深入
-  → 遇到复杂调用链或分支逻辑时提供可视化辅助
-  → AI 自动决定深入程度
-
-Step 3: 总结
-  → 生成代码理解笔记
-  → 保存到 docs/superpowers/specs/YYYY-MM-DD-<模块名>-read.md
+📍 是什么：它的功能
+🔧 怎么组织：设计思路
+⚙️ 怎么做：用伪代码讲逻辑
 ```
 
-### 文件结构
+## 问题质量
 
-```
-ys-powers/
-├── skills/
-│   └── teach-code/
-│       ├── SKILL.md          # 改造后的 skill，复用 brainstorming 框架
-│       └── (其他辅助文件，如 visual-companion.md 如有需要)
-├── commands/
-│   └── teach-code.md         # command 文件，requires: teach-code
-└── docs/superpowers/specs/
-    └── YYYY-MM-DD-teach-code-design.md  # 本设计文档
-```
+好问题引发思考：
+- "为什么要这样设计？"
+- "这样设计有什么缺点？"
+- "有什么替代方案？"
+- "如果不用这个设计，会怎样？"
+
+Never 问：
+- "你知道这个 TypeScript 语法是什么意思吗"
+- "你理解了吗"
 
 ## 验证标准
 
-- `skills/teach-code/SKILL.md` 存在，且 checklist 适配代码理解流程
-- `commands/teach-code.md` 存在，frontmatter 指定 `requires: teach-code`
-- 命令流程完整：探索上下文 → 交互式问答 → 总结产出笔记
+- `commands/teach-code.md` 存在
+- 核心节奏：讲一段问一段
+- 讲解内容聚焦：功能→设计→实现（不用讲语法）
+- 问题质量：追问动机、权衡、替代
