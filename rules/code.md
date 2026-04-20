@@ -61,3 +61,39 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+## Code Smells
+
+Know these to avoid writing them, and recognize them during review.
+
+### 5.1 Bloaters
+
+| Smell | Recognition | Threshold | How to Avoid |
+|-------|-------------|----------|--------------|
+| Long Method | Function does too many things | > 20 lines | Single responsibility; extract early |
+| Large Class | Class has too many responsibilities | > 200 lines | Single responsibility; extract subclasses |
+| Long Parameter List | Too many arguments passed together | > 3 params | Introduce parameter object |
+| Primitive Obsession | Same field groups repeated as primitives | Multiple occurrences | Extract dedicated type |
+| Data Clumps | Same fields appear together everywhere | Repeated field groups | Extract shared object |
+
+### 5.2 Dispensables
+
+| Smell | Recognition | Threshold | How to Avoid |
+|-------|-------------|----------|--------------|
+| Dead Code | Unused variables, functions, or imports | Any unused code | Remove when discovered; don't accumulate |
+| Duplicate Code | Same logic repeated in multiple places | Any repetition | Extract shared function |
+| Speculative Generality | Unused abstractions "for future" | Unused interfaces/classes | Don't build what isn't needed yet |
+| Comments | Code needs a comment to explain why it exists | Any "explains the why" comment | Fix the code, don't explain it |
+
+### 5.3 Couplers
+
+| Smell | Recognition | Threshold | How to Avoid |
+|-------|-------------|----------|--------------|
+| Feature Envy | Method heavily uses another class's data | Multiple methods accessing same external class | Move method to the data's class |
+| Message Chains | `a.b().c().d()` chains | Chain > 2 | Introduce intermediate variable or restructure |
+| Middle Man | Class delegates everything to another class | Delegation > 80% | Remove middleman; call directly |
+| Inappropriate Intimacy | Classes know each other's internals | Cross-class internal access | Enforce encapsulation |
+
+**When you spot a smell:** Flag it in review rather than silently working around it. "This function is 80 lines — consider splitting" is more helpful than working around the length.
