@@ -9,18 +9,6 @@ description: "带你由浅入深理解任意代码模块的源码。先宏观再
 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a code understanding summary and the user has confirmed they've grasped the key concepts.
-
-**约束分级：**
-
-| 级别 | 语义 | 适用场景 |
-|------|------|----------|
-| CRITICAL | 绝对不可违反 | 不可逆损失（删数据、泄露密钥、覆盖生产环境） |
-| NEVER | 禁止，功能级错误 | 会导致功能错误或逻辑混乱的行为 |
-| IMPORTANT | 质量项，容易遗忘 | 代码风格、边界检查、安全习惯 |
-| Do NOT | 一般禁止 | 常规不应做，但后果可控 |
-| Avoid | 偏好，有例外 | 通常不推荐，但特定场景可破例 |
-
-**执行规则：** 每讲完一个知识点，必须先输出互动问题，等待用户回应后才能继续。
 </HARD-GATE>
 
 <IMPORTANT>
