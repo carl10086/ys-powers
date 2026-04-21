@@ -2,6 +2,29 @@
 description: 智能 Git 工作流：分支创建、提交、推送、PR 一步完成
 ---
 
+<CRITICAL>
+- 永远不 force push 到 main/master
+- 永远不提交包含密钥/token/credentials 的变更
+</CRITICAL>
+
+<NEVER>
+- 不要跳过 Git 冲突解决直接提交
+- 不要在未确定分支前缀正确前执行 push
+</NEVER>
+
+<IMPORTANT>
+- commit message 用 commitizen 格式：type(scope): 描述
+- 描述 ≤50 字，动词开头
+- 分支名格式：{前缀}{简短描述-月日}
+</IMPORTANT>
+
+<Do NOT>
+- 不要 hardcode 路径
+- 不要自动合并冲突（除非用户明确授权）
+</Do NOT>
+
+---
+
 ## 流程
 
 ```
@@ -60,6 +83,13 @@ git push -u origin HEAD
 mcp__chrome-devtools__new_page("https://github.com/carl10086/{repo}/pull/new/{branch}")
 ```
 
+## 执行后自检
+
+- [ ] 分支名符合 {前缀}{描述-月日} 规范
+- [ ] commit message 格式正确
+- [ ] 没有 secrets/keys/tokens 泄露
+- [ ] push 到远程成功
+
 ## 特殊情况
 
 | 情况 | 处理 |
@@ -68,3 +98,7 @@ mcp__chrome-devtools__new_page("https://github.com/carl10086/{repo}/pull/new/{br
 | 推送失败 | 重试一次，仍失败提示用户 |
 | 无变更 | 提示"无变更可提交" |
 | 冲突 | 提示用户解决后继续 |
+
+---
+
+REMINDER: 检查分支名是否符合规范，确保没有 secrets 泄露。
