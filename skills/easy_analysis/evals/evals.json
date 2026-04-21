@@ -1,0 +1,33 @@
+{
+  "skill_name": "easy_analysis",
+  "evals": [
+    {
+      "id": 1,
+      "name": "analyze-skill-file",
+      "prompt": "分析一下 /Users/carlyu/soft/projects/agent-powers/refer/superpowers/skills/brainstorming/SKILL.md，我需要彻底理解这个头脑风暴 skill 是如何工作的。请逐段翻译并总结要点。",
+      "expected_output": "逐段翻译的文档分析，包含原文、中文翻译、要点，以及引用文件解释",
+      "files": ["/Users/carlyu/soft/projects/agent-powers/refer/superpowers/skills/brainstorming/SKILL.md"],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "analyze-workflow-doc",
+      "prompt": "帮我理解这个文档：/Users/carlyu/soft/projects/agent-powers/docs/gsd/01-map-codebase-workflow.md。我英语不太好，请带我一步步看懂。",
+      "expected_output": "段落化的分析，每段都有翻译和要点，整体有总结",
+      "files": ["/Users/carlyu/soft/projects/agent-powers/docs/gsd/01-map-codebase-workflow.md"],
+      "assertions": []
+    },
+    {
+      "id": 3,
+      "name": "analyze-with-references",
+      "prompt": "详细分析一下 brainstorming skill 的 visual-companion.md 文件，包括它引用的所有脚本文件。我要复刻这个功能。",
+      "expected_output": "包含 visual-companion.md 的逐段分析，以及对 scripts/ 目录下相关脚本的详细解释",
+      "files": [
+        "/Users/carlyu/soft/projects/agent-powers/refer/superpowers/skills/brainstorming/visual-companion.md",
+        "/Users/carlyu/soft/projects/agent-powers/refer/superpowers/skills/brainstorming/scripts/server.cjs",
+        "/Users/carlyu/soft/projects/agent-powers/refer/superpowers/skills/brainstorming/scripts/helper.js"
+      ],
+      "assertions": []
+    }
+  ]
+}
