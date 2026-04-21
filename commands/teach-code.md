@@ -9,6 +9,18 @@ description: "带你由浅入深理解任意代码模块的源码。先宏观再
 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a code understanding summary and the user has confirmed they've grasped the key concepts.
+
+**约束分级：**
+
+| 级别 | 语义 | 适用场景 |
+|------|------|----------|
+| CRITICAL | 绝对不可违反 | 不可逆损失（删数据、泄露密钥、覆盖生产环境） |
+| NEVER | 禁止，功能级错误 | 会导致功能错误或逻辑混乱的行为 |
+| IMPORTANT | 质量项，容易遗忘 | 代码风格、边界检查、安全习惯 |
+| Do NOT | 一般禁止 | 常规不应做，但后果可控 |
+| Avoid | 偏好，有例外 | 通常不推荐，但特定场景可破例 |
+
+**执行规则：** 每讲完一个知识点，必须先输出互动问题，等待用户回应后才能继续。
 </HARD-GATE>
 
 <IMPORTANT>
@@ -29,9 +41,9 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 - 它在整个系统中**处于什么位置**
 - **输入是什么，输出是什么**
 
-**不要在这个阶段列子项、不要提前拆分知识点。** 比如不要讲"这个文件有四部分"、"这里定义了 XX 类型"。这些属于后续知识点拆分的内容。
+<IMPORTANT>不要在这个阶段列子项、不要提前拆分知识点。比如不要讲"这个文件有四部分"、"这里定义了 XX 类型"。这些属于后续知识点拆分的内容。</IMPORTANT>
 
-**必须用伪代码或文字流程来描述这个模块在系统中的位置和作用**，不能只堆文字说明。比如：
+<CRITICAL>必须用伪代码或文字流程来描述这个模块在系统中的位置和作用，不能只堆文字说明。</CRITICAL>比如：
 
 ```
 这个模块在系统中的位置：
@@ -60,15 +72,15 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 
 ### 3. 控制节奏
 
-**每讲完一个知识点，必须停下来互动。**
+<CRITICAL>每讲完一个知识点，必须停下来互动。</CRITICAL>
 
 - 一个知识点内可以问多个问题
 - 直到用户表示"继续"或"我理解了"，再进入下一个知识点
-- 不要在一个回复里塞多个知识点
+<NEVER>不要在一个回复里塞多个知识点。</NEVER>
 
 ### 4. 不讲语法，讲逻辑
 
-- 不要逐行解释 TypeScript 语法
+<IMPORTANT>不要逐行解释 TypeScript 语法。</IMPORTANT>
 - 不要纠结类型定义的具体写法
 - 用"先做什么，再做什么，最后做什么"的方式讲流程
 
@@ -80,10 +92,11 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 讲解一个单元 → 停下来 → 问一个问题 → 等待用户回应 → 再讲下一个单元
 ```
 
-**NEVER:**
+<NEVER>
 - 一次性讲完所有内容再问问题
 - 连续输出超过一个单元不互动
 - 问"你理解了吗"这种无效问题
+</NEVER>
 
 ---
 
