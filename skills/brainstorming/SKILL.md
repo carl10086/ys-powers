@@ -15,7 +15,7 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 
 <IMPORTANT>
     - You must use chinese to ask question
-    - You must use chinse to write spec plan file
+    - You must use chinese to write spec plan file
 </IMPORTANT>
 
 
