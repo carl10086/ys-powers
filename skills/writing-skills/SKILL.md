@@ -19,6 +19,25 @@ You write test cases (pressure scenarios with subagents), watch them fail (basel
 
 **Official guidance:** For Anthropic's official skill authoring best practices, see anthropic-best-practices.md. This document provides additional patterns and guidelines that complement the TDD-focused approach in this skill.
 
+## Language Requirement
+
+<IMPORTANT>
+ALL new skills created through this skill MUST be written in **Chinese (简体中文)**.
+
+This includes:
+- Overview, usage conditions, core patterns, all explanations
+- Code comments and example descriptions
+- Flowchart labels and diagram text
+- Error examples and correct examples
+
+What MAY remain in English:
+- Technical terms (API names, library names, CLI commands)
+- File paths and directory names
+- Code identifiers (variable names, function names)
+
+A skill that violates this rule is considered incomplete.
+</IMPORTANT>
+
 ## What is a Skill?
 
 A **skill** is a reference guide for proven techniques, patterns, or tools. Skills help future Claude instances find and apply effective approaches.
