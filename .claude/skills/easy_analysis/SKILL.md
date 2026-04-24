@@ -1,90 +1,90 @@
 ---
 name: easy-analysis
-description: Use when user needs to deeply understand a complex technical document, especially English documents, or when preparing to replicate a feature or pattern from documentation. Triggered by phrases like "analyze this", "help me understand", "paragraph-by-paragraph", or when user expresses confusion about documentation.
+description: Use when user needs to deeply understand a complex technical document, especially English documents, or when preparing to replicate a feature or pattern from documentation.
 ---
 
 # Easy Analysis
 
-## Overview
+## 概述
 
-**Macro first, micro second.** Provide paragraph-by-paragraph deep reading with translation and summarization. Target audience: users who need thorough understanding of complex technical documents, especially English documentation.
+**先宏观，后微观。** 对复杂技术文档进行逐段精读、翻译、总结，确保彻底理解每个细节，特别适合英语不熟练的用户深入理解英文技术文档。
 
-## When to Use
+## 使用场景
 
 ```dot
 digraph when_to_use {
-    "Need to understand a document deeply?" [shape=diamond];
-    "English document?" [shape=diamond];
-    "Need to replicate/feature extract?" [shape=diamond];
-    "Use easy-analysis" [shape=box];
-    "Use standard reading" [shape=box];
+    "需要深入理解文档?" [shape=diamond];
+    "英文文档?" [shape=diamond];
+    "需要复刻/提取功能?" [shape=diamond];
+    "使用 easy-analysis" [shape=box];
+    "使用标准阅读方式" [shape=box];
 
-    "Need to understand a document deeply?" -> "English document?" [label="yes"];
-    "Need to understand a document deeply?" -> "Use standard reading" [label="no"];
-    "English document?" -> "Use easy-analysis" [label="yes"];
-    "English document?" -> "Need to replicate/feature extract?" [label="no"];
-    "Need to replicate/feature extract?" -> "Use easy-analysis" [label="yes"];
-    "Need to replicate/feature extract?" -> "Use standard reading" [label="no"];
+    "需要深入理解文档?" -> "英文文档?" [label="是"];
+    "需要深入理解文档?" -> "使用标准阅读方式" [label="否"];
+    "英文文档?" -> "使用 easy-analysis" [label="是"];
+    "英文文档?" -> "需要复刻/提取功能?" [label="否"];
+    "需要复刻/提取功能?" -> "使用 easy-analysis" [label="是"];
+    "需要复刻/提取功能?" -> "使用标准阅读方式" [label="否"];
 }
 ```
 
-**Use when:**
-- User says "analyze this document", "help me understand", "paragraph-by-paragraph"
-- User explicitly says "I don't understand" or "my English is not good"
-- Preparing to replicate a skill, pattern, or feature from documentation
-- Analyzing SKILL.md files, workflow documents, or technical specifications
-- Any scenario requiring dismantling complex documentation piece by piece
+**使用时机：**
+- 用户说"分析这个文档"、"帮我理解"、"逐段分析"
+- 用户明确表示"我看不懂"或"我英语不好"
+- 准备从文档中复刻某个 skill、模式或功能
+- 分析 SKILL.md 文件、工作流程文档或技术规范
+- 任何需要拆解复杂文档的场景
 
-**Don't use when:**
-- Quick reference lookup (use find-docs or direct reading)
-- Code review or debugging (use appropriate skills)
-- User just wants a one-sentence summary
+**不要使用：**
+- 快速查阅（直接用 find-docs 或读取文件）
+- 代码审查或调试（使用对应 skill）
+- 用户只需要一句话总结
 
-## HARD-GATE
+## 硬门槛
 
 <CRITICAL>
-Do NOT start paragraph-by-paragraph reading until you have completed Step 0 (Macro Overview).
-Do NOT skip translation for any paragraph.
-Do NOT mix multiple paragraphs into one block.
-Do NOT omit Key Points for any paragraph.
+在完成 Step 0（宏观概览）之前，禁止开始逐段阅读。
+禁止跳过任何段落的翻译。
+禁止将多个段落合并到一个块中。
+禁止遗漏任何段落的要点。
 
-**No exceptions:**
-- Not for "short documents"
-- Not for "I already know what this says"
-- Not for "user wants quick answer"
-- Not for "these paragraphs are related"
+**没有例外：**
+- 不因"文档很短"而跳过
+- 不因"我已经知道内容"而跳过
+- 不因"用户想要快速答案"而跳过
+- 不因"这些段落相关"而合并
 </CRITICAL>
 
-## Analysis Flow
+## 分析流程
 
 ```dot
 digraph analysis_flow {
-    "Start" [shape=oval];
-    "Step 0: Macro Overview" [shape=box];
-    "Need paragraph analysis?" [shape=diamond];
-    "Step 1: Paragraph-by-Paragraph" [shape=box];
-    "References found?" [shape=diamond];
-    "Step 2: Reference Analysis" [shape=box];
-    "Step 3: Final Summary" [shape=box];
-    "Save to file" [shape=box];
-    "End" [shape=oval];
+    "开始" [shape=oval];
+    "Step 0: 宏观概览" [shape=box];
+    "需要逐段分析?" [shape=diamond];
+    "Step 1: 逐段精读" [shape=box];
+    "发现引用文件?" [shape=diamond];
+    "Step 2: 引用分析" [shape=box];
+    "Step 3: 整体总结" [shape=box];
+    "保存到文件" [shape=box];
+    "结束" [shape=oval];
 
-    "Start" -> "Step 0: Macro Overview";
-    "Step 0: Macro Overview" -> "Need paragraph analysis?";
-    "Need paragraph analysis?" -> "Step 1: Paragraph-by-Paragraph" [label="yes"];
-    "Need paragraph analysis?" -> "Step 3: Final Summary" [label="no, macro enough"];
-    "Step 1: Paragraph-by-Paragraph" -> "References found?";
-    "References found?" -> "Step 2: Reference Analysis" [label="yes"];
-    "References found?" -> "Step 3: Final Summary" [label="no"];
-    "Step 2: Reference Analysis" -> "Step 3: Final Summary";
-    "Step 3: Final Summary" -> "Save to file";
-    "Save to file" -> "End";
+    "开始" -> "Step 0: 宏观概览";
+    "Step 0: 宏观概览" -> "需要逐段分析?";
+    "需要逐段分析?" -> "Step 1: 逐段精读" [label="是"];
+    "需要逐段分析?" -> "Step 3: 整体总结" [label="否, 宏观足够"];
+    "Step 1: 逐段精读" -> "发现引用文件?";
+    "发现引用文件?" -> "Step 2: 引用分析" [label="是"];
+    "发现引用文件?" -> "Step 3: 整体总结" [label="否"];
+    "Step 2: 引用分析" -> "Step 3: 整体总结";
+    "Step 3: 整体总结" -> "保存到文件";
+    "保存到文件" -> "结束";
 }
 ```
 
-### Step 0: Macro Overview
+### Step 0: 宏观概览
 
-**Before ANY paragraph-by-paragraph reading**, provide:
+**在开始任何逐段阅读之前**，先提供：
 
 ```markdown
 ## 分析概要
@@ -99,7 +99,7 @@ digraph analysis_flow {
 [用列表或表格展示文档的整体结构，不用展开细节]
 
 ### 关键洞察
-[2-3个最重要的takeaway，还没读细节就能知道的东西]
+[2-3个最重要的 takeaway，还没读细节就能知道的东西]
 
 ### 与我何干
 [为什么用户需要理解这个？复刻？使用？学习？]
@@ -107,111 +107,111 @@ digraph analysis_flow {
 ---
 ```
 
-**Why this matters:** Users need the "map" before the "terrain". Without macro context, paragraph details are isolated facts without connection. This also lets users decide if they need full analysis or can stop here.
+**为什么重要：** 用户需要"地图"再读"地形"。没有宏观上下文，段落细节只是孤立的事实。这也让用户判断是否需要完整分析。
 
-### Step 1: Paragraph-by-Paragraph Reading
+### Step 1: 逐段精读
 
-**ONE paragraph = ONE block.** Never combine paragraphs, even if they seem related.
+**一个段落 = 一个块。** 绝不合并段落，即使它们看起来相关。
 
-Each block follows this exact format:
+每个块遵循以下格式：
 
 ```markdown
-### Paragraph N
+### 段落 N
 
-**Original:**
-[Original text, copy verbatim]
+**原文:**
+[原文，逐字复制]
 
-**Translation:**
-[Chinese translation, literal but fluent]
+**翻译:**
+[中文翻译，直译但通顺]
 
-**Key Points:**
-- Point 1: [Why this matters / implication]
-- Point 2: [Connection to other concepts]
-- Point 3: [Actionable takeaway]
+**要点:**
+- 要点 1: [为什么重要 / 隐含意义]
+- 要点 2: [与其他概念的联系]
+- 要点 3: [可执行的建议]
 ```
 
-**Key Points are NOT a summary of translation.** They answer:
-- Why does this paragraph exist?
-- What would change if this paragraph were removed?
-- How does this connect to the document's core claim?
+**要点不是翻译的总结。** 它们回答：
+- 这个段落为什么存在？
+- 如果删除这个段落，什么会改变？
+- 这与文档的核心主张如何联系？
 
-### Step 2: Reference File Analysis
+### Step 2: 引用文件分析
 
-If the paragraph references external files, append detailed explanation after the paragraph:
+如果段落引用了外部文件，在段落后追加详细解释：
 
-**For script files:**
-- **Code Structure**: Segment-by-segment explanation with comments
-- **Key Logic**: Core algorithm/flow description
-- **Data Flow**: Input/output, state changes
+**对于脚本文件：**
+- **代码结构**：分段解释，每段加注释
+- **关键逻辑**：核心算法/流程说明
+- **数据流**：输入输出、状态变化
 
-**For document files:**
-- **Structure Overview**: Overall document structure
-- **Core Concepts**: Key concepts defined
-- **Usage Examples**: Example code provided
+**对于文档文件：**
+- **结构概述**：文件整体结构
+- **核心概念**：定义的关键概念
+- **使用示例**：提供的示例代码
 
-**Rule:** References are IN SCOPE. "See X.md for details" means you MUST read X.md and include it in analysis.
+**规则：** 引用文件属于分析范围。"详见 X.md"意味着你必须读取 X.md 并纳入分析。
 
-### Step 3: Final Summary
+### Step 3: 整体总结
 
-After all paragraphs, provide:
+所有段落分析完成后，提供：
 
 ```markdown
 ## 整体总结
 
 ### 核心概念
-[Key terms and concepts defined in the document]
+[文档中定义的关键术语和概念]
 
 ### 工作流程
-[Step-by-step flowchart/checklist]
+[步骤化的流程图/清单]
 
 ### 关键文件
-[File list and their roles]
+[文件清单及其作用]
 
 ### 如何复刻/应用
-[How to apply this skill/pattern in practice]
+[实际应用该 skill/模式的方法]
 ```
 
-## Output Format
+## 输出格式
 
-Save analysis results to `docs/<project-name>/` directory:
+分析结果保存到 `docs/<project-name>/` 目录：
 
 ```
 <NN>-<skill-name>-analysis.md
 ```
 
-Example: `07-brainstorming-skill.md`
+示例：`07-brainstorming-skill.md`
 
-**This is MANDATORY.** Chat output alone is insufficient.
+**强制要求。** 仅聊天输出是不够的。
 
-## Anti-Patterns
+## 反模式
 
-| Rationalization | Why It's Wrong | Correct Response |
-|-----------------|----------------|------------------|
-| "Short document, skip macro" | Macro provides context regardless of length | Step 0 is NEVER optional |
-| "Summary achieves same goal as translation" | Summary = author's interpretation; translation = user's interpretation | Both are required |
-| "These paragraphs are related, combine them" | Destroys granularity; user can't reference specific paragraphs | ONE paragraph = ONE block |
-| "Translation speaks for itself, no key points needed" | Key points explain WHY, not WHAT | Both are required |
-| "User asked about THIS doc only" | References are part of the document's meaning | Chase ALL references |
-| "Chat format, no file needed" | File provides persistent reference | ALWAYS save to file |
-| "There's already an analysis file, I'll read that" | Existing analysis is someone else's interpretation, not primary source | ALWAYS read the ORIGINAL file specified by user |
+| 借口 | 为什么错 | 正确做法 |
+|------|---------|---------|
+| "文档很短，跳过宏观概览" | 无论长短，宏观都提供上下文 | Step 0 永不跳过 |
+| "总结和翻译效果一样" | 总结 = 作者的解释；翻译 = 用户自己的解释 | 两者都需要 |
+| "这些段落相关，合并吧" | 破坏粒度，用户无法定位具体段落 | 一个段落 = 一个块 |
+| "翻译已经说清楚了，不要要点" | 要点解释 WHY，不是 WHAT | 两者都需要 |
+| "用户只问了这篇文档" | 引用文件是文档意义的一部分 | 追踪所有引用 |
+| "聊天就行，不用保存文件" | 文件提供持久参考 | 必须保存到文件 |
+| "已经有分析文件了，我读那个" | 现有分析是他人的解释，不是一手来源 | 始终读取用户指定的原始文件 |
 
-## Rules
+## 规则
 
-1. **Step 0 first** — Macro overview before any paragraph reading. No exceptions.
-2. **ONE paragraph = ONE block** — Never combine, never skip, never summarize across paragraphs.
-3. **Translate every paragraph** — Even seemingly simple ones. Copy original verbatim.
-4. **Key points for every paragraph** — Explain why it matters, not just what it says.
-5. **Chase references** — External files are in scope. Read and analyze them.
-6. **Save to file** — `docs/<project-name>/<NN>-<skill-name>-analysis.md`
-7. **Use Chinese** — All explanations, summaries, and key points must be in Chinese.
-8. **Preserve structure hierarchy** — Follow original heading levels.
-9. **Read original files only** — Do NOT read existing analysis files, summaries, or secondary sources. Always analyze the primary document specified by the user.
+1. **Step 0 优先** — 逐段阅读之前必须有宏观概览。没有例外。
+2. **一个段落 = 一个块** — 绝不合并、跳过或跨段落总结。
+3. **每段都翻译** — 即使看起来简单。逐字复制原文。
+4. **每段都要点** — 解释为什么重要，而不只是说了什么。
+5. **追踪引用** — 外部文件属于分析范围。读取并分析它们。
+6. **保存到文件** — `docs/<project-name>/<NN>-<skill-name>-analysis.md`
+7. **使用中文** — 所有解释、总结、要点必须用中文。
+8. **保持结构层次** — 严格跟随原文的标题层级。
+9. **只读原始文件** — 不要读取已有的分析文件、总结或二手来源。始终分析用户指定的一手文档。
 
-## Example
+## 示例
 
-User request: "Analyze @docs/gsd/01-map-codebase-workflow.md"
+用户请求："分析 @docs/gsd/01-map-codebase-workflow.md"
 
-**Step 0 Output:**
+**Step 0 输出：**
 ```markdown
 ## 分析概要
 
@@ -238,25 +238,25 @@ User request: "Analyze @docs/gsd/01-map-codebase-workflow.md"
 ---
 ```
 
-**Step 1 Output (Paragraph 1):**
+**Step 1 输出（段落 1）：**
 ```markdown
-### Paragraph 1
+### 段落 1
 
-**Original:**
+**原文:**
 This workflow maps a codebase to produce an ARCHITECTURE.md document suitable for onboarding and refactoring decisions.
 
-**Translation:**
+**翻译:**
 这个工作流程将一个代码库映射为生成 ARCHITECTURE.md 文档，该文档适用于 onboarding 和重构决策。
 
-**Key Points:**
+**要点:**
 - 明确产出物是 ARCHITECTURE.md，不是其他格式
 - 两个核心用途：onboarding（新人理解）和 refactoring（重构决策）
 - 暗示这个文档需要足够清晰，让不熟悉代码的人也能理解
 ```
 
-[... more paragraphs ...]
+[... 更多段落 ...]
 
-**Step 3 Output:**
+**Step 3 输出：**
 ```markdown
 ## 整体总结
 
@@ -271,7 +271,7 @@ This workflow maps a codebase to produce an ARCHITECTURE.md document suitable fo
 ### 关键文件
 | 文件 | 作用 |
 |------|------|
-| map-codebase.sh | 主脚本， orchestrates 整个流程 |
+| map-codebase.sh | 主脚本，orchestrates 整个流程 |
 | ARCHITECTURE.md.template | 输出模板 |
 
 ### 如何复刻/应用
