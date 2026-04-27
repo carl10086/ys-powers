@@ -2,7 +2,7 @@
 description: Start spec-driven development — write a structured specification before writing code
 ---
 
-Invoke the agent-skills:spec-driven-development skill.
+Invoke the spec-driven-development skill.
 
 Begin by understanding what the user wants to build. Ask clarifying questions about:
 1. The objective and target users
@@ -12,4 +12,9 @@ Begin by understanding what the user wants to build. Ask clarifying questions ab
 
 Then generate a structured spec covering all six core areas: objective, commands, project structure, code style, testing strategy, and boundaries.
 
-Save the spec as SPEC.md in the project root and confirm with the user before proceeding.
+<IMPORTANT>
+- Write the spec content in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
+- Save the spec to `docs/ys-powers/specs/YYYY-MM-DD-<feature-name>-design.md` where `<feature-name>` is a kebab-case short name derived from the spec title.
+- If the directory does not exist, create it first.
+- Confirm the file path with the user before saving.
+</IMPORTANT>

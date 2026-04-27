@@ -2,9 +2,9 @@
 description: Implement the next task incrementally — build, test, verify, commit
 ---
 
-Invoke the agent-skills:incremental-implementation skill alongside agent-skills:test-driven-development.
+Invoke the incremental-implementation skill alongside test-driven-development.
 
-Pick the next pending task from the plan. For each task:
+Read the plan for this feature. If a plan was generated earlier in this session, use that file path. Otherwise, check `docs/ys-powers/plans/` for the most recent plan file, or ask the user for the plan path if ambiguous. Then pick the next pending task. For each task:
 
 1. Read the task's acceptance criteria
 2. Load relevant context (existing code, patterns, types)
@@ -15,4 +15,4 @@ Pick the next pending task from the plan. For each task:
 7. Commit with a descriptive message
 8. Mark the task complete and move to the next one
 
-If any step fails, follow the agent-skills:debugging-and-error-recovery skill.
+If any step fails, follow the debugging-and-error-recovery skill.
