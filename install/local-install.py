@@ -4,9 +4,11 @@ ys-powers skills 本地安装脚本
 
 功能：
 1. 获取 ys-powers 项目的本地目录
-2. 在当前工作目录创建 ./.claude/skills 和 ./.claude/rules
+2. 在当前工作目录创建 ./.claude/ 下的子目录
 3. Skills: 文件夹级全量覆盖（同名文件夹整体替换）
-4. Rules: 文件级同名覆盖（同名文件替换，保留目标独有的文件/文件夹）
+4. Rules/Commands/Hooks/References: 文件级同名覆盖（同名文件替换，保留目标独有的文件/文件夹）
+5. Agents: 文件夹级全量覆盖
+6. Hooks: 复制后自动注册到 .claude/settings.local.json
 
 使用方法：
     python install/local-install.py
@@ -14,6 +16,7 @@ ys-powers skills 本地安装脚本
 
 import shutil
 import sys
+import json
 from pathlib import Path
 
 
@@ -23,7 +26,10 @@ from pathlib import Path
 DIRECTORIES = {
     "skills": ("skills", "folder"),
     "rules": ("rules", "file"),
-    "commands": ("commands", "file")
+    "commands": ("commands", "file"),
+    "agents": ("agents", "folder"),
+    "hooks": ("hooks", "file"),
+    "references": ("references", "file")
 }
 
 
@@ -144,6 +150,83 @@ def install_directory(source_name: str, target_name: str, strategy: str) -> bool
     return success
 
 
+def install_hooks_settings() -> bool:
+    """
+    注册 hooks 到 settings.local.json
+
+    读取 hooks/hooks.json（如果存在），转换路径后合并到 .claude/settings.local.json
+    路径转换: ${CLAUDE_PLUGIN_ROOT} -> ${CLAUDE_PROJECT_DIR}/.claude
+    """
+    project_root = get_project_root()
+    hooks_json_path = project_root / "hooks" / "hooks.json"
+
+    if not hooks_json_path.exists():
+        print("ℹ Hooks 配置未找到（hooks/hooks.json 不存在），跳过注册")
+        return True
+
+    try:
+        # 读取 hooks.json
+        with open(hooks_json_path, 'r', encoding='utf-8') as f:
+            hooks_config = json.load(f)
+
+        if "hooks" not in hooks_config:
+            print("ℹ hooks.json 中没有 hooks 字段，跳过注册")
+            return True
+
+        # 转换路径：把 ${CLAUDE_PLUGIN_ROOT} 替换为 ${CLAUDE_PROJECT_DIR}/.claude
+        hooks_str = json.dumps(hooks_config["hooks"])
+        hooks_str = hooks_str.replace("${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_PROJECT_DIR}/.claude")
+        converted_hooks = json.loads(hooks_str)
+
+        # 读取现有的 settings.local.json
+        settings_path = Path.cwd() / ".claude" / "settings.local.json"
+        if settings_path.exists():
+            with open(settings_path, 'r', encoding='utf-8') as f:
+                settings = json.load(f)
+        else:
+            settings = {}
+
+        # 合并 hooks（如果已存在则追加，避免覆盖）
+        if "hooks" not in settings:
+            settings["hooks"] = {}
+
+        for hook_type, hook_list in converted_hooks.items():
+            if hook_type not in settings["hooks"]:
+                settings["hooks"][hook_type] = hook_list
+                print(f"  添加 hook: {hook_type}")
+            else:
+                # 用整个 hook dict 的 JSON 字符串（排序键）作为去重 key
+                # 避免 matcher 为空字符串时误判为重复
+                existing_hooks = {json.dumps(h, sort_keys=True) for h in settings["hooks"][hook_type]}
+                for hook in hook_list:
+                    hook_key = json.dumps(hook, sort_keys=True)
+                    if hook_key not in existing_hooks:
+                        settings["hooks"][hook_type].append(hook)
+                        print(f"  追加 hook: {hook_type}")
+                        existing_hooks.add(hook_key)
+                    else:
+                        print(f"  跳过已存在 hook: {hook_type}")
+
+        # 写回 settings.local.json（先备份）
+        settings_path.parent.mkdir(parents=True, exist_ok=True)
+        if settings_path.exists():
+            backup_path = settings_path.with_suffix('.json.bak')
+            shutil.copy2(settings_path, backup_path)
+        with open(settings_path, 'w', encoding='utf-8') as f:
+            json.dump(settings, f, indent=2, ensure_ascii=False)
+
+        print(f"✓ Hooks 注册成功")
+        print(f"  配置文件: {settings_path}")
+        return True
+
+    except json.JSONDecodeError as e:
+        print(f"✗ hooks.json 解析失败: {e}", file=sys.stderr)
+        return False
+    except Exception as e:
+        print(f"✗ Hooks 注册失败: {e}", file=sys.stderr)
+        return False
+
+
 def main():
     """主入口：批量处理所有目录"""
     project_root = get_project_root()
@@ -157,6 +240,15 @@ def main():
         success = install_directory(source_name, target_name, strategy)
         results.append((source_name, success))
         if success:
+            print()
+
+    # 注册 hooks（如果 hooks 目录安装成功）
+    hooks_success = any(name == "hooks" and success for name, success in results)
+    if hooks_success:
+        print("正在注册 hooks...")
+        hook_register_success = install_hooks_settings()
+        results.append(("hooks-registration", hook_register_success))
+        if hook_register_success:
             print()
 
     # 统计结果
