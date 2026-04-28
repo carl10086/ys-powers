@@ -30,14 +30,20 @@ Every project goes through this process. A todo list, a single-function utility,
 
 Complete these in order:
 
-1. **Explore project context** — check files, docs, recent commits
-2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-3. **Propose 2-3 approaches** — with trade-offs and your recommendation
-4. **Present design** — in sections scaled to their complexity, get user approval after each section
+1. **Search Historical SOPs** — use sop-search to check for relevant historical experience
+   - Match found → read relevant SOPs and incorporate into context
+   - No match → continue
+2. **Explore project context** — check files, docs, recent commits
+3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+4. **Propose 2-3 approaches** — with trade-offs and your recommendation
+5. **Present design** — in sections scaled to their complexity, get user approval after each section
 
 ## Process Flow
 
 ```
+Search Historical SOPs
+        |
+        v
 Explore project context
         |
         v
@@ -58,9 +64,19 @@ User approves design? ---no--> revise
 
 ## The Process
 
-### 1. Explore Project Context
+### 1. Search Historical SOPs
 
-Check out the current project state first (files, docs, recent commits).
+Before exploring project context, always search for relevant historical SOPs first.
+
+- Use `sop-search` to find past experiences related to the current task
+- If matching SOPs exist, read them and incorporate key decisions and pseudo-code steps into your context
+- If no matching SOPs exist, proceed normally — this establishes the habit of checking history first
+
+This step is unconditional. Even if the project has few SOPs, executing this query builds muscle memory for knowledge reuse.
+
+### 2. Explore Project Context
+
+Check out the current project state (files, docs, recent commits), incorporating any SOP insights discovered in Step 1.
 
 - Do this silently — don't dump file listings unless something is unclear
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems, flag this immediately and help decompose
@@ -75,7 +91,7 @@ Check out the current project state first (files, docs, recent commits).
 → 有不对的地方请现在纠正，否则我将基于这些假设继续。
 ```
 
-### 2. Ask Clarifying Questions
+### 3. Ask Clarifying Questions
 
 Ask questions **one at a time** to refine the idea.
 
@@ -84,7 +100,7 @@ Ask questions **one at a time** to refine the idea.
 - Focus on understanding: purpose, constraints, success criteria
 - Continue until requirements are concrete
 
-### 3. Propose 2-3 Approaches
+### 4. Propose 2-3 Approaches
 
 Once you understand what you're building, propose different approaches with trade-offs.
 
@@ -92,7 +108,7 @@ Once you understand what you're building, propose different approaches with trad
 - Lead with your recommended option and explain why
 - Be ready to go back and clarify if something doesn't make sense
 
-### 4. Present Design
+### 5. Present Design
 
 Present the design in sections scaled to complexity.
 
