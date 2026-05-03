@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python:*)",
+      "Bash(npx ctx7@latest:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(rm -rf .claude)",
+      "Bash(mkdir -p .claude/skills)",
+      "Bash(echo \"old skill content\")",
+      "Bash(echo \"user custom file\")",
+      "Bash(mkdir -p .claude/skills/brainstorming)",
+      "Bash(echo \"old brainstorming content\")",
+      "Bash(echo \"user custom skill\")",
+      "Bash(echo \"old code.md content\")",
+      "Bash(echo \"user custom rule\")",
+      "Bash(git fsck:*)",
+      "Bash(gh pr:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git branch:*)",
+      "Bash(git reset:*)",
+      "Bash(xxd /Users/carlyu/soft/projects/ys-powers/.gitignore)",
+      "Bash(git rm:*)",
+      "Bash(git pull:*)",
+      "Bash(open:*)",
+      "Bash(git stash:*)",
+      "Bash(git remote:*)",
+      "Bash(echo '// login feature added')",
+      "Bash(echo '// critical fix')",
+      "Bash(echo '## docs update')",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__click"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
