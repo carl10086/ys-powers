@@ -68,7 +68,7 @@ User approves design? ---no--> revise
 
 Before exploring project context, always search for relevant historical SOPs first.
 
-- Use `sop-search` `skill` to find past experiences related to the current task
+- Use `sop-search` to find past experiences related to the current task
 - If matching SOPs exist, read them and incorporate key decisions and pseudo-code steps into your context
 - If no matching SOPs exist, proceed normally — this establishes the habit of checking history first
 
@@ -147,3 +147,4 @@ Simply confirm the agreed-upon direction and wait for the user's next instructio
 - **Explore alternatives** — Always propose 2-3 approaches before settling
 - **Incremental validation** — Present design, get approval before moving on
 - **Be flexible** — Go back and clarify when something doesn't make sense
+
