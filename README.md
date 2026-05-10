@@ -36,41 +36,44 @@ ls -la .claude/
 
 开发新功能的完整路径：
 
-```
-/spec  →  /plan  →  /build  →  /test  →  /review  →  /ship
- 构思      规划      构建       验证       审查       交付
+```mermaid
+flowchart LR
+    A[/spec<br/>构思/] --> B[/plan<br/>规划/]
+    B --> C[/build<br/>构建/]
+    C --> D[/test<br/>验证/]
+    D --> E[/review<br/>审查/]
+    E --> F[/ship<br/>交付/]
+
+    C -.异常调试.-> G[debugging]
+    C -.查文档实现.-> H[source-driven]
+    C -.优化上下文.-> I[context-eng]
+    E -.随时提交.-> J[/gc/]
+    F -.记录经验.-> K[/sop-add/]
 ```
 
-横向贯穿的能力（自动触发或按需调用）：
-
-- `debugging-and-error-recovery` [skill] — 测试失败或行为异常时系统调试
-- `context-engineering` [skill] — 会话质量下降或切换任务时优化上下文
-- `source-driven-development` [skill] — 基于官方文档实现，避免过时模式
-- `/gc` [command] — 随时提交代码
-- `/sop-add` [command] — 任务完成后记录经验
+**主线**（实线）：构思 → 规划 → 构建 → 验证 → 审查 → 交付  
+**支撑**（虚线）：构建、审查、交付阶段按需触发的横向能力，非强制步骤
 
 ## 能力分类速览
 
+| 类型 | 数量 | 调用方式 | 核心代表 |
+|------|------|----------|----------|
+| 显式命令 | 16 | 直接输入 `/command` | `/spec` `/plan` `/build` |
+| 行为技能 | 28 | 场景自动触发 | `idea-refine` `test-driven-development` |
+| 子智能体 | 3 | 自动指派 | `code-reviewer` |
+| 编码规范 | 1 | 自动生效 | `code.md` |
+
 ### 显式命令（`/command`）
 
-直接输入使用：
+直接输入使用，按开发阶段分组：
 
-- `/spec` — 启动 spec 驱动开发
-- `/plan` — 拆分任务与验收标准
-- `/build` — 增量实现、测试、提交
-- `/test` — TDD 流程或 bug 重现
-- `/review` — 五轴代码审查
-- `/ship` — 上线前检查清单
-- `/refactor` — 识别 code smells 并重构
-- `/code-simplify` — 简化代码复杂度
-- `/gc` — 智能 Git 工作流（分支、提交、推送、PR）
-- `/local-commit` — 极简本地提交
-- `/sop-add` — 生成结构化 SOP
-- `/s2m` — 退出 worktree 返回 main
-- `/doc-codebase` — 生成 ARCHITECTURE.md
-- `/teach-code` — 源码讲解
-- `/wskill` — 创建新 skill
-- `/easy-analysis` — 简易分析
+| 阶段 | 命令 |
+|------|------|
+| 构思与规划 | `/spec` `/plan` |
+| 构建与验证 | `/build` `/test` |
+| 审查与优化 | `/review` `/refactor` `/code-simplify` |
+| 交付与提交 | `/ship` `/gc` `/local-commit` |
+| 辅助 | `/sop-add` `/s2m` `/doc-codebase` `/teach-code` `/wskill` `/easy-analysis` |
 
 ### 行为技能（自动触发）
 
