@@ -74,35 +74,13 @@ description: 评审 spec 文档：AI 提炼关键点 + 列 issues，人勾选哪
 
 人一条都没勾 → 跳过追问，直接进 §6。
 
-## 6. 汇总 + 落盘
+## 6. 直接修改原文
 
-汇总成 review summary：
-- 人勾的 issues + 选的解法 → "决议"段
-- 未勾的 issues → 并入 Advisories
+根据人的决策，直接修改 spec 原文：
+- 人勾的 issues + 选的解法 → 体现到对应章节
+- 未勾的 issues → 忽略
 
-问一次："保存到 `<original-stem>-review.md`？(Y/n)" 默认 Y。
-
-落盘格式：
-
-```markdown
-# Spec Review: <spec 标题>
-
-Spec: docs/ys-powers/specs/<original>-design.md
-Reviewed: YYYY-MM-DD
-
-## 关键点提炼
-- ...
-
-## 决议
-1. [§N] <issue> → 决定：<人选的解法>
-
-## Advisories
-- ...
-```
-
-**文件名规则**：`<original-stem>-review.md`，紧邻原 spec。重跑覆盖。
-
-**NEVER edit the original spec file.** 只能新增 review 文件。
+修改完成后，简要汇总改动。
 
 ## Common Mistakes（来自 baseline 观测）
 
@@ -112,7 +90,6 @@ Reviewed: YYYY-MM-DD
 | 自创章节名（"总体判断"等） | 严格用【关键点提炼】【Issues】【Advisories】 |
 | 直接写"可以进入实施阶段" | 不下结论，决议来自人勾选 |
 | Issues 数量超过 7 | 排序取头部 7 条，剩下落 Advisories |
-| 改原 spec 文件 | 永不修改原 spec |
 | 跳过 AskUserQuestion 直接出结论 | 必须 multiSelect 让人勾 |
 
 ## Red Flags — STOP
@@ -122,7 +99,6 @@ Reviewed: YYYY-MM-DD
 - "分级标准是..."
 - "## 总体判断" 或 "## Blocker" 或任何非约定章节名
 - "这份 spec 可以进 / 不可以进 plan"
-- 调用 Edit / Write 改原 spec 文件
 - 跳过 AskUserQuestion 直接给最终决议
 
 → 全部意味着：**停下，回到 §3 / §5 重做**。
@@ -131,6 +107,5 @@ Reviewed: YYYY-MM-DD
 - 报告全部用中文。技术术语 / 文件路径 / 命令名保留英文。
 - 章节名严格用【关键点提炼】【Issues】【Advisories】，不自创章节。
 - AI 永不给 issues 分级，分级靠人勾选。
-- NEVER edit the original spec file —— 只新增 review 文件，不改原文。
-- 落盘前确认路径。
+- 根据人的决策直接修改 spec 原文。
 </IMPORTANT>
