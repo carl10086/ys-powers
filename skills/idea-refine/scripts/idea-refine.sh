@@ -3,7 +3,7 @@ set -e
 
 # This script helps initialize the ideas directory for the idea-refine skill.
 
-IDEAS_DIR="docs/ideas"
+IDEAS_DIR="docs/ys-powers/ideas"
 
 if [ ! -d "$IDEAS_DIR" ]; then
   mkdir -p "$IDEAS_DIR"
