@@ -1,0 +1,8 @@
+{
+  "commands": {
+    "review.md": "ys-review.md"
+  },
+  "rules": {},
+  "hooks": {},
+  "references": {}
+}
