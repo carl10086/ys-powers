@@ -52,3 +52,40 @@ Jesse Vincent 的完整软件开发方法论，强调真正的 red/green TDD、s
 - `refer/` 下文件**只读**：不要 edit、不要删除、不要重排。
 - 借鉴 `refer/` 内容时，应在 ys-powers 自有目录中重写，而非搬运。
 - `install/local-install.py` 的覆盖策略详见 `README.md`，本文件不重复说明。
+
+## STALE-FILE-CLEANUP
+
+`install/local-install.py` 对 commands/rules/hooks/references 目录使用「文件级同名覆盖」策略。当源侧文件重命名（如 `review.md` → `ys-review.md`）时，目标项目中的旧名文件不会自动消失，导致新旧共存。
+
+### renames.json
+
+`install/renames.json` 记录文件重命名映射，用于安装时自动清理目标侧 stale 文件。
+
+```json
+{
+  "commands": {
+    "review.md": "ys-review.md"
+  },
+  "rules": {},
+  "hooks": {},
+  "references": {}
+}
+```
+
+格式：按目录分组，键为旧文件名，值为新文件名。
+
+### AI 维护义务
+
+每次在 commands / rules / hooks / references 目录下执行文件重命名（rename）操作后：
+
+1. **必须**更新 `install/renames.json`，在对应目录下添加 `"旧名": "新名"` 映射
+2. **必须**在 commit message 中注明 renames.json 的变更
+3. 由 human review 确认映射是否正确
+
+### 示例
+
+已记录的映射：
+
+| 目录 | 旧文件名 | 新文件名 |
+|------|----------|----------|
+| commands | review.md | ys-review.md |
