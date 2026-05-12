@@ -63,7 +63,12 @@ def cleanup_stale_files(source_name: str, target_dir: Path) -> None:
     if not source_renames:
         return
 
-    for old_name in source_renames.keys():
+    for old_name in source_renames:
+        # 防止路径遍历：跳过包含路径分隔符或以 . 开头的名称
+        if "/" in old_name or old_name.startswith("."):
+            print(f"  跳过非法重命名键: {old_name}", file=sys.stderr)
+            continue
+
         stale_file = target_dir / old_name
         if stale_file.exists():
             if stale_file.is_dir():
