@@ -40,6 +40,39 @@ def get_project_root() -> Path:
     return script_path.parent.parent
 
 
+def cleanup_stale_files(source_name: str, target_dir: Path) -> None:
+    """
+    根据 renames.json 清理目标目录中的 stale 文件。
+
+    读取 install/renames.json，根据当前 source_name 取对应映射，
+    删除目标目录中仍存在的旧名文件。
+    """
+    project_root = get_project_root()
+    renames_path = project_root / "install" / "renames.json"
+
+    if not renames_path.exists():
+        return
+
+    try:
+        with open(renames_path, 'r', encoding='utf-8') as f:
+            renames = json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return
+
+    source_renames = renames.get(source_name, {})
+    if not source_renames:
+        return
+
+    for old_name in source_renames.keys():
+        stale_file = target_dir / old_name
+        if stale_file.exists():
+            if stale_file.is_dir():
+                shutil.rmtree(stale_file)
+            else:
+                stale_file.unlink()
+            print(f"  清理 stale 文件: {old_name}")
+
+
 def install_folder_level(source_dir: Path, target_dir: Path) -> bool:
     """
     文件夹级全量覆盖策略
@@ -127,6 +160,10 @@ def install_directory(source_name: str, target_name: str, strategy: str) -> bool
         print(f"⚠ {source_name.capitalize()} 路径不是目录，跳过", file=sys.stderr)
         print(f"  源路径: {source_dir}", file=sys.stderr)
         return False
+
+    # file 策略下：先清理 stale 文件，再执行覆盖
+    if strategy == "file":
+        cleanup_stale_files(source_name, target_dir)
 
     # 根据策略执行复制
     if strategy == "folder":
