@@ -25,12 +25,29 @@ def get_project_root() -> Path:
 
 def should_copy(path: Path) -> bool:
     """Return True if the file should be copied."""
+    if path.is_symlink():
+        return False
     if path.name in EXCLUDE_NAMES:
         return False
     for pattern in EXCLUDE_PATTERNS:
         if path.match(pattern):
             return False
     return True
+
+
+def _copy_item(rel: Path, src: Path, dst: Path, dry_run: bool) -> bool:
+    """Copy a single file. Returns True if copied/skipped, False on error."""
+    if dry_run:
+        print(f"[DRY-RUN] would copy: {rel}")
+        return True
+    try:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        print(f"Copied: {rel}")
+        return True
+    except OSError as exc:
+        print(f"Error copying {rel}: {exc}", file=sys.stderr)
+        return False
 
 
 def sync(dry_run: bool = False) -> int:
@@ -43,8 +60,14 @@ def sync(dry_run: bool = False) -> int:
         print(f"Error: source not found: {source}", file=sys.stderr)
         return 1
 
+    # Clean target before syncing (unless dry-run)
+    if not dry_run and target.exists():
+        print(f"Cleaning: {target}")
+        shutil.rmtree(target)
+
     copied = 0
     skipped = 0
+    errors = 0
 
     for asset in ASSETS:
         src_path = source / asset
@@ -58,13 +81,10 @@ def sync(dry_run: bool = False) -> int:
                 continue
             rel = src_path.relative_to(source)
             dst_path = target / rel
-            if dry_run:
-                print(f"[DRY-RUN] would copy: {rel}")
+            if _copy_item(rel, src_path, dst_path, dry_run):
+                copied += 1
             else:
-                dst_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src_path, dst_path)
-                print(f"Copied: {rel}")
-            copied += 1
+                errors += 1
         elif src_path.is_dir():
             for file_path in sorted(src_path.rglob("*")):
                 if not file_path.is_file():
@@ -74,16 +94,15 @@ def sync(dry_run: bool = False) -> int:
                     continue
                 rel = file_path.relative_to(source)
                 dst_path = target / rel
-                if dry_run:
-                    print(f"[DRY-RUN] would copy: {rel}")
+                if _copy_item(rel, file_path, dst_path, dry_run):
+                    copied += 1
                 else:
-                    dst_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(file_path, dst_path)
-                    print(f"Copied: {rel}")
-                copied += 1
+                    errors += 1
 
     action = "Would copy" if dry_run else "Copied"
     print(f"\n{action} {copied} files, skipped {skipped} files.")
+    if errors:
+        print(f"Errors: {errors} files", file=sys.stderr)
 
     if not dry_run:
         return verify(target)
@@ -108,6 +127,15 @@ def verify(target: Path) -> int:
             print(f"  ✓ {rel}")
         else:
             print(f"  ✗ {rel} MISSING")
+            all_ok = False
+
+    # Extended: ensure prompts dirs contain at least one .md file
+    for subdir in ("sources", "styles"):
+        md_files = list((target / "prompts" / subdir).glob("*.md"))
+        if md_files:
+            print(f"  ✓ prompts/{subdir}/ has {len(md_files)} .md files")
+        else:
+            print(f"  ✗ prompts/{subdir}/ has no .md files")
             all_ok = False
 
     if all_ok:
