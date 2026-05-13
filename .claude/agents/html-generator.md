@@ -1,7 +1,6 @@
 ---
 name: html-generator
 description: HTML generator that turns any input (file, folder, URL, or brief) into a polished single-file HTML page. Follows the html-anything skill workflow and performs lightweight verification.
-model: sonnet
 ---
 
 # html-generator Agent

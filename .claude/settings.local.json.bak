@@ -34,17 +34,5 @@
       "mcp__chrome-devtools__take_snapshot",
       "mcp__chrome-devtools__click"
     ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/session-start.sh"
-          }
-        ]
-      }
-    ]
   }
 }
