@@ -52,11 +52,11 @@ def cleanup_stale_files(project_root: Path, source_name: str, target_dir: Path) 
             try:
                 shutil.rmtree(stale_file)
                 print(f"  清理 stale 目录: {old_name}")
-            except (PermissionError, OSError) as e:
+            except OSError as e:
                 print(f"  错误: 无法删除 {old_name}: {e}", file=sys.stderr)
         except FileNotFoundError:
             pass
-        except (PermissionError, OSError) as e:
+        except OSError as e:
             print(f"  错误: 无法删除 {old_name}: {e}", file=sys.stderr)
 
 
@@ -209,6 +209,9 @@ def uninstall_directory(
     Returns:
         是否卸载成功（目标不存在视为成功）
     """
+    # strategy 当前未使用，保留参数以维持 API 一致性
+    _ = strategy
+
     source_dir = project_root / source_name
     target_subdir = target_dir / target_name
 
@@ -217,8 +220,8 @@ def uninstall_directory(
         return True
 
     if not source_dir.exists():
-        print(f"⚠ {source_name.capitalize()} 源目录不存在，跳过卸载")
-        return True
+        print(f"✗ {source_name.capitalize()} 源目录不存在，跳过卸载", file=sys.stderr)
+        return False
 
     all_ok = True
 
@@ -253,9 +256,8 @@ def uninstall_directory(
                 )
                 all_ok = False
 
-    # file 策略下，额外清理 renames.json 中的旧名
-    if strategy == "file":
-        cleanup_stale_files(project_root, source_name, target_subdir)
+    # 清理 renames.json 中记录的旧名
+    cleanup_stale_files(project_root, source_name, target_subdir)
 
     if all_ok:
         print(f"✓ {target_name.capitalize()} 卸载成功")
