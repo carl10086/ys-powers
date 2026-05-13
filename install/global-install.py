@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
-ys-powers skills 本地安装脚本
+ys-powers skills 全局安装脚本
 
 功能：
 1. 获取 ys-powers 项目的本地目录
-2. 在当前工作目录创建 ./.claude/ 下的子目录
+2. 在用户主目录的 ~/.claude/ 下创建子目录
 3. Skills: 文件夹级全量覆盖（同名文件夹整体替换）
 4. Rules/Commands/Hooks/References: 文件级同名覆盖（同名文件替换，保留目标独有的文件/文件夹）
 5. Agents: 文件夹级全量覆盖
-6. Hooks: 复制后自动注册到 .claude/settings.local.json
+6. 根据 install/renames.json 清理 stale 文件
 
 使用方法：
-    python install/local-install.py
+    python install/global-install.py
+
+注意：
+- Hooks 全局自动注册暂未实现，安装完成后请根据提示手动配置 ~/.claude/settings.json
+- 全局安装后，Claude Code 在所有项目都会加载 ~/.claude/ 下的能力
 """
 
 import shutil
@@ -38,6 +42,11 @@ def get_project_root() -> Path:
     script_path = Path(__file__).resolve()
     # 脚本位于 install/ 目录下，项目根目录是上一级
     return script_path.parent.parent
+
+
+def get_global_claude_dir() -> Path:
+    """获取全局 Claude 配置目录 ~/.claude/"""
+    return Path.home() / ".claude"
 
 
 def cleanup_stale_files(source_name: str, target_dir: Path) -> None:
@@ -167,7 +176,7 @@ def install_directory(source_name: str, target_name: str, strategy: str) -> bool
 
     Args:
         source_name: 源目录名（相对于项目根目录）
-        target_name: 目标子目录名（相对于 .claude/）
+        target_name: 目标子目录名（相对于 ~/.claude/）
         strategy: 复制策略 ('folder' 或 'file')
 
     Returns:
@@ -175,7 +184,7 @@ def install_directory(source_name: str, target_name: str, strategy: str) -> bool
     """
     project_root = get_project_root()
     source_dir = project_root / source_name
-    target_dir = Path.cwd() / ".claude" / target_name
+    target_dir = get_global_claude_dir() / target_name
 
     # 检查源目录是否存在
     if not source_dir.exists():
@@ -214,88 +223,40 @@ def install_directory(source_name: str, target_name: str, strategy: str) -> bool
     return success
 
 
-def install_hooks_settings() -> bool:
+def print_hooks_todo() -> None:
     """
-    注册 hooks 到 settings.local.json
+    打印 hooks 全局注册的 TODO 提示。
 
-    读取 hooks/hooks.json（如果存在），转换路径后合并到 .claude/settings.local.json
-    路径转换: ${CLAUDE_PLUGIN_ROOT} -> ${CLAUDE_PROJECT_DIR}/.claude
+    当前版本暂不自动注册 hooks 到 ~/.claude/settings.json，
+    仅打印提示信息，由用户手动配置。
     """
-    project_root = get_project_root()
-    hooks_json_path = project_root / "hooks" / "hooks.json"
-
-    if not hooks_json_path.exists():
-        print("ℹ Hooks 配置未找到（hooks/hooks.json 不存在），跳过注册")
-        return True
-
-    try:
-        # 读取 hooks.json
-        with open(hooks_json_path, 'r', encoding='utf-8') as f:
-            hooks_config = json.load(f)
-
-        if "hooks" not in hooks_config:
-            print("ℹ hooks.json 中没有 hooks 字段，跳过注册")
-            return True
-
-        # 转换路径：把 ${CLAUDE_PLUGIN_ROOT} 替换为 ${CLAUDE_PROJECT_DIR}/.claude
-        hooks_str = json.dumps(hooks_config["hooks"])
-        hooks_str = hooks_str.replace("${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_PROJECT_DIR}/.claude")
-        converted_hooks = json.loads(hooks_str)
-
-        # 读取现有的 settings.local.json
-        settings_path = Path.cwd() / ".claude" / "settings.local.json"
-        if settings_path.exists():
-            with open(settings_path, 'r', encoding='utf-8') as f:
-                settings = json.load(f)
-        else:
-            settings = {}
-
-        # 合并 hooks（如果已存在则追加，避免覆盖）
-        if "hooks" not in settings:
-            settings["hooks"] = {}
-
-        for hook_type, hook_list in converted_hooks.items():
-            if hook_type not in settings["hooks"]:
-                settings["hooks"][hook_type] = hook_list
-                print(f"  添加 hook: {hook_type}")
-            else:
-                # 用整个 hook dict 的 JSON 字符串（排序键）作为去重 key
-                # 避免 matcher 为空字符串时误判为重复
-                existing_hooks = {json.dumps(h, sort_keys=True) for h in settings["hooks"][hook_type]}
-                for hook in hook_list:
-                    hook_key = json.dumps(hook, sort_keys=True)
-                    if hook_key not in existing_hooks:
-                        settings["hooks"][hook_type].append(hook)
-                        print(f"  追加 hook: {hook_type}")
-                        existing_hooks.add(hook_key)
-                    else:
-                        print(f"  跳过已存在 hook: {hook_type}")
-
-        # 写回 settings.local.json（先备份）
-        settings_path.parent.mkdir(parents=True, exist_ok=True)
-        if settings_path.exists():
-            backup_path = settings_path.with_suffix('.json.bak')
-            shutil.copy2(settings_path, backup_path)
-        with open(settings_path, 'w', encoding='utf-8') as f:
-            json.dump(settings, f, indent=2, ensure_ascii=False)
-
-        print(f"✓ Hooks 注册成功")
-        print(f"  配置文件: {settings_path}")
-        return True
-
-    except json.JSONDecodeError as e:
-        print(f"✗ hooks.json 解析失败: {e}", file=sys.stderr)
-        return False
-    except Exception as e:
-        print(f"✗ Hooks 注册失败: {e}", file=sys.stderr)
-        return False
+    print()
+    print("=" * 60)
+    print("[TODO] Hooks 全局自动注册暂未实现")
+    print("=" * 60)
+    print()
+    print("如需使用全局 hooks，请手动编辑 ~/.claude/settings.json：")
+    print()
+    print("1. 创建或编辑 ~/.claude/settings.json")
+    print("2. 将 hooks/hooks.json 中的内容复制进去")
+    print("3. 将路径中的 ${CLAUDE_PLUGIN_ROOT} 替换为 ~/.claude 的绝对路径")
+    print("   例如: /Users/yourname/.claude")
+    print()
+    print("示例（将 ${CLAUDE_PLUGIN_ROOT} 替换为绝对路径）:")
+    print('  "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"')
+    print('  → "command": "bash /Users/yourname/.claude/hooks/session-start.sh"')
+    print()
+    print("注意: 全局 hooks 对所有项目生效。如需项目级覆盖，")
+    print("      可在项目 ./.claude/settings.local.json 中定义同名 hook。")
+    print("=" * 60)
 
 
 def main():
     """主入口：批量处理所有目录"""
     project_root = get_project_root()
+    global_dir = get_global_claude_dir()
     print(f"项目根目录: {project_root}")
-    print(f"目标根目录: {Path.cwd() / '.claude'}")
+    print(f"目标根目录: {global_dir}")
     print()
 
     results = []
@@ -306,14 +267,8 @@ def main():
         if success:
             print()
 
-    # 注册 hooks（如果 hooks 目录安装成功）
-    hooks_success = any(name == "hooks" and success for name, success in results)
-    if hooks_success:
-        print("正在注册 hooks...")
-        hook_register_success = install_hooks_settings()
-        results.append(("hooks-registration", hook_register_success))
-        if hook_register_success:
-            print()
+    # 打印 hooks TODO 提示
+    print_hooks_todo()
 
     # 统计结果
     success_count = sum(1 for _, success in results if success)
@@ -322,7 +277,7 @@ def main():
     print(f"安装完成: {success_count}/{total_count} 成功")
 
     # 如果有失败，以非零状态码退出
-    if success_count == 0 and total_count > 0:
+    if success_count < total_count:
         sys.exit(1)
 
 
