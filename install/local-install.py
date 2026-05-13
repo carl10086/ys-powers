@@ -56,26 +56,40 @@ def cleanup_stale_files(source_name: str, target_dir: Path) -> None:
     try:
         with open(renames_path, 'r', encoding='utf-8') as f:
             renames = json.load(f)
-    except (json.JSONDecodeError, IOError):
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"  警告: 无法读取 renames.json: {e}", file=sys.stderr)
+        return
+
+    if not isinstance(renames, dict):
+        print(f"  警告: renames.json 格式错误，应为对象", file=sys.stderr)
         return
 
     source_renames = renames.get(source_name, {})
+    if not isinstance(source_renames, dict):
+        print(f"  警告: renames.json 中 {source_name} 不是对象", file=sys.stderr)
+        return
+
     if not source_renames:
         return
 
     for old_name in source_renames:
         # 防止路径遍历：跳过包含路径分隔符或以 . 开头的名称
-        if "/" in old_name or old_name.startswith("."):
+        if "/" in old_name or "\\" in old_name or old_name.startswith("."):
             print(f"  跳过非法重命名键: {old_name}", file=sys.stderr)
             continue
 
         stale_file = target_dir / old_name
         if stale_file.exists():
-            if stale_file.is_dir():
-                shutil.rmtree(stale_file)
-            else:
-                stale_file.unlink()
-            print(f"  清理 stale 文件: {old_name}")
+            try:
+                if stale_file.is_symlink():
+                    stale_file.unlink()
+                elif stale_file.is_dir():
+                    shutil.rmtree(stale_file)
+                else:
+                    stale_file.unlink()
+                print(f"  清理 stale 文件: {old_name}")
+            except (PermissionError, OSError) as e:
+                print(f"  错误: 无法删除 {old_name}: {e}", file=sys.stderr)
 
 
 def install_folder_level(source_dir: Path, target_dir: Path) -> bool:
