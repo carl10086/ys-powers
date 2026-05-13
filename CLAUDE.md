@@ -47,6 +47,12 @@ Jesse Vincent 的完整软件开发方法论，强调真正的 red/green TDD、s
 
 **适用查阅**：想看更轻量的、跨平台的 spec-driven 设计时。
 
+### html-anything/
+
+Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出等）转换为美观、可分享的单一 HTML 页面。支持 source-aware parsing、自动风格路由与多风格系统。
+
+**适用查阅**：想借鉴「把 agent 输出从 Markdown 升级为富 HTML 页面」的交互设计或 prompt 组织方式时。
+
 ## 给 Claude 的工作约定
 
 - `refer/` 下文件**只读**：不要 edit、不要删除、不要重排。

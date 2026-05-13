@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>html-anything — Skill Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #a03b00;
+    --primary-container: #c94c00;
+    --primary-fixed: #ffdbcd;
+    --primary-fixed-dim: #ffb597;
+    --on-primary: #ffffff;
+    --accent-glow: #E8400D;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #fff8f6;
+    --surface: #fff8f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fbf2ef;
+    --surface-container: #f5ece9;
+    --surface-container-high: #efe6e3;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #e1bfb2;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+    --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #060B18;
+      --surface: #0B1426;
+      --surface-container-lowest: #101D35;
+      --surface-container-low: #101D35;
+      --surface-container: #162544;
+      --surface-container-high: #1c2d52;
+      --fg-1: #F8FAFC;
+      --fg-2: #CBD5E1;
+      --fg-muted: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #FF6B35;
+      --accent-glow: #00D4FF;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg-1);
+    background: var(--bg);
+  }
+
+  /* Document shell */
+  .document-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  /* Cover */
+  .cover {
+    background: var(--gradient-hero);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-4xl) var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+    color: var(--on-primary);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-lg);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .cover .meta {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: var(--space-xl);
+  }
+  .cover .deck {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    max-width: 700px;
+    opacity: 0.95;
+  }
+
+  /* Reader rail */
+  .reader-rail {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-3xl);
+    flex-wrap: wrap;
+    position: sticky;
+    top: var(--space-lg);
+    z-index: 10;
+    background: var(--bg);
+    padding: var(--space-md) 0;
+  }
+  .reader-rail a {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    background: var(--surface-container);
+    color: var(--fg-2);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+  .reader-rail a:hover,
+  .reader-rail a:focus {
+    background: var(--primary);
+    color: var(--on-primary);
+    outline: none;
+    box-shadow: var(--shadow-accent);
+  }
+
+  /* Body sections */
+  .body-section {
+    margin-bottom: var(--space-4xl);
+  }
+  .body-section h2 {
+    font-family: var(--font-headline);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    margin: 0 0 var(--space-xl);
+    letter-spacing: -0.01em;
+    color: var(--fg-1);
+  }
+  .body-section h3 {
+    font-family: var(--font-headline);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: var(--space-2xl) 0 var(--space-md);
+    color: var(--fg-2);
+  }
+  .body-section p {
+    margin: 0 0 var(--space-lg);
+    color: var(--fg-2);
+  }
+
+  /* Claim cards */
+  .claim-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    transition: box-shadow 0.2s ease;
+  }
+  .claim-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+  .claim-card strong {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Fact table */
+  .fact-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-xl) 0;
+    font-size: 0.95rem;
+  }
+  .fact-table th,
+  .fact-table td {
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .fact-table th {
+    font-weight: 600;
+    color: var(--fg-1);
+    background: var(--surface-container);
+    font-family: var(--font-headline);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .fact-table td {
+    color: var(--fg-2);
+  }
+  .fact-table tr:hover td {
+    background: var(--surface-container-low);
+  }
+
+  /* Evidence margin */
+  .evidence-margin {
+    border-left: 3px solid var(--primary);
+    padding-left: var(--space-lg);
+    margin: var(--space-xl) 0;
+    color: var(--fg-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Pull quote */
+  .pull-quote {
+    font-family: var(--font-headline);
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--primary);
+    margin: var(--space-2xl) 0;
+    padding: var(--space-xl) var(--space-2xl);
+    background: var(--surface-container);
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+  .pull-quote::before {
+    content: '"';
+    font-size: 3rem;
+    position: absolute;
+    top: -0.2em;
+    left: var(--space-md);
+    opacity: 0.2;
+    font-family: Georgia, serif;
+  }
+
+  /* Caveat box */
+  .caveat-box {
+    background: var(--surface-container-high);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg) var(--space-xl);
+    margin: var(--space-xl) 0;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+  }
+  .caveat-box strong {
+    color: var(--fg-2);
+  }
+
+  /* Question panel */
+  .question-panel {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    margin-top: var(--space-2xl);
+  }
+  .question-panel h3 {
+    margin-top: 0;
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    color: var(--fg-1);
+  }
+  .question-panel ul {
+    margin: 0;
+    padding-left: var(--space-xl);
+    color: var(--fg-2);
+  }
+  .question-panel li {
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Source spread */
+  .source-spread {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+  }
+  .source-spread .claim-card {
+    margin-bottom: 0;
+  }
+
+  /* Code/pre */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--surface-container);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+  }
+  pre {
+    background: var(--surface-container-high);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--fg-2);
+    border: 1px solid var(--border);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .document-shell {
+      padding: var(--space-xl) var(--space-lg);
+    }
+    .cover {
+      padding: var(--space-2xl) var(--space-xl);
+    }
+    .reader-rail {
+      position: relative;
+      top: auto;
+    }
+    .source-spread {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .claim-card { transition: none; }
+    .reader-rail a { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <h1>html-anything</h1>
+    <div class="meta">Version 0.1.0 &nbsp;&middot;&nbsp; <a href="https://github.com/clockless-org/html-anything" style="color:inherit;text-decoration:underline;">github.com/clockless-org/html-anything</a></div>
+    <div class="deck">
+      Turn rich agent answers and any file, folder, URL, or export into a polished single-file HTML page. Auto-picks a default route plus 17 concrete design systems for teaching, dashboards, atlases, timelines, documents, and more.
+    </div>
+  </header>
+
+  <!-- Reader rail -->
+  <nav class="reader-rail" role="navigation" aria-label="Section navigation">
+    <a href="#promise">User Promise</a>
+    <a href="#inputs">Inputs</a>
+    <a href="#outputs">Outputs</a>
+    <a href="#taxonomy">Use-Case Taxonomy</a>
+    <a href="#styles">Auto Styles</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#design">Design Requirements</a>
+    <a href="#privacy">Data &amp; Privacy</a>
+  </nav>
+
+  <!-- Body: User Promise -->
+  <section class="body-section" id="promise">
+    <h2>User-Facing Promise</h2>
+    <p>Accept requests like <em>"create an interactive teaching site about the solar system,"</em> <em>"turn my Amazon order history into a personal spending atlas,"</em> or <em>"make this CSV into a dashboard I can share."</em> Return a working HTML artifact, not a proposal.</p>
+
+    <div class="pull-quote">
+      When a user asks for something similar to an official example, route to the same source family and style system, then produce a page with comparable structure, interaction depth, visual specificity, and browser-verified polish.
+    </div>
+
+    <div class="claim-card">
+      <strong>Canonical Example Parity.</strong> The checked-in examples are the quality bar. Treat them as canonical usage patterns, not loose inspiration. For exact topic or usage matches, use the reference HTML as the structural target: first viewport geometry, CSS token overrides, surface treatment, component classes, interaction wiring, and asset references should be adapted, not reinvented.
+    </div>
+  </section>
+
+  <!-- Body: Inputs -->
+  <section class="body-section" id="inputs">
+    <h2>Inputs</h2>
+    <p>Handle these input modes automatically. Do not ask the user to pick a style by default. Use <code>auto</code>.</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr><th>Input mode</th><th>What to do</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Idea / brief</td><td>Expand the brief into a concrete content plan, choose an auto style, create the HTML, and generate assets when useful.</td></tr>
+        <tr><td>Local file</td><td>Inspect the file, sample it if large, identify the source type, and create the page.</td></tr>
+        <tr><td>Folder</td><td>Inspect structure and representative files, then create an atlas / audit / browser for the folder.</td></tr>
+        <tr><td>URL</td><td>Fetch or inspect the URL when possible, then create a page from the page/repo/article content.</td></tr>
+        <tr><td>Export request</td><td>If the user names a platform/source but has no file yet, read the relevant source prompt's export instructions and guide them first.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Body: Outputs -->
+  <section class="body-section" id="outputs">
+    <h2>Outputs</h2>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>Default output.</strong> <code>output.html</code> next to the source, or in a clear project/example folder when starting from a brief. If the user gives <code>foo.csv</code>, <code>foo.html</code> is also acceptable when more natural for the local workflow.
+      </div>
+      <div class="claim-card">
+        <strong>Asset outputs.</strong> If generated images, sprite sheets, thumbnails, or other local media make the page materially better, create an <code>assets/</code> folder next to the HTML. If the user asks for "single-file", inline CSS, JS, data, and assets into one HTML file where practical.
+      </div>
+      <div class="claim-card">
+        <strong>Final response.</strong> Give the path/link to the HTML. Mention important generated assets if any. Mention browser verification. Do not explain the internal pipeline unless the user asks.
+      </div>
+    </div>
+  </section>
+
+  <!-- Body: Taxonomy -->
+  <section class="body-section" id="taxonomy">
+    <h2>Use-Case Taxonomy</h2>
+    <p>Route every request through one of four user-facing use cases before choosing the style system. Source prompts can be many; use cases should stay stable.</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr><th>Use case</th><th>User means</th><th>Likely styles</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Teaching Studios</td><td>Turn an idea, article, lesson, long text, or document into an interactive or guided learning surface, not a scrolling article.</td><td><code>teaching</code>, <code>architectural-spread</code>, <code>kami-reading</code></td></tr>
+        <tr><td>Files &amp; Work Data</td><td>Transform files and work artifacts: CSV/spreadsheet-style exports, PDFs, DOCX, Markdown, logs, CI output, email/support archives, finance, calendars, issue trackers, repos, research records, and slide-style carousel outputs.</td><td><code>dashboard</code>, <code>soft-saas</code>, <code>document</code>, <code>kami-reading</code>, <code>architectural-spread</code>, <code>digital-eguide</code>, <code>editorial-carousel</code>, <code>developer</code>, <code>terminal-cli</code></td></tr>
+        <tr><td>Conversation Analysis</td><td>Analyze private chats, relationship exports, team channels, or message archives.</td><td><code>love-romance-3d</code>, <code>kinetic-scoreboard</code>, <code>network-map</code></td></tr>
+        <tr><td>Personal Data &amp; Places</td><td>Make a recap/timeline/story/map from personal exports: orders, health, browsing, media, payments, professional networks, notes, AI chats, saved places, travel history, and routes.</td><td><code>timeline-story</code>, <code>global-travel</code>, <code>living-essay</code>, <code>network-map</code>, <code>map-atlas</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="caveat-box">
+      <strong>Note:</strong> Do not expose this as a required choice to the user. Use it internally to make auto-routing predictable.
+    </div>
+  </section>
+
+  <!-- Body: Auto Styles -->
+  <section class="body-section" id="styles">
+    <h2>Auto Style Selection</h2>
+    <p>Pick a style automatically from the user's intent and source. Treat styles as <strong>behavior and page shape</strong>, not a superficial CSS skin. Styles are underlying systems. Choose the system first, then design the page inside it. Do not create a generic report and recolor it.</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr><th>Auto style</th><th>Use for</th><th>Page shape</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>default</code></td><td>Unknown, mixed, or weakly classified briefs/sources</td><td><strong>Insight Brief</strong>: answer header, primary insight panel, evidence stack, local drill-down</td></tr>
+        <tr><td><code>teaching</code></td><td>Tutorials, lessons, "teach me", interactive explainers, course-like pages</td><td><strong>Lesson Lab</strong>: visual stage, step rail, try-it controls, concept cards, check-yourself, recap</td></tr>
+        <tr><td><code>love-romance-3d</code></td><td>1:1 chats, couple/friend/family chats, WhatsApp/WeChat/iMessage relationship exports</td><td><strong>Keepsake 3D Rhythm</strong>: soft 3D cover, pulse boards, comparison lanes, privacy-first evidence</td></tr>
+        <tr><td><code>living-essay</code></td><td>Kindle highlights, reflective essays, idea notes, concept-heavy reading archives</td><td><strong>Mycelium Writing Environment</strong>: paper manuscript, vertical margin question, inline spore words, living SVG threads, quiet appendix</td></tr>
+        <tr><td><code>dashboard</code></td><td>Finance/admin data, logs, operational data, issue trackers, dense tabular queues</td><td><strong>Ops Console</strong>: command bar, KPI rail, work surface, flag queue, searchable data grid</td></tr>
+        <tr><td><code>soft-saas</code></td><td>Support mailboxes, email campaigns, onboarding programs, customer-success queues, lightweight SaaS metrics</td><td><strong>Soft SaaS Console</strong>: pale app canvas, profile/source card, central metric bloom, campaign panels, leaderboard, activity strip</td></tr>
+        <tr><td><code>kinetic-scoreboard</code></td><td>Multi-participant activity streams, team chats, ranked contributors, owners/reps/players by contribution or workload</td><td><strong>Kinetic Championship</strong>: full-viewport lanes, live ranks, big counters, kinetic activity body, telemetry footer, linked evidence pits</td></tr>
+        <tr><td><code>timeline-story</code></td><td>Personal histories — chronological and topical</td><td><strong>Timeline Story</strong>: time lens, timeline spine, chapter panels, rhythm strip, memory drawer</td></tr>
+        <tr><td><code>global-travel</code></td><td>Travel history, Uber/Lyft trip exports, airport patterns, and personal mobility recaps</td><td><strong>Global Travel Map</strong>: centered headline, source selector, dotted world map, warm pins, metric runway, itinerary browser</td></tr>
+        <tr><td><code>map-atlas</code></td><td>Saved places, routes, location history, geotagged photo metadata</td><td><strong>Map Atlas</strong>: spatial stage, place drawer, period/place filters, waypoint browser</td></tr>
+        <tr><td><code>network-map</code></td><td>Contacts, LinkedIn, Venmo/PayPal, people/org graphs, community relationship maps</td><td><strong>Network Map</strong>: graph canvas, entity inspector, cluster controls, hub cards, linked records</td></tr>
+        <tr><td><code>document</code></td><td>Essays, articles, reading lists, bookmarks, research collections, PDFs, DOCX, legal/medical/lab/academic records</td><td><strong>Document Review</strong>: cover, reading rail, body sheet, evidence margin, drill-down. Tone shifts narrative ↔ formal based on source.</td></tr>
+        <tr><td><code>kami-reading</code></td><td>Long prose, DOCX memos, articles, essays, and manuscripts meant for sustained reading</td><td><strong>Kami Longform Reader</strong>: warm parchment document, serif cover, inline contents, printable chapters, source appendix</td></tr>
+        <tr><td><code>architectural-spread</code></td><td>Long-form visual explainers, object-focused articles, manifestos, and reference requests that look like the split Mars architectural HTML</td><td><strong>Architectural Editorial Spread</strong>: left visual bay, right cream content panel, serif italic emphasis, corner anchors, pagination dots</td></tr>
+        <tr><td><code>digital-eguide</code></td><td>E-guides, PDF guides, creator guides, playbooks, lead magnets, downloadable course previews</td><td><strong>Digital E-Guide Spread</strong>: two paper pages on a warm desk, cover + TOC, inside lesson, pull quote, steps, exercise strip</td></tr>
+        <tr><td><code>editorial-carousel</code></td><td>Brand strategy essays, founder letters, article takeaways, lightweight reports meant to be shared as a sequence</td><td><strong>Editorial Carousel</strong>: issue cover, spread rail, 4-8 argument spreads, evidence drawer, copy actions</td></tr>
+        <tr><td><code>developer</code></td><td>Diffs, PR patches, CI logs, stack traces, repos</td><td><strong>Terminal Evidence Workbench</strong>: prompt line, hotspots, risk checklist, raw artifact navigator, copyable handoff</td></tr>
+        <tr><td><code>terminal-cli</code></td><td>Terminal, CLI, shell, mainframe, hacker, server-console, or tmux feel</td><td><strong>Terminal CLI</strong>: shell prompt, status rail, terminal pane grid, command controls, raw console, scanline overlay</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Body: Workflow -->
+  <section class="body-section" id="workflow">
+    <h2>Standard Workflow</h2>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>1. Understand the request.</strong> Decide whether the user supplied an idea, file, folder, URL, or export request.
+      </div>
+      <div class="claim-card">
+        <strong>2. Onboard exports when needed.</strong> If the user names a source but has no file yet, read the matching prompt in <code>prompts/sources/&lt;source&gt;.md</code> and give concise export steps. Stop after the export guidance unless the file is already available.
+      </div>
+      <div class="claim-card">
+        <strong>3. Inspect the source or brief.</strong> For files/folders, read a representative sample and gather stats. For URLs, fetch/inspect enough content to understand shape. For ideas/briefs, create a structured content plan yourself. Use web verification for current or high-stakes facts.
+      </div>
+      <div class="claim-card">
+        <strong>4. Load guidance.</strong> Read <code>prompts/styles/_design.md</code>, <code>prompts/styles/catalog.json</code>, and the closest source prompt. Apply shared family prompts when relevant. Use the catalog entry for the chosen style as the compact preflight checklist. Then read and follow <code>prompts/styles/&lt;style&gt;.md</code>.
+      </div>
+      <div class="claim-card">
+        <strong>5. Choose auto style.</strong> Pick the page style internally. Do not ask the user to choose unless they explicitly want style options.
+      </div>
+      <div class="claim-card">
+        <strong>6. Extract the style contract.</strong> Before writing HTML, identify the selected style's 5-8 core invariants: first viewport geometry, layout scaffold, typography roles, color/surface language, component vocabulary, primary interaction, motion grammar, and what must be absent.
+      </div>
+      <div class="claim-card">
+        <strong>7. Build the page.</strong> Create the HTML/CSS/JS directly. Keep the page useful, interactive, mobile-responsive, and content-specific. Put <code>data-ha-style="&lt;selected-style&gt;"</code> on the root <code>&lt;html&gt;</code> element and use the style's class/component vocabulary.
+      </div>
+      <div class="claim-card">
+        <strong>8. Generate assets when they improve the artifact.</strong> Before generating new assets, inspect any matching <code>referenceAssets</code> or official example asset folder and reuse appropriate files when licensing and context allow.
+      </div>
+      <div class="claim-card">
+        <strong>9. Verify in a browser.</strong> Check: page is nonblank; desktop and mobile viewports render cleanly; no obvious horizontal overflow; contrast is readable and focus states are visible; keyboard and touch paths exist for core interactions; primary interactions work; generated assets load. Also check style fidelity.
+      </div>
+      <div class="claim-card">
+        <strong>10. Handoff.</strong> Give the user the local path or live link. Keep the explanation short.
+      </div>
+    </div>
+
+    <div class="evidence-margin">
+      <strong>Style Fidelity Gate:</strong> Before final handoff, the HTML must pass an internal checklist: root <code>&lt;html&gt;</code> declares <code>data-ha-style</code>; first viewport is built from the selected style's scaffold; at least four style-specific class names/components appear in the HTML; primary interaction is native to the style and works with local data; required source modules are present but shaped in the style's vocabulary; text contrast, focus states, keyboard access, and touch targets meet the UI quality gate; charts and dense visuals have visible values or list/table fallbacks and do not rely on color alone; there is no accidental body-level horizontal overflow; motion follows the style's motion grammar and respects <code>prefers-reduced-motion</code>; the page is complete, offline-capable, and not just a recolored default report.
+    </div>
+  </section>
+
+  <!-- Body: Design Requirements -->
+  <section class="body-section" id="design">
+    <h2>Design Requirements</h2>
+    <p>Read <code>prompts/styles/_design.md</code> for Clockless tokens and apply them by default.</p>
+
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>Mobile-first responsive layout.</strong> The page must work cleanly from small screens upward.
+      </div>
+      <div class="claim-card">
+        <strong>WCAG AA contrast.</strong> Meaningful text, visible focus states, labeled controls, and 44px primary touch targets where possible.
+      </div>
+      <div class="claim-card">
+        <strong>Light + dark mode.</strong> When the page is a report/data artifact; for app-like examples, a polished light-mode Clockless surface is acceptable.
+      </div>
+      <div class="claim-card">
+        <strong>Inline CSS and JS.</strong> No external JS/CDN dependencies unless the user explicitly allows them. The only default external font call is the Google Fonts import from <code>_design.md</code>.
+      </div>
+      <div class="claim-card">
+        <strong>Use generated bitmap assets when needed.</strong> Use SVG/CSS/canvas for deterministic diagrams and UI.
+      </div>
+      <div class="claim-card">
+        <strong>Build the actual usable experience.</strong> Do not build a generic landing page when the user asked for a tool, teaching site, dashboard, report, or explorer. Build the actual usable experience as the first screen.
+      </div>
+    </div>
+  </section>
+
+  <!-- Body: Data & Privacy -->
+  <section class="body-section" id="privacy">
+    <h2>Data and Privacy Defaults</h2>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>Sensitive by default.</strong> Treat generated HTML as sensitive as the source data because it may embed source records client-side.
+      </div>
+      <div class="claim-card">
+        <strong>Intimate chats.</strong> Do not include a raw-message appendix by default. Use aggregate charts and small anonymized evidence snippets.
+      </div>
+      <div class="claim-card">
+        <strong>High-stakes sources.</strong> For medical, legal, tax, accounting, immigration, insurance, or investment-adjacent sources, stay observational and include caveats. Do not provide professional advice.
+      </div>
+      <div class="claim-card">
+        <strong>Mask identifiers.</strong> For contacts, payments, chats, and personal exports, mask or omit sensitive identifiers unless the user asks to reveal them.
+      </div>
+      <div class="claim-card">
+        <strong>Photos metadata-only.</strong> For Google Photos-style sources, prefer metadata-only analysis unless the user explicitly asks to inspect actual media.
+      </div>
+    </div>
+
+    <div class="question-panel">
+      <h3>Sampling Guidance</h3>
+      <p>Read enough to understand the source shape without loading huge private exports into the model unnecessarily:</p>
+      <ul>
+        <li><strong>Tabular data:</strong> header, first rows, last rows, column stats, date ranges, categories, numeric summaries</li>
+        <li><strong>Chat:</strong> first/last messages, sender list, time span, daily/monthly counts, media/deleted/transfer counts if present</li>
+        <li><strong>Long text:</strong> headings, first sections, word count, section outline</li>
+        <li><strong>Email:</strong> thread counts, sender counts, first/last messages, open loops</li>
+        <li><strong>Transcript:</strong> speaker stats, first/last cues, longest cues, decisions and action-item clues</li>
+        <li><strong>Event/log stream:</strong> inferred schema, severity/category counts, time-bucket histogram, representative errors/outliers</li>
+        <li><strong>Finance/admin:</strong> in/out/net or status totals, categories, recurring items, duplicates/outliers</li>
+        <li><strong>Geo/routes:</strong> bbox, distance, points, elevation/pace if present, waypoint list</li>
+        <li><strong>Folder/repo:</strong> tree, README/index files, representative key files</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="text-align:center; padding: var(--space-3xl) 0; color: var(--fg-muted); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: var(--space-4xl);">
+    html-anything skill documentation &nbsp;&middot;&nbsp; Built with the Document Review style system
+  </footer>
+
+</div>
+</body>
+</html>

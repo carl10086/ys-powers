@@ -21,12 +21,12 @@ ls -la .claude/
 
 | 我在做什么 | 推荐入手 |
 |-----------|---------|
-| 有一个模糊想法，想梳理成需求 | `/spec` → 自动触发 `idea-refine`、`spec-driven-development` |
+| 有一个模糊想法，想梳理成需求 | `/spec` → `explore-then-ask`、`spec-driven-development` |
 | 需求已明确，要拆任务 | `/plan` |
 | 写代码/改逻辑 | `/build`（增量实现）或 `/refactor`（重构） |
 | 写 UI/前端 | `frontend-ui-engineering` [skill] 自动触发 |
 | 修 bug | `/test`（先写重现测试）→ `/build` |
-| 代码写完了，要审查 | `/review` |
+| 代码写完了，要审查 | `/ys-review` |
 | 准备发版 | `/ship` |
 | 提交代码 | `/gc`（完整 Git 流程）或 `/local-commit`（极简本地提交） |
 | 看不懂某段代码 | `/teach-code` |
@@ -41,7 +41,7 @@ flowchart LR
     A[/spec<br/>构思/] --> B[/plan<br/>规划/]
     B --> C[/build<br/>构建/]
     C --> D[/test<br/>验证/]
-    D --> E[/review<br/>审查/]
+    D --> E[/ys-review<br/>审查/]
     E --> F[/ship<br/>交付/]
 
     C -.异常调试.-> G[debugging]
@@ -54,12 +54,66 @@ flowchart LR
 **主线**（实线）：构思 → 规划 → 构建 → 验证 → 审查 → 交付  
 **支撑**（虚线）：构建、审查、交付阶段按需触发的横向能力，非强制步骤
 
+## 简化依赖关系
+
+README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖说明见 [`docs/power-dependencies.md`](docs/power-dependencies.md)。
+
+```mermaid
+flowchart LR
+    subgraph Commands["显式 commands"]
+        spec["/spec"]
+        plan["/plan"]
+        build["/build"]
+        test["/test"]
+        review["/ys-review"]
+        simplify["/code-simplify"]
+        ship["/ship"]
+        wskill["/wskill"]
+        refactor["/refactor"]
+        git["/gc · /local-commit · /s2m"]
+        docs["/doc-codebase · /easy-analysis · /teach-code · /sop-add"]
+    end
+
+    subgraph Skills["核心 skills"]
+        explore["explore-then-ask"]
+        specdev["spec-driven-development"]
+        planning["planning-and-task-breakdown"]
+        incremental["incremental-implementation"]
+        tdd["test-driven-development"]
+        browser["browser-testing-with-devtools"]
+        quality["code-review-and-quality"]
+        codesimp["code-simplification"]
+        shipping["shipping-and-launch"]
+        writing["writing-skills"]
+        brainstorm["brainstorming"]
+        debug["debugging-and-error-recovery"]
+    end
+
+    spec --> explore
+    spec --> specdev
+    plan --> planning
+    build --> incremental
+    build --> tdd
+    build -.失败时.-> debug
+    test --> tdd
+    test -.浏览器相关.-> browser
+    review --> quality
+    simplify --> codesimp
+    ship --> shipping
+    wskill --> explore
+    wskill --> writing
+    refactor --> brainstorm
+    refactor --> tdd
+```
+
+自包含 commands（`/gc`、`/local-commit`、`/s2m`、`/doc-codebase`、`/easy-analysis`、`/teach-code`、`/sop-add`）主要把完整流程写在 command 内部，不显式委托某个 skill。
+
 ## 能力分类速览
 
 | 类型 | 数量 | 调用方式 | 核心代表 |
 |------|------|----------|----------|
 | 显式命令 | 16 | 直接输入 `/command` | `/spec` `/plan` `/build` |
-| 行为技能 | 28 | 场景自动触发 | `idea-refine` `test-driven-development` |
+| 行为技能 | 25 | 场景自动触发 | `idea-refine` `test-driven-development` |
 | 子智能体 | 3 | 自动指派 | `code-reviewer` |
 | 编码规范 | 1 | 自动生效 | `code.md` |
 
@@ -71,7 +125,7 @@ flowchart LR
 |------|------|
 | 构思与规划 | `/spec` `/plan` |
 | 构建与验证 | `/build` `/test` |
-| 审查与优化 | `/review` `/refactor` `/code-simplify` |
+| 审查与优化 | `/ys-review` `/refactor` `/code-simplify` |
 | 交付与提交 | `/ship` `/gc` `/local-commit` |
 | 辅助 | `/sop-add` `/s2m` `/doc-codebase` `/teach-code` `/wskill` `/easy-analysis` |
 
@@ -107,7 +161,7 @@ flowchart LR
 
 ```
 ys-powers/
-├── skills/      # 28 个场景化行为技能
+├── skills/      # 25 个场景化行为技能
 ├── commands/    # 16 个显式调用命令
 ├── agents/      # 3 个专用子智能体
 ├── rules/       # 编码规范与行为约束
@@ -133,7 +187,7 @@ ys-powers/
 /test
 
 # 5. 审查
-/review
+/ys-review
 
 # 6. 提交
 /gc
