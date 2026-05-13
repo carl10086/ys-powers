@@ -1,517 +1,686 @@
-# ys-powers 依赖关系图
+# ys-powers commands / skills 依赖关系说明
 
-> 全面分析 skills / commands / agents 三层组件的显式调用关系、隐式引用关系及 Phase 串联顺序。
-> 生成时间：2026-05-11
+本文从 `commands/` 和 `skills/` 的作者视角出发，说明 ys-powers 的能力组织方式。
 
----
+核心口径：
 
-## 1. 组件清单
-
-### 1.1 Skills（25 个）
-
-位于 `skills/<name>/SKILL.md`，按 Phase 分组：
-
-| Phase | Skills |
-|-------|--------|
-| **Meta** | `using-agent-skills`, `explore-then-ask` |
-| **Define** | `idea-refine`, `brainstorming`, `spec-driven-development` |
-| **Plan** | `planning-and-task-breakdown` |
-| **Build** | `incremental-implementation`, `context-engineering`, `source-driven-development`, `api-and-interface-design`, `frontend-ui-engineering` |
-| **Verify** | `test-driven-development`, `browser-testing-with-devtools`, `debugging-and-error-recovery` |
-| **Review** | `code-review-and-quality`, `code-simplification`, `security-and-hardening`, `performance-optimization` |
-| **Ship** | `shipping-and-launch`, `ci-cd-and-automation`, `git-workflow-and-versioning` |
-| **Maintain** | `deprecation-and-migration`, `documentation-and-adrs`, `sop-search` |
-| **Develop** | `writing-skills` |
-
-### 1.2 Commands（18 个）
-
-位于 `commands/<name>.md`，由 slash command 触发：
-
-| Command | 调用 Skill | 说明 |
-|---------|-----------|------|
-| `/spec` | `explore-then-ask` → `spec-driven-development` | 阶段式：先澄清需求，再生成 spec |
-| `/plan` | `planning-and-task-breakdown` | 任务拆解 |
-| `/build` | `incremental-implementation` + `test-driven-development` | 增量构建 + TDD |
-| `/test` | `test-driven-development` + `browser-testing-with-devtools` | TDD + 浏览器验证 |
-| `/review` | `code-review-and-quality` | 五维 code review |
-| `/code-simplify` | `code-simplification` | 代码简化（不改变行为） |
-| `/ship` | `shipping-and-launch` | 发射检查清单（并行程式调用） |
-| `/wskill` | `explore-then-ask` → `writing-skills` | 阶段式：先澄清需求，再写 skill |
-| `/refactor` | `brainstorming` + `test-driven-development` | 重构方案设计 + TDD 执行 |
-| `/spec-review` | — | 自包含流程（无显式 skill 调用） |
-| `/doc-codebase` | — | 自包含流程（生成架构文档） |
-| `/easy-analysis` | — | 自包含流程（逐段精读文档） |
-| `/map-codebase` | — | 自包含流程（代码库架构映射） |
-| `/teach-code` | — | 自包含流程（代码教学） |
-| `/sop-add` | — | 自包含流程（SOP 抽取） |
-| `/gc` | — | 自包含流程（Git 工作流） |
-| `/local-commit` | — | 自包含流程（本地提交） |
-| `/s2m` | — | 自包含流程（worktree 管理） |
-
-### 1.3 Agents（3 个）
-
-位于 `agents/<name>.md`，作为 specialist subagent 被 `/ship` 并行调用：
-
-| Agent | 角色 | 用于 |
-|-------|------|------|
-| `code-reviewer` | Senior Staff Engineer | 五维 review（正确性/可读性/架构/安全/性能） |
-| `security-auditor` | Security Engineer | 漏洞检测、OWASP 风格审计 |
-| `test-engineer` | QA Engineer | 测试策略、覆盖率分析 |
-
-> Agents 无 `skills:` frontmatter 声明，是纯 system prompt，不参与 skill → skill 调用链。
+- `commands/` 是用户入口和工作流编排层，回答“用户触发什么入口”。
+- `skills/` 是可复用能力模块层，回答“入口背后使用什么方法论或执行规范”。
+- `Command -> Skill` 和 `Skill -> Skill` 都是本文主线。
+- `agents/` 不是主线，只在 `/ship` 明确并行编排时作为附录说明。
+- `.claude/` 是安装产物，不作为本文判断源依赖关系的依据。
 
 ---
 
-## 2. Mermaid 依赖图
+## 1. 阅读口径
 
-### 2.1 Command → Skill 显式调用
+本文只使用当前源目录作为依据：
+
+```text
+commands/*.md
+skills/*/SKILL.md
+agents/*.md
+agents/README.md
+```
+
+其中：
+
+- 当前 `commands/` 下有 16 个 command。
+- 当前 `skills/` 下有 25 个 skill。
+- 当前 `agents/` 下有 3 个 persona，加一个 `README.md`。
+
+本文不把“开发生命周期阶段”当作依赖关系。生命周期可以帮助理解使用顺序，但它不是代码式依赖。如果一个 skill 只是出现在生命周期示例里，本文会写成“发现 / 建议 / 索引关系”，而不是强依赖。
+
+本文也不把“读者可能会连续使用两个 skill”自动当成 `Skill -> Skill`。只有源文件里明确出现的关系，才进入 `Skill -> Skill` 主线。
+
+---
+
+## 2. 关系类型
+
+为了避免把弱引用画成强调用，本文统一使用以下关系类型。
+
+### 2.1 Command -> Skill
+
+| 类型 | 含义 | 图中表示 |
+|------|------|----------|
+| `invokes` | command 明确写了 `Invoke the ... skill` | 实线箭头 |
+| `combines` | command 明确组合多个 skills，通常有串联或并行语义 | 多条实线箭头 |
+| `fallback` | command 在失败、异常或特定条件下要求 follow 某个 skill | 虚线箭头 |
+| `embedded-workflow` | command 自身写完整流程，没有显式委托 skill | 不连到 skill，单独归组 |
+| `orchestrates` | command 编排 agents，而不是调用 skill | 虚线箭头到 agents |
+
+### 2.2 Skill -> Skill
+
+| 类型 | 含义 | 图中表示 |
+|------|------|----------|
+| `requires` | 当前 skill 明确要求先执行另一个 skill 或步骤 | 虚线箭头 |
+| `discovers` | meta skill 根据任务场景帮助选择其他 skills | 虚线箭头 |
+| `sequence-example` | 源文件给出典型连续使用顺序，但不是强制调用 | 虚线箭头 |
+| `follows` | 当前 skill 明确要求实现阶段遵循其他 skills | 虚线箭头 |
+| `recommends` | 当前 skill 建议进一步参考或配合另一个 skill | 虚线箭头 |
+| `fallback` | 当前 skill 遇到失败场景时转入另一个 skill | 虚线箭头 |
+| `required-background` | 当前 skill 要求理解另一个 skill 的方法论背景 | 虚线箭头 |
+| `unresolved-reference` | 源文件提到了 skill 名，但当前 `skills/` 不存在 | 文本标注，不画成有效依赖 |
+
+`Skill -> Skill` 是主线，但不是“运行时调用链”。它更接近能力模块之间的协作说明、前置知识和工作流衔接。
+
+---
+
+## 3. 两张主图总览
+
+当前依赖关系用两张图表达，而不是压进一张复杂图：
+
+- 图一只表达 `Command -> Skill`：用户入口如何直接使用 skills。
+- 图二只表达 `Skill -> Skill`：skills 文档之间有哪些明确关系。
+
+这样可以避免两类关系互相污染。`Command -> Skill` 更接近入口执行关系；`Skill -> Skill` 更接近能力协作、背景知识、专项深入或失败路径。
+
+### 3.1 Command -> Skill 入口图
+
+这张图只回答一个问题：用户调用某个 command 时，会直接进入哪些 skills？
+
+实线表示 command 明确调用或组合 skill。虚线表示条件路径、失败路径或 agent 编排。
 
 ```mermaid
-graph LR
-    subgraph Commands
+flowchart LR
+    subgraph Commands["commands: 用户入口 / 工作流编排"]
         spec["/spec"]
         plan["/plan"]
         build["/build"]
         test["/test"]
-        review["/review"]
-        code-simplify["/code-simplify"]
+        ysReview["/ys-review"]
+        codeSimplify["/code-simplify"]
         ship["/ship"]
         wskill["/wskill"]
         refactor["/refactor"]
+        embedded["embedded-workflow commands"]
     end
 
-    subgraph Skills
+    subgraph Skills["skills: command 直接使用"]
         explore["explore-then-ask"]
         specdev["spec-driven-development"]
-        planTB["planning-and-task-breakdown"]
-        impl["incremental-implementation"]
+        planning["planning-and-task-breakdown"]
+        incremental["incremental-implementation"]
         tdd["test-driven-development"]
+        browser["browser-testing-with-devtools"]
         reviewSkill["code-review-and-quality"]
         simplify["code-simplification"]
-        shipSkill["shipping-and-launch"]
+        shipping["shipping-and-launch"]
         writing["writing-skills"]
-        brainstorm["brainstorming"]
-        browser["browser-testing-with-devtools"]
+        brainstorming["brainstorming"]
+        debug["debugging-and-error-recovery"]
+        sec["security-and-hardening"]
+        perf["performance-optimization"]
+    end
+
+    subgraph Agents["agents: /ship 附属编排"]
+        cr["code-reviewer"]
+        sa["security-auditor"]
+        te["test-engineer"]
     end
 
     spec --> explore
     spec --> specdev
-    plan --> planTB
-    build --> impl
+    plan --> planning
+    build --> incremental
     build --> tdd
     test --> tdd
     test --> browser
-    review --> reviewSkill
-    code-simplify --> simplify
-    ship --> shipSkill
+    ysReview --> reviewSkill
+    ysReview -. recommends .-> sec
+    ysReview -. recommends .-> perf
+    codeSimplify --> simplify
+    ship --> shipping
     wskill --> explore
     wskill --> writing
-    refactor --> brainstorm
+    refactor --> brainstorming
     refactor --> tdd
+    build -. fallback .-> debug
 
-    style spec fill:#e1f5ff,stroke:#01579b
-    style wskill fill:#e1f5ff,stroke:#01579b
-    style refactor fill:#e1f5ff,stroke:#01579b
+    ship -. orchestrates .-> cr
+    ship -. orchestrates .-> sa
+    ship -. orchestrates .-> te
 ```
 
-### 2.2 Skill → Skill 引用关系
+### 3.2 Skill -> Skill 关系图
+
+这张图只回答一个问题：skills 之间有哪些明确文本关系？
+
+所有边都使用虚线，因为这些关系不是运行时强调用。它们可能是发现、后续阶段衔接、专项深入、失败路径或前置知识。
 
 ```mermaid
-graph LR
-    subgraph Skills
+flowchart LR
+    subgraph Meta["meta / discovery"]
         using["using-agent-skills"]
-        specdev["spec-driven-development"]
-        brainstorm["brainstorming"]
-        cicd["ci-cd-and-automation"]
-        writing["writing-skills"]
+        discoverySet["task-routed skills\n(see 5.1)"]
     end
 
-    subgraph Referenced Skills
-        idea["idea-refine"]
-        planTB["planning-and-task-breakdown"]
-        impl["incremental-implementation"]
-        tdd["test-driven-development"]
-        reviewSkill["code-review-and-quality"]
-        simplify["code-simplification"]
-        hardening["security-and-hardening"]
-        perf["performance-optimization"]
-        shipSkill["shipping-and-launch"]
-        debug["debugging-and-error-recovery"]
-        ctx["context-engineering"]
-    end
-
-    using --> idea
-    using --> specdev
-    using --> planTB
-    using --> impl
-    using --> tdd
-    using --> reviewSkill
-    using --> shipSkill
-
-    specdev --> impl
-    specdev --> tdd
-    specdev --> ctx
-
-    brainstorm --> planTB
-
-    cicd --> debug
-
-    writing --> tdd
-
-    style using fill:#fff9e6,stroke:#f57f17
-    style specdev fill:#e8f5e9,stroke:#2e7d32
-    style brainstorm fill:#e8f5e9,stroke:#2e7d32
-    style cicd fill:#e8f5e9,stroke:#2e7d32
-    style writing fill:#e8f5e9,stroke:#2e7d32
-```
-
-### 2.3 Agent → Skill（/ship 并行调用）
-
-```mermaid
-graph TB
-    ship["/ship"] --> codeReviewer["code-reviewer agent"]
-    ship["/ship"] --> secAuditor["security-auditor agent"]
-    ship["/ship"] --> testEng["test-engineer agent"]
-
-    codeReviewer -->|review result| shippingLaunch["shipping-and-launch skill\n(merge phase)"]
-    secAuditor -->|audit result| shippingLaunch
-    testEng -->|test result| shippingLaunch
-
-    style ship fill:#fce4ec,stroke:#c62828
-    style codeReviewer fill:#e3f2fd,stroke:#1565c0
-    style secAuditor fill:#e3f2fd,stroke:#1565c0
-    style testEng fill:#e3f2fd,stroke:#1565c0
-```
-
-### 2.4 Phase 内 Skill 串联顺序
-
-```mermaid
-graph TB
-    subgraph Define["Define Phase"]
-        idea["idea-refine"]
-        brainstorm["brainstorming"]
-        specdev["spec-driven-development"]
-    end
-
-    subgraph Plan["Plan Phase"]
-        planTB["planning-and-task-breakdown"]
-    end
-
-    subgraph Build["Build Phase"]
-        impl["incremental-implementation"]
-        tdd["test-driven-development"]
-        ctx["context-engineering"]
-        source["source-driven-development"]
-        api["api-and-interface-design"]
-        fe["frontend-ui-engineering"]
-    end
-
-    subgraph Verify["Verify Phase"]
-        browser["browser-testing-with-devtools"]
-        debug["debugging-and-error-recovery"]
-    end
-
-    subgraph Review["Review Phase"]
-        reviewSkill["code-review-and-quality"]
-        simplify["code-simplification"]
-        hardening["security-and-hardening"]
-        perf["performance-optimization"]
-    end
-
-    subgraph Ship["Ship Phase"]
-        shipSkill["shipping-and-launch"]
-        cicd["ci-cd-and-automation"]
-        git["git-workflow-and-versioning"]
-    end
-
-    Define --> Plan
-    Plan --> Build
-    Build --> Verify
-    Verify --> Review
-    Review --> Ship
-
-    specdev --> impl
-    specdev --> tdd
-    specdev --> ctx
-    impl --> tdd
-    build --> impl
-
-    tdd --> browser
-    cicd --> debug
-
-    simplify --> reviewSkill
-    hardening --> reviewSkill
-    perf --> reviewSkill
-    reviewSkill --> shipSkill
-
-    style Define fill:#e1f5ff,stroke:#01579b
-    style Plan fill:#e8f5e9,stroke:#2e7d32
-    style Build fill:#fff9e6,stroke:#f57f17
-    style Verify fill:#fce4ec,stroke:#c62828
-    style Review fill:#f3e5f5,stroke:#6a1b9a
-    style Ship fill:#e0f7fa,stroke:#00838f
-```
-
----
-
-## 3. 详细依赖分析
-
-### 3.1 Command → Skill 显式调用（完整表）
-
-| Command | 调用的 Skill | 调用模式 |
-|---------|-------------|---------|
-| `/spec` | `explore-then-ask` → `spec-driven-development` | 串联两阶段 |
-| `/wskill` | `explore-then-ask` → `writing-skills` | 串联两阶段 |
-| `/refactor` | `brainstorming` → `test-driven-development` | 串联两阶段（方案设计 + 执行） |
-| `/build` | `incremental-implementation` + `test-driven-development` | 并行调用 |
-| `/test` | `test-driven-development` + `browser-testing-with-devtools` | 并行调用（浏览器相关时） |
-| `/plan` | `planning-and-task-breakdown` | 单个 |
-| `/review` | `code-review-and-quality` | 单个 |
-| `/code-simplify` | `code-simplification` | 单个 |
-| `/ship` | `shipping-and-launch` | 单个（内含并行 subagent 调用） |
-| 其他 9 个 | — | 自包含流程，无显式 skill 调用 |
-
-### 3.2 Skill → Skill 显式引用
-
-| Skill | 引用的 Skill | 说明 |
-|-------|-------------|------|
-| `using-agent-skills` | `idea-refine`, `spec-driven-development`, `planning-and-task-breakdown`, `incremental-implementation`, `test-driven-development`, `code-review-and-quality`, `shipping-and-launch` | 定义标准生命周期序列 |
-| `spec-driven-development` | `incremental-implementation`, `test-driven-development`, `context-engineering` | 执行阶段调用 |
-| `brainstorming` | `planning-and-task-breakdown` | 终端状态：产重构计划 |
-| `ci-cd-and-automation` | `debugging-and-error-recovery` | 测试失败时触发 |
-| `writing-skills` | `test-driven-development` | 前置知识要求 |
-
-### 3.3 Agent → Skill 声明
-
-**结论：无显式声明。**
-
-三个 agent（`code-reviewer`, `security-auditor`, `test-engineer`）的 frontmatter 均无 `skills:` 字段。它们是纯 persona，通过 `/ship` 的并行 fan-out 机制被调用，而非通过 skill 系统发现激活。
-
----
-
-## 4. Phase 串联关系详解
-
-### 4.1 Define Phase（需求定义）
-
-```
-idea-refine → brainstorming → spec-driven-development
-```
-
-- `idea-refine`：结构化头脑风暴，收敛模糊想法
-- `brainstorming`：设计评审，产出具体方案
-- `spec-driven-development`：生成结构化 spec 文档
-
-### 4.2 Plan Phase（任务规划）
-
-```
-spec-driven-development → planning-and-task-breakdown
-```
-
-- `planning-and-task-breakdown`：将 spec 拆解为可验证的小任务
-
-### 4.3 Build Phase（增量构建）
-
-```
-planning-and-task-breakdown → incremental-implementation + test-driven-development
-                              (+ context-engineering, source-driven-development)
-```
-
-- `context-engineering`：在每步加载正确上下文
-- `source-driven-development`：查文档再实现
-- `api-and-interface-design`：接口设计
-- `frontend-ui-engineering`：UI 构建
-
-### 4.4 Verify Phase（验证）
-
-```
-test-driven-development → browser-testing-with-devtools
-                          (+ debugging-and-error-recovery)
-```
-
-- `test-driven-development`：红绿重构循环
-- `browser-testing-with-devtools`：浏览器环境验证
-- `debugging-and-error-recovery`：问题定位与修复
-
-### 4.5 Review Phase（评审，串联顺序）
-
-```
-code-review-and-quality
-    ↓  (串联，review 后可接简化)
-code-simplification
-    ↓  (可选)
-security-and-hardening
-    ↓  (可选)
-performance-optimization
-```
-
-> 四者同级并列，可按需串联。`code-review-and-quality` 通常是入口。
-
-### 4.6 Ship Phase（发射）
-
-```
-code-review-and-quality → shipping-and-launch
-                           (+ ci-cd-and-automation, git-workflow-and-versioning)
-```
-
-- `shipping-and-launch`：启动并行 fan-out（code-reviewer + security-auditor + test-engineer）
-- `ci-cd-and-automation`：CI/CD 质量门
-- `git-workflow-and-versioning`：版本和分支策略
-
-### 4.7 Meta Skills（跨所有 Phase）
-
-| Meta Skill | 作用 |
-|-----------|------|
-| `using-agent-skills` | 元 skill：定义何时使用哪个 skill |
-| `explore-then-ask` | 需求澄清对话（任何阶段入口） |
-| `brainstorming` | 方案设计（任何需要设计决策时） |
-
----
-
-## 5. 自包含 Commands（无 Skill 调用）
-
-以下 9 个 command 不通过 skill 系统工作，而是内嵌完整工作流：
-
-| Command | 内嵌工作流 |
-|---------|-----------|
-| `/spec-review` | Spec 评审：AI 提炼关键点 + 列 issues，人勾选 blocker |
-| `/doc-codebase` | 代码库架构分析，生成 `docs/codebase/ARCHITECTURE.md` |
-| `/easy-analysis` | 逐段精读复杂文档（先宏观后微观） |
-| `/map-codebase` | 代码库映射（ARCHITECTURE.md 生成） |
-| `/teach-code` | 代码教学：AI 逐步讲解，用户追问确认 |
-| `/sop-add` | 从 session 历史抽取 SOP |
-| `/gc` | 智能 Git 工作流（分支/提交/推送/PR 一步） |
-| `/local-commit` | 本地极简提交（暂存/生成 message/确认/提交） |
-| `/s2m` | Git worktree 管理（返回 main/更新/清理） |
-
----
-
-## 6. 关键设计模式
-
-### 6.1 Command 两种模式
-
-| 模式 | 示例 | 特征 |
-|------|------|------|
-| **Skill 委托型** | `/review` → `code-review-and-quality` | command 文本很短，核心逻辑在 skill |
-| **自包含型** | `/easy-analysis` | command 包含完整工作流定义 |
-
-### 6.2 Skill 激活两种方式
-
-| 方式 | 示例 | 触发机制 |
-|------|------|---------|
-| **Command 显式调用** | `/build` → `incremental-implementation` | slash command |
-| **Description 自动发现** | "Use when code is hard to read" | `using-agent-skills` 的元 skill 发现机制 |
-
-### 6.3 并行 Fan-out
-
-`/ship` 采用 Pattern 3（并行 fan-out with merge），三个 agent 并行工作，结果汇聚后做 go/no-go 决策：
-
-```
-/ship
-  ├── code-reviewer     ─┐
-  ├── security-auditor  ─┼─→ merge → shipping-and-launch
-  └── test-engineer     ─┘
-```
-
----
-
-## 7. 依赖关系总结
-
-### 7.1 所有 Skill 调用链（按 Phase）
-
-```mermaid
-graph TD
-    subgraph all["完整依赖链"]
-        idea["idea-refine"]
-        brainstorm["brainstorming"]
-        specdev["spec-driven-development"]
-        planTB["planning-and-task-breakdown"]
-        impl["incremental-implementation"]
-        tdd["test-driven-development"]
-        ctx["context-engineering"]
-        source["source-driven-development"]
-        api["api-and-interface-design"]
-        fe["frontend-ui-engineering"]
-        browser["browser-testing-with-devtools"]
-        debug["debugging-and-error-recovery"]
-        reviewSkill["code-review-and-quality"]
-        simplify["code-simplification"]
-        hardening["security-and-hardening"]
-        perf["performance-optimization"]
-        shipSkill["shipping-and-launch"]
-        cicd["ci-cd-and-automation"]
-        git["git-workflow-and-versioning"]
-        using["using-agent-skills"]
+    subgraph Skills["skills: 明确文本关系"]
         explore["explore-then-ask"]
+        sop["sop-search"]
+        specdev["spec-driven-development"]
+        incremental["incremental-implementation"]
+        tdd["test-driven-development"]
+        ctx["context-engineering"]
+        browser["browser-testing-with-devtools"]
+        reviewSkill["code-review-and-quality"]
+        sec["security-and-hardening"]
+        perf["performance-optimization"]
+        git["git-workflow-and-versioning"]
+        cicd["ci-cd-and-automation"]
+        debug["debugging-and-error-recovery"]
+        api["api-and-interface-design"]
+        migration["deprecation-and-migration"]
         writing["writing-skills"]
+        brainstorming["brainstorming"]
+        missing["writing-plans\nmissing"]
     end
 
-    explore --> idea
-    explore --> brainstorm
-    explore --> specdev
-    idea --> brainstorm
-    brainstorm --> planTB
-    specdev --> planTB
-    specdev --> impl
-    specdev --> tdd
-    specdev --> ctx
-    planTB --> impl
-    impl --> tdd
-    tdd --> browser
-    tdd --> debug
-    impl --> debug
-    cicd --> debug
-    reviewSkill --> simplify
-    reviewSkill --> hardening
-    reviewSkill --> perf
-    simplify --> shipSkill
-    hardening --> shipSkill
-    perf --> shipSkill
-    reviewSkill --> shipSkill
-    writing --> tdd
-    using --> idea
-    using --> specdev
-    using --> planTB
-    using --> impl
-    using --> tdd
-    using --> reviewSkill
-    using --> shipSkill
+    using -. discovers .-> discoverySet
 
-    style explore fill:#e1f5ff,stroke:#01579b
-    style using fill:#fff9e6,stroke:#f57f17
-    style specdev fill:#e8f5e9,stroke:#2e7d32
-    style brainstorm fill:#e8f5e9,stroke:#2e7d32
-    style planTB fill:#e8f5e9,stroke:#2e7d32
-    style impl fill:#fff9e6,stroke:#f57f17
-    style tdd fill:#fff9e6,stroke:#f57f17
-    style reviewSkill fill:#f3e5f5,stroke:#6a1b9a
-    style simplify fill:#f3e5f5,stroke:#6a1b9a
-    style hardening fill:#f3e5f5,stroke:#6a1b9a
-    style perf fill:#f3e5f5,stroke:#6a1b9a
-    style shipSkill fill:#e0f7fa,stroke:#00838f
+    explore -. requires .-> sop
+    specdev -. follows .-> incremental
+    specdev -. follows .-> tdd
+    specdev -. context .-> ctx
+    tdd -. recommends .-> browser
+    reviewSkill -. recommends .-> sec
+    reviewSkill -. recommends .-> perf
+    incremental -. references .-> git
+    git -. references .-> reviewSkill
+    cicd -. fallback .-> debug
+    api -. references .-> migration
+    writing -. required-background .-> tdd
+    brainstorming -. unresolved .-> missing
 ```
 
-### 7.2 快速索引表
+注意：这两张图都不是“所有可能使用顺序”。它们只表达源文件中明确出现的关系。没有出现在图里的 skill，不代表不重要，只代表当前源文件里没有明确的跨 skill 关系需要放入图中。
 
-**Command 查 Skill：**
+---
 
-| /spec | /plan | /build | /test | /review | /code-simplify | /ship | /wskill | /refactor |
-|-------|-------|--------|-------|---------|----------------|-------|---------|-----------|
-| explore + specdev | planTB | impl + tdd | tdd + browser | reviewSkill | simplify | shipSkill | explore + writing | brainstorm + tdd |
+## 4. Command -> Skill 主线
 
-**Skill 查被谁调用（仅显式）：**
+### 4.1 Command 清单
 
-| Skill | 被调用来源 |
-|-------|-----------|
+当前 `commands/` 源目录包含 16 个 command：
+
+| Command | 类型 | 直接关系 |
+|---------|------|----------|
+| `/spec` | 多 skill 串联型 | `explore-then-ask`, `spec-driven-development` |
+| `/plan` | 单 skill 委托型 | `planning-and-task-breakdown` |
+| `/build` | 多 skill 组合型 | `incremental-implementation`, `test-driven-development`; 失败时 `debugging-and-error-recovery` |
+| `/test` | 多 skill 组合型 | `test-driven-development`; 浏览器相关时 `browser-testing-with-devtools` |
+| `/ys-review` | 单 skill 委托型 + 审查维度建议 | `code-review-and-quality`; 安全 / 性能维度提到 `security-and-hardening`, `performance-optimization` |
+| `/code-simplify` | 单 skill 委托型 | `code-simplification` |
+| `/ship` | skill 委托型 + agent fan-out | `shipping-and-launch`; 并行编排 3 个 agents |
+| `/wskill` | 多 skill 串联型 | `explore-then-ask`, `writing-skills` |
+| `/refactor` | 多 skill 串联型 | `brainstorming`, `test-driven-development` |
+| `/doc-codebase` | embedded-workflow | 无显式 skill 依赖 |
+| `/easy-analysis` | embedded-workflow | 无显式 skill 依赖 |
+| `/gc` | embedded-workflow | 无显式 skill 依赖 |
+| `/local-commit` | embedded-workflow | 无显式 skill 依赖 |
+| `/s2m` | embedded-workflow | 无显式 skill 依赖 |
+| `/sop-add` | embedded-workflow | 无显式 skill 依赖 |
+| `/teach-code` | embedded-workflow | 无显式 skill 依赖 |
+
+旧文档中出现过的 `/review`、`/spec-review`、`/map-codebase` 不在当前 `commands/` 源目录中，因此不进入当前主清单。
+
+### 4.2 `/spec`
+
+类型：多 skill 串联型 command。
+
+直接关系：
+
+- `invokes` `explore-then-ask`
+- `invokes` `spec-driven-development`
+
+说明：
+
+`/spec` 先要求使用 `explore-then-ask` 澄清需求，再要求使用 `spec-driven-development` 生成结构化 spec。这里是强关系，因为 command 源文件明确写了 `Invoke the ... skill`。
+
+维护注意：
+
+如果以后 `/spec` 增加 plan 或 build 阶段，不应直接把后续阶段画进 `/spec` 的强依赖，除非 command 源文件明确要求 invoke 对应 skill。
+
+### 4.3 `/plan`
+
+类型：单 skill 委托型 command。
+
+直接关系：
+
+- `invokes` `planning-and-task-breakdown`
+
+说明：
+
+`/plan` 的核心流程在 `planning-and-task-breakdown` 中。command 自身主要负责读取 spec、进入 plan mode、确认保存路径等命令级约束。
+
+### 4.4 `/build`
+
+类型：多 skill 组合型 command。
+
+直接关系：
+
+- `combines` `incremental-implementation`
+- `combines` `test-driven-development`
+- `fallback` `debugging-and-error-recovery`
+
+说明：
+
+`/build` 明确要求同时使用 `incremental-implementation` 和 `test-driven-development`。这表示实现时既要按小步增量推进，也要用测试证明行为。
+
+`debugging-and-error-recovery` 是失败路径：command 写明 “If any step fails, follow the debugging-and-error-recovery skill.” 因此它不属于正常主路径，但属于明确条件关系。
+
+### 4.5 `/test`
+
+类型：多 skill 组合型 command。
+
+直接关系：
+
+- `invokes` `test-driven-development`
+- `conditional` `browser-testing-with-devtools`
+
+说明：
+
+`/test` 的主路径是 TDD。浏览器相关问题还要使用 `browser-testing-with-devtools` 做真实运行时验证。因此 `browser-testing-with-devtools` 是条件关系，不是每次 `/test` 都必然执行。
+
+### 4.6 `/ys-review`
+
+类型：单 skill 委托型 command，带审查维度建议。
+
+直接关系：
+
+- `invokes` `code-review-and-quality`
+- `recommends` `security-and-hardening`
+- `recommends` `performance-optimization`
+
+说明：
+
+`/ys-review` 直接委托 `code-review-and-quality` 做五维 review。command 在安全和性能维度中分别写了 “Use security-and-hardening skill” 和 “Use performance-optimization skill”。这两个不是入口主 skill，但属于 review 过程中明确提到的专项补充。
+
+### 4.7 `/code-simplify`
+
+类型：单 skill 委托型 command。
+
+直接关系：
+
+- `invokes` `code-simplification`
+
+说明：
+
+`/code-simplify` 的目标是保持行为不变的代码简化。command 源文件明确 invoke `code-simplification`，后续测试、构建、review 作为流程要求存在，但不是新的 command 级 skill 依赖。
+
+### 4.8 `/ship`
+
+类型：skill 委托型 + agent fan-out 编排。
+
+直接关系：
+
+- `invokes` `shipping-and-launch`
+- `orchestrates` `code-reviewer`
+- `orchestrates` `security-auditor`
+- `orchestrates` `test-engineer`
+
+说明：
+
+`/ship` 先委托 `shipping-and-launch`，然后并行调度三个 specialist personas。三个 agents 独立检查当前变更，结果回到主 agent 汇总成 go / no-go 决策和 rollback plan。
+
+这里的 agents 是 `/ship` 的执行辅助，不是全局依赖主线。
+
+### 4.9 `/wskill`
+
+类型：多 skill 串联型 command。
+
+直接关系：
+
+- `invokes` `explore-then-ask`
+- `invokes` `writing-skills`
+
+说明：
+
+`/wskill` 先澄清 skill 需求，再进入 skill 编写流程。它和 `/spec` 类似，都是“先澄清，再生成结构化产物”的串联型 command。
+
+### 4.10 `/refactor`
+
+类型：多 skill 串联型 command。
+
+直接关系：
+
+- `requires` `brainstorming`
+- `uses` `test-driven-development`
+
+说明：
+
+`/refactor` 的 hard gate 明确要求先调用 `brainstorming` 做重构方案设计，然后执行阶段严格遵循 TDD。这里 `brainstorming` 是前置强关系，`test-driven-development` 是执行阶段强关系。
+
+### 4.11 Embedded-workflow commands
+
+以下 commands 没有显式 invoke 某个 skill，而是在 command 文件中写完整流程：
+
+| Command | 自包含流程重点 |
+|---------|----------------|
+| `/doc-codebase` | 分析代码库并生成 `docs/codebase/ARCHITECTURE.md` |
+| `/easy-analysis` | 对复杂文档做宏观概览、逐段精读、引用分析和总结 |
+| `/gc` | 分支、提交、推送、PR 的智能 Git 工作流 |
+| `/local-commit` | 本地极简提交流程 |
+| `/s2m` | worktree 场景下安全返回 main 并清理环境 |
+| `/sop-add` | 从 session 历史抽取 SOP 文档 |
+| `/teach-code` | 由浅入深讲解代码模块并生成理解笔记 |
+
+这些 commands 仍然可能在文本中提到 skill、rule 或其他概念，但没有形成 `Command -> Skill` 的显式委托关系。
+
+---
+
+## 5. Skill -> Skill 主线
+
+`Skill -> Skill` 是本文第二条主线。它说明能力模块之间如何协作，但必须区分“发现关系”“建议关系”“背景知识”和“失败路径”。
+
+### 5.1 `using-agent-skills`
+
+类型：meta discovery skill。
+
+关系：
+
+- `discovers` `idea-refine`
+- `discovers` `spec-driven-development`
+- `discovers` `planning-and-task-breakdown`
+- `discovers` `incremental-implementation`
+- `discovers` `frontend-ui-engineering`
+- `discovers` `api-and-interface-design`
+- `discovers` `context-engineering`
+- `discovers` `source-driven-development`
+- `discovers` `test-driven-development`
+- `discovers` `browser-testing-with-devtools`
+- `discovers` `debugging-and-error-recovery`
+- `discovers` `code-review-and-quality`
+- `discovers` `security-and-hardening`
+- `discovers` `performance-optimization`
+- `discovers` `git-workflow-and-versioning`
+- `discovers` `ci-cd-and-automation`
+- `discovers` `documentation-and-adrs`
+- `discovers` `shipping-and-launch`
+
+理由：
+
+`using-agent-skills` 的作用是根据任务类型发现应该使用哪个 skill。它列出 skill discovery 决策树、典型 lifecycle sequence 和 quick reference。
+
+这不是普通强依赖。不能理解为 `using-agent-skills` 在运行时“调用所有 skill”。它更像索引和路由说明。
+
+### 5.2 `explore-then-ask`
+
+类型：需求澄清与设计确认 skill。
+
+关系：
+
+- `requires` `sop-search`
+
+理由：
+
+`explore-then-ask` 的 checklist 第一步要求先搜索历史 SOP，并明确写到 “always search ... first”。因此这不是普通引用，而是进入澄清流程前的必做步骤。
+
+### 5.3 `spec-driven-development`
+
+类型：spec 到实现阶段的衔接 skill。
+
+关系：
+
+- `follows` `incremental-implementation`
+- `follows` `test-driven-development`
+- `recommends` `context-engineering`
+
+理由：
+
+`spec-driven-development` 在 Phase 4: Implement 中明确写到：执行任务时 follow `incremental-implementation` 和 `test-driven-development`，并使用 `context-engineering` 加载正确 spec section 和源文件。
+
+这里是实现阶段衔接关系，不是 spec 阶段内部的直接调用。
+
+### 5.4 `brainstorming`
+
+类型：设计澄清与方案形成 skill。
+
+关系：
+
+- `unresolved-reference` `writing-plans`
+
+理由：
+
+`brainstorming` 的流程中写到：用户批准 spec 后 invoke `writing-plans` skill 创建实现计划。但当前 `skills/` 源目录中没有 `writing-plans`。因此只能记录为 unresolved reference，不能画成有效依赖。
+
+维护建议：
+
+如果未来补充 `skills/writing-plans/SKILL.md`，应把这条关系从 unresolved 改成明确的 `follows` 或 `invokes`，并重新检查 `/plan` 与 `planning-and-task-breakdown` 的边界是否重叠。
+
+### 5.5 `test-driven-development`
+
+类型：测试与验证方法论 skill。
+
+关系：
+
+- `recommends` `browser-testing-with-devtools`
+
+理由：
+
+`test-driven-development` 在 Browser Testing with DevTools 部分写明：对于浏览器运行的内容，单元测试不够，需要结合 Chrome DevTools MCP 做运行时验证，并指向 `browser-testing-with-devtools`。
+
+这是浏览器场景下的补充验证关系，不是所有 TDD 场景的强制关系。
+
+### 5.6 `code-review-and-quality`
+
+类型：五维 code review skill。
+
+关系：
+
+- `recommends` `security-and-hardening`
+- `recommends` `performance-optimization`
+
+理由：
+
+`code-review-and-quality` 在安全检查和性能检查部分分别提示：更详细的安全指导见 `security-and-hardening`，更详细的 profiling / optimization 见 `performance-optimization`。
+
+这两条是专项深入关系。review 主 skill 仍然是 `code-review-and-quality`。
+
+### 5.7 `incremental-implementation`
+
+类型：增量实现 skill。
+
+关系：
+
+- `references` `git-workflow-and-versioning`
+
+理由：
+
+`incremental-implementation` 的增量循环中提到 commit，并提示参考 `git-workflow-and-versioning` 的 atomic commit guidance。
+
+这是提交实践引用，不是实现流程的前置依赖。
+
+### 5.8 `git-workflow-and-versioning`
+
+类型：git 工作流 skill。
+
+关系：
+
+- `references` `code-review-and-quality`
+
+理由：
+
+`git-workflow-and-versioning` 在控制 change size 时提到：超过约 1000 行的变更应该拆分，并参考 `code-review-and-quality` 中的 splitting strategies。
+
+这是 reviewability 相关的引用关系。
+
+### 5.9 `ci-cd-and-automation`
+
+类型：CI/CD 自动化 skill。
+
+关系：
+
+- `fallback` `debugging-and-error-recovery`
+
+理由：
+
+`ci-cd-and-automation` 在 CI failure handling 中明确写到：Test failure 时 agent follows `debugging-and-error-recovery` skill。
+
+这是失败路径关系，不属于正常 CI 配置主路径。
+
+### 5.10 `api-and-interface-design`
+
+类型：API 与模块边界设计 skill。
+
+关系：
+
+- `references` `deprecation-and-migration`
+
+理由：
+
+`api-and-interface-design` 在接口演进和兼容性语境中提到 deprecation / migration planning。这里是设计时的迁移参考关系，不代表每次 API 设计都必须进入迁移流程。
+
+### 5.11 `writing-skills`
+
+类型：skill 编写 skill。
+
+关系：
+
+- `required-background` `test-driven-development`
+
+理由：
+
+`writing-skills` 明确写到：必须理解 `superpowers:test-driven-development`，因为它把 RED-GREEN-REFACTOR 应用到 skill 文档测试。当前仓库也有 `test-driven-development` skill，但原文使用的是 `superpowers:` 前缀，因此这里记录为方法论背景关系，而不是本地强调用。
+
+### 5.12 当前没有明确对外 skill 关系的 skills
+
+以下 skills 当前没有作为 source 进入 `Skill -> Skill` 主线，不代表不重要，只代表源文件中没有明确的对外 skill 关系需要记录：
+
+- `browser-testing-with-devtools`
+- `code-simplification`
+- `context-engineering`
+- `debugging-and-error-recovery`
+- `deprecation-and-migration`
+- `documentation-and-adrs`
+- `frontend-ui-engineering`
+- `idea-refine`
+- `performance-optimization`
+- `planning-and-task-breakdown`
+- `security-and-hardening`
+- `shipping-and-launch`
+- `sop-search`
+- `source-driven-development`
+
+维护时可以新增关系，但必须能在对应 `SKILL.md` 中找到明确依据。
+
+---
+
+## 6. Agents 附录
+
+当前 `agents/` 包含：
+
+| Agent | 角色 | 在本文中的位置 |
+|-------|------|----------------|
+| `code-reviewer` | Senior Staff Engineer | `/ship` fan-out 的一个审查视角 |
+| `security-auditor` | Security Engineer | `/ship` fan-out 的安全视角 |
+| `test-engineer` | QA Engineer | `/ship` fan-out 的测试覆盖视角 |
+
+`agents/README.md` 对三层关系的说明很重要：
+
+```text
+Skill   = the how
+Persona = the who
+Command = the when
+```
+
+因此本文不把 agents 放进主依赖图。它们不是 `commands` 和 `skills` 的平级主线，而是 `/ship` 的并行执行资源。
+
+---
+
+## 7. 维护规则
+
+### 7.1 新增或修改 command 时
+
+更新本文的 `Command -> Skill` 主线：
+
+1. 在 `commands/` 清单中确认 command 文件存在。
+2. 如果 command 明确写了 `Invoke the ... skill`，加入 `invokes`。
+3. 如果 command 同时使用多个 skills，标成 `combines`，并说明是串联、并行还是不同阶段。
+4. 如果 command 只在失败时 follow 某个 skill，标成 `fallback`。
+5. 如果 command 自己写完整流程，不显式 invoke skill，标成 `embedded-workflow`。
+6. 如果 command 编排 agents，写到 agents 附录，不要提升为全局主线。
+
+### 7.2 新增或修改 skill 时
+
+更新本文的 `Skill -> Skill` 主线：
+
+1. 只记录 `SKILL.md` 中明确出现的 skill 名。
+2. 先判断关系类型，再写入正文：
+   - 发现 / 索引：`discovers`
+   - 后续阶段衔接：`follows`
+   - 专项深入：`recommends`
+   - 失败路径：`fallback`
+   - 前置知识：`required-background`
+   - 不存在目标：`unresolved-reference`
+3. 不要把 lifecycle 示例直接画成强依赖。
+4. 不要把 `using-agent-skills` 画成依赖所有 skills 的强调用链。
+5. 如果只是“可能会一起用”，但源文件没写，不进入本文。
+
+### 7.3 更新 Mermaid 时
+
+图优先保持“两张主图”：
+
+- 第一张图只表达 `Command -> Skill`，不要放 `Skill -> Skill`。
+- 第二张图只表达 `Skill -> Skill`，不要放 commands 或 agents。
+- 实线只给 `Command -> Skill` 的明确调用。
+- 虚线给条件关系、失败路径、`Skill -> Skill` 和 `/ship -> agents`。
+- 不按 phase 分组。
+- 不按依赖深度分组。
+- 不把所有 skill 都强行放进图里；复杂索引关系可以用汇总节点承载，正文再展开。
+
+---
+
+## 8. 快速索引
+
+### 8.1 Command 查 Skill
+
+| Command | Direct Skills |
+|---------|---------------|
+| `/spec` | `explore-then-ask`, `spec-driven-development` |
+| `/plan` | `planning-and-task-breakdown` |
+| `/build` | `incremental-implementation`, `test-driven-development`, fallback `debugging-and-error-recovery` |
+| `/test` | `test-driven-development`, conditional `browser-testing-with-devtools` |
+| `/ys-review` | `code-review-and-quality`, recommends `security-and-hardening`, `performance-optimization` |
+| `/code-simplify` | `code-simplification` |
+| `/ship` | `shipping-and-launch`; orchestrates agents |
+| `/wskill` | `explore-then-ask`, `writing-skills` |
+| `/refactor` | `brainstorming`, `test-driven-development` |
+
+### 8.2 Skill 查 Command
+
+| Skill | 被 command 使用 |
+|-------|-----------------|
 | `explore-then-ask` | `/spec`, `/wskill` |
 | `spec-driven-development` | `/spec` |
-| `planning-and-task-breakdown` | `/plan`, `brainstorming` |
+| `planning-and-task-breakdown` | `/plan` |
 | `incremental-implementation` | `/build` |
-| `test-driven-development` | `/build`, `/test`, `/refactor`, `spec-driven-development`, `writing-skills` |
-| `code-review-and-quality` | `/review` |
+| `test-driven-development` | `/build`, `/test`, `/refactor` |
+| `debugging-and-error-recovery` | `/build` fallback |
+| `browser-testing-with-devtools` | `/test` conditional |
+| `code-review-and-quality` | `/ys-review` |
+| `security-and-hardening` | `/ys-review` recommends |
+| `performance-optimization` | `/ys-review` recommends |
 | `code-simplification` | `/code-simplify` |
 | `shipping-and-launch` | `/ship` |
 | `writing-skills` | `/wskill` |
 | `brainstorming` | `/refactor` |
-| `browser-testing-with-devtools` | `/test` |
-| `context-engineering` | `spec-driven-development` |
-| `debugging-and-error-recovery` | `ci-cd-and-automation` |
+
+### 8.3 Skill 查 Skill
+
+| Source Skill | Target Skill | Type |
+|--------------|--------------|------|
+| `using-agent-skills` | 多个 skills | `discovers` |
+| `explore-then-ask` | `sop-search` | `requires` |
+| `spec-driven-development` | `incremental-implementation` | `follows` |
+| `spec-driven-development` | `test-driven-development` | `follows` |
+| `spec-driven-development` | `context-engineering` | `recommends` |
+| `brainstorming` | `writing-plans` | `unresolved-reference` |
+| `test-driven-development` | `browser-testing-with-devtools` | `recommends` |
+| `code-review-and-quality` | `security-and-hardening` | `recommends` |
+| `code-review-and-quality` | `performance-optimization` | `recommends` |
+| `incremental-implementation` | `git-workflow-and-versioning` | `references` |
+| `git-workflow-and-versioning` | `code-review-and-quality` | `references` |
+| `ci-cd-and-automation` | `debugging-and-error-recovery` | `fallback` |
+| `api-and-interface-design` | `deprecation-and-migration` | `references` |
+| `writing-skills` | `test-driven-development` | `required-background` |
