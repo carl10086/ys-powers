@@ -40,3 +40,51 @@ Invoke the **spec-driven-development** skill to generate a structured spec cover
 - If the directory does not exist, create it first.
 - Confirm the file path with the user before saving.
 </IMPORTANT>
+
+## Phase 4: HTML Preview
+
+After the spec is saved, automatically convert it to an HTML page for easier reading and sharing.
+
+Spawn the `html-generator` subagent using the Agent tool:
+
+```
+Agent tool:
+  subagent_type: "html-generator"
+  description: "Convert spec to HTML preview"
+  prompt: |
+    Input: <spec-file-path>
+    Input type: file
+    Working directory: <current-directory>
+    Generate HTML following skills/html-anything/SKILL.md.
+    Apply the Output Path Rule and return the result in the specified output format.
+```
+
+Wait for the subagent to complete and return its output.
+
+### Browser Open
+
+After receiving the file path from the subagent:
+
+1. Convert the absolute path to a `file://` URL
+2. Use the Chrome DevTools MCP to navigate to that URL
+3. The page opens for the user to review visually
+
+### Response to User
+
+Present the result in Chinese:
+
+```markdown
+**Spec 已完成**
+
+- Spec 路径：`<spec-file-path>`
+- HTML 预览：`<html-file-path>`
+
+已在浏览器中打开 HTML 预览版。
+如需调整 spec 内容，直接描述修改需求。
+```
+
+### Rules
+
+1. Skip HTML preview only if the user explicitly says "不需要 HTML 预览" or "no preview".
+2. Always delegate HTML generation to the `html-generator` subagent. Do not build HTML directly in the primary agent.
+3. Pass the exact spec file path to the subagent without modification.
