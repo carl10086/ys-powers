@@ -59,8 +59,8 @@ def do_uninstall(project_root: Path, target_dir: Path, path_var: str) -> bool:
     """执行卸载。"""
     all_ok = True
 
-    for _, (target_name, _) in DIRECTORIES.items():
-        if not uninstall_directory(target_dir, target_name):
+    for source_name, (target_name, strategy) in DIRECTORIES.items():
+        if not uninstall_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
     if not remove_hooks(project_root, target_dir, path_var):

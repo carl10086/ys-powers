@@ -185,35 +185,81 @@ def install_directory(
     return success
 
 
-def uninstall_directory(target_dir: Path, target_name: str) -> bool:
+def uninstall_directory(
+    project_root: Path,
+    source_name: str,
+    target_dir: Path,
+    target_name: str,
+    strategy: str,
+) -> bool:
     """
     卸载单个目录
 
-    仅删除目标目录下指定名称的子目录，不扫描整个目标目录。
+    遍历源目录中的每个项目，仅删除目标目录中与之同名的文件/目录。
+    对于 file 策略，额外清理 renames.json 中记录的旧名。
+    绝不删除整个目标目录，保留目标中不在源目录里的项目。
 
     Args:
+        project_root: ys-powers 项目根目录
+        source_name: 源目录名（相对于项目根目录）
         target_dir: 目标目录（如 ~/.claude/ 或 ./.claude/）
-        target_name: 要删除的子目录名
+        target_name: 目标子目录名（如 skills, rules）
+        strategy: 复制策略 ('folder' 或 'file')，用于决定是否清理 stale 文件
 
     Returns:
         是否卸载成功（目标不存在视为成功）
     """
+    source_dir = project_root / source_name
     target_subdir = target_dir / target_name
 
     if not target_subdir.exists():
         print(f"ℹ {target_name.capitalize()} 未安装，跳过卸载")
         return True
 
-    try:
-        if target_subdir.is_dir():
-            shutil.rmtree(target_subdir)
-        else:
-            target_subdir.unlink()
-        print(f"✓ {target_name.capitalize()} 卸载成功")
+    if not source_dir.exists():
+        print(f"⚠ {source_name.capitalize()} 源目录不存在，跳过卸载")
         return True
-    except PermissionError as e:
-        print(f"✗ {target_name.capitalize()} 卸载失败: 权限不足 - {e}", file=sys.stderr)
-        return False
-    except Exception as e:
-        print(f"✗ {target_name.capitalize()} 卸载失败: {e}", file=sys.stderr)
-        return False
+
+    all_ok = True
+
+    # 遍历源目录，删除目标中同名的项目
+    for source_item in source_dir.iterdir():
+        # 路径遍历防护
+        if (
+            "/" in source_item.name
+            or "\\" in source_item.name
+            or source_item.name.startswith(".")
+        ):
+            continue
+
+        target_item = target_subdir / source_item.name
+        if target_item.exists():
+            try:
+                if target_item.is_dir():
+                    shutil.rmtree(target_item)
+                else:
+                    target_item.unlink()
+                print(f"  删除: {target_name}/{source_item.name}")
+            except PermissionError as e:
+                print(
+                    f"  错误: 无法删除 {target_name}/{source_item.name}: 权限不足 - {e}",
+                    file=sys.stderr,
+                )
+                all_ok = False
+            except Exception as e:
+                print(
+                    f"  错误: 无法删除 {target_name}/{source_item.name}: {e}",
+                    file=sys.stderr,
+                )
+                all_ok = False
+
+    # file 策略下，额外清理 renames.json 中的旧名
+    if strategy == "file":
+        cleanup_stale_files(project_root, source_name, target_subdir)
+
+    if all_ok:
+        print(f"✓ {target_name.capitalize()} 卸载成功")
+    else:
+        print(f"✗ {target_name.capitalize()} 卸载失败", file=sys.stderr)
+
+    return all_ok
