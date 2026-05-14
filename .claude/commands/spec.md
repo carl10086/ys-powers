@@ -38,7 +38,7 @@ Invoke the **spec-driven-development** skill to generate a structured spec cover
 - Write the spec content in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
 - Save the spec to `docs/ys-powers/specs/YYYY-MM-DD-<feature-name>-design.md` where `<feature-name>` is a kebab-case short name derived from the spec title.
 - If the directory does not exist, create it first.
-- Confirm the file path with the user before saving.
+- Save directly without asking the user for confirmation.
 </IMPORTANT>
 
 ## Phase 4: HTML Preview
