@@ -3,7 +3,7 @@
 **审计日期**: 2026-05-14
 **审计范围**: `skills/`, `commands/`, `agents/`, `hooks/` 全部文件
 **审计目标**: 排查 global install（`~/.claude/`）后，因相对路径或硬编码路径导致的能力失效问题
-**状态**: 🔄 方案讨论中（代码修改已回滚至 `491ad78`）
+**状态**: ✅ 已修复（分支 `feat/global_install`，提交至 `b839cb4`）
 
 ---
 
@@ -156,12 +156,23 @@ Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` �
 
 ---
 
-## 七、待决策清单
+## 七、修复决策与验证结果
 
-- [ ] **`skills/idea-refine/SKILL.md:22`** — 选择修复方案（A/B/C/D）
-- [ ] **`agents/html-generator.md`** — 是否信任 Claude Code 路径解析，还是采用替代方案
-- [ ] **`skills/html-anything/SKILL.md`** — 是否信任 Claude Code 路径解析，还是内联 prompts 内容
-- [ ] **统一策略** — 是否制定全局路径引用规范，避免未来新增能力引入类似问题
+| 问题 | 决策 | 验证结果 |
+|------|------|----------|
+| `skills/idea-refine/SKILL.md:22` | 方案 B：`./scripts/idea-refine.sh` | ✅ 已修复（`441630f`） |
+| `agents/html-generator.md` | 改为 `skill: html-anything` 调用 | ✅ 已修复（`b839cb4`） |
+| `skills/html-anything/SKILL.md` | 信任 Claude Code 从 skill 目录解析 `./prompts/...` | ✅ 已验证（`/html test` 成功生成 `teaching` 风格 HTML） |
+| **统一策略** | 已制定，见 [spec](specs/2026-05-15-global-install-path-fix-design.md) | — |
+
+### 验证详情（2026-05-15）
+
+在 `ys-powers` 项目内执行 `/html test`：
+- `/html` 命令正确触发
+- `html-generator` subagent 正常启动
+- 成功应用 `teaching` 风格（说明 `prompts/styles/` 被正确读取）
+- 输出文件有效（含完整 HTML 结构、CSS 变量、字体加载）
+- 无 "file not found" 或 "skill not found" 错误
 
 ---
 
