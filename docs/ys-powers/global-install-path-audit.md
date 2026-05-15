@@ -3,13 +3,15 @@
 **审计日期**: 2026-05-14
 **审计范围**: `skills/`, `commands/`, `agents/`, `hooks/` 全部文件
 **审计目标**: 排查 global install（`~/.claude/`）后，因相对路径或硬编码路径导致的能力失效问题
+**状态**: 🔄 方案讨论中（代码修改已回滚至 `491ad78`）
 
 ---
 
 ## 执行摘要
 
-Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` 下。当 Claude Code 加载这些能力时，**当前工作目录（CWD）是用户的项目目录**，而非 ys-powers 仓库根目录。因此：
+Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` 下。当 Claude Code 加载这些能力时，**当前工作目录（CWD）是用户的项目目录**，而非 ys-powers 仓库根目录。
 
+因此：
 - 任何假设 CWD 是 ys-powers 项目根目录的相对路径都会失效或指向错误位置
 - 任何硬编码的绝对路径（如容器路径）会完全失效
 - 使用 `$0`/`__file__` 自定位的脚本在 global install 后通常能正确工作
@@ -27,7 +29,12 @@ Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` �
 | **问题代码** | `bash /mnt/skills/user/idea-refine/scripts/idea-refine.sh` |
 | **影响** | 用户在任何项目运行该 skill 时，Claude Code 尝试执行此路径，文件不存在 |
 | **根因** | 该路径是容器环境（`/mnt/skills/user/`）的硬编码绝对路径，global install 后 skill 位于 `~/.claude/skills/idea-refine/` |
-| **修复建议** | 改为 `./scripts/idea-refine.sh`（如果 Claude Code 执行 skill 时 CWD 是 skill 目录）或移除该引用，让 skill 直接执行初始化逻辑 |
+
+**待决策修复方案**：
+- **方案 A**：改为 `bash "$HOME/.claude/skills/idea-refine/scripts/idea-refine.sh"`（global install 后确定存在，但 local install 时可能不存在）
+- **方案 B**：改为 `bash ./scripts/idea-refine.sh`（假设 Claude Code 执行 skill 时 CWD 是 skill 目录）
+- **方案 C**：移除引用，改为内联 `mkdir -p docs/ys-powers/ideas`（不依赖外部脚本）
+- **方案 D**：安装时替换（`install.py` 复制文件时将 `/mnt/skills/user/...` 替换为实际路径）
 
 ---
 
@@ -49,7 +56,12 @@ Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` �
 | **问题代码** | `Load skills/html-anything/SKILL.md`<br>`Read prompts/styles/_design.md, prompts/styles/catalog.json` |
 | **影响** | Agent 被调用时，Claude Code 尝试读取这些文件。如果按 CWD 解析，在用户项目下找不到 `skills/` 和 `prompts/` 目录 |
 | **风险场景** | 用户运行 `/html` 命令时，agent 无法加载 style guidance，导致 HTML 生成缺少设计系统约束 |
-| **修复建议** | 验证 Claude Code 行为。如果按 CWD 解析，需要改为使用环境变量（如 `${CLAUDE_PLUGIN_ROOT}`）或绝对路径 |
+
+**待决策修复方案**：
+- **方案 A**：信任 Claude Code 从 agent/skill 目录解析（与 `html-anything` 原项目保持一致，无需修改）
+- **方案 B**：安装时替换路径（将 `skills/html-anything/SKILL.md` 替换为 `${CLAUDE_PLUGIN_ROOT}/skills/html-anything/SKILL.md` 或绝对路径）
+- **方案 C**：重构为 skill 名称调用（参考 `agent-skills`，不直接引用文件路径，而是通过 Claude Code 机制调用 `skill: html-anything`）
+- **方案 D**：内容内联（将引用的 skill/prompts 内容直接复制到 agent 文件中，消除外部依赖）
 
 ### 3. `skills/html-anything/SKILL.md` — Skill 内引用 Prompts
 
@@ -59,12 +71,59 @@ Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` �
 | **行号** | 369, 426, 451 |
 | **问题代码** | `Read ./prompts/styles/_design.md`<br>`prompts/sources/`<br>`prompts/styles/` |
 | **影响** | Skill 的 instructions 包含相对路径引用。如果 Claude Code 按 CWD 解析，找不到 prompts 目录 |
-| **风险场景** | HTML 生成时缺少 Clockless 设计 token 和 source-specific 分析 guidance |
-| **修复建议** | 同上。注意：如果 global install 后整个 `skills/html-anything/`（含 `prompts/` 子目录）被复制到 `~/.claude/skills/html-anything/`，且 Claude Code 从 skill 文件目录解析，则路径正确 |
+
+**待决策修复方案**：
+- **方案 A**：信任 Claude Code 从 skill 目录解析（`html-anything` 原项目的设计方式）
+- **方案 B**：安装时替换（将 `./prompts/` 替换为 `${CLAUDE_PLUGIN_ROOT}/skills/html-anything/prompts/`）
+- **方案 C**：内容内联（将 prompts 内容合并到 SKILL.md 中）
 
 ---
 
-## 三、设计意图（非 Bug，在用户项目 CWD 下操作）
+## 三、参考项目策略对比
+
+| 项目 | 核心策略 | 适用场景 |
+|------|---------|---------|
+| **superpowers** | `$0` 自定位 | Hooks、可执行脚本 |
+| **agent-skills** | 环境变量 `${CLAUDE_PLUGIN_ROOT}` + skill 名称调用 | Hooks、skill 间调用 |
+| **get-shit-done** | 安装时路径替换 + 泄漏检测 | 跨平台通用工具 |
+| **html-anything**（原项目） | `__dirname` 运行时解析 + 相对路径 | 带可执行组件的 skill |
+
+**关键洞察**：
+- `superpowers` 和 `agent-skills` 都不在 skill/agent markdown 中硬编码文件路径
+- `html-anything` 原项目使用 `./prompts/styles/...` 相对路径，说明作者预期 Claude Code 从 skill 目录解析
+- `get-shit-done` 的安装时替换最全面，但复杂度最高，且对 markdown 文件的替换存在不可移植性问题
+
+---
+
+## 四、方案讨论记录
+
+### 议题 1：安装时替换的可行性
+
+**观点**：在 `install.py` 复制文件时，将相对路径替换为 `${CLAUDE_PLUGIN_ROOT}` 或绝对路径。
+
+**反对理由**：
+- 替换为绝对路径（如 `/Users/xxx/.claude/skills/...`）→ 不可移植到其他机器
+- 替换为环境变量（如 `$HOME/.claude/skills/...`）→ Claude Code 解析 markdown 时不会展开 shell 变量
+- 替换为 `${CLAUDE_PLUGIN_ROOT}` → Claude Code 只在 hooks 配置中保证识别此变量，skill/agent markdown 中不保证识别
+
+**结论**：安装时替换对 hooks 可行（已在使用），对 skill/agent markdown **不可行**。
+
+### 议题 2：保守策略 vs 主动修复
+
+**保守策略（方案 C）**：
+- 只修复 `/mnt/skills/user/...`（明确 bug）
+- 其他路径引用保持现状（信任 `html-anything` 原项目的设计）
+- 未来如发现问题，再系统性修复
+
+**主动修复（方案 A/B）**：
+- 对所有潜在风险点进行预防性修改
+- 可能引入不必要的复杂度和维护负担
+
+**待决策**：是否接受保守策略？
+
+---
+
+## 五、设计意图（非 Bug，在用户项目 CWD 下操作）
 
 以下路径是 skill/command 的**预期行为**，它们故意在用户当前项目下创建或读取文件：
 
@@ -82,11 +141,9 @@ Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` �
 | `commands/easy-analysis.md` | `docs/<project-name>/...` | 保存分析结果到用户项目 |
 | `commands/sop-add.md` | `sop/...` | 保存 SOP 到用户项目 |
 
-**注意**：这些设计意图的路径在 global install 后仍然正确工作，因为它们本来就打算在用户项目 CWD 下操作。
-
 ---
 
-## 四、已验证安全（Global Install 后正确工作）
+## 六、已验证安全（Global Install 后正确工作）
 
 | 文件 | 机制 | 说明 |
 |------|------|------|
@@ -99,58 +156,12 @@ Global install 将 ys-powers 的内容复制到用户主目录的 `~/.claude/` �
 
 ---
 
-## 五、低风险项（通常不影响生产使用）
+## 七、待决策清单
 
-| 文件 | 问题 | 说明 |
-|------|------|------|
-| `hooks/simplify-ignore-test.sh` | 相对路径 `hooks/simplify-ignore.sh` | 测试脚本，通常不会被用户直接执行。Global install 后即使被复制到 `~/.claude/hooks/`，误执行的概率极低 |
-| `skills/html-anything/prompts/styles/catalog.json` | 17 个 `docs/example-previews/` 路径 | JSON 数据文件，不会自动被读取。只有当 skill 显式解析该 JSON 并加载预览图时才会涉及。需验证 html-anything skill 是否真的会加载这些预览图 |
-| `agents/README.md` | `../references/orchestration-patterns.md` | Markdown 文档链接，不影响功能 |
-| `agents/code-reviewer.md` | `[agents/README.md](README.md)` | 同上 |
-
----
-
-## 六、修复建议汇总
-
-### 优先级 P0（必须修复）
-
-**`skills/idea-refine/SKILL.md:22`**
-```markdown
-# 修改前
-bash /mnt/skills/user/idea-refine/scripts/idea-refine.sh
-
-# 修改后（方案 A：相对路径，假设 CWD 是 skill 目录）
-bash ./scripts/idea-refine.sh
-
-# 修改后（方案 B：移除引用，让 skill 自身执行初始化）
-# 删除该行，skill instructions 中直接包含目录初始化逻辑
-```
-
-### 优先级 P1（需要验证后决定）
-
-**`agents/html-generator.md:34-35`** 和 **`skills/html-anything/SKILL.md:369,426,451`**
-
-**验证方法**：
-1. 在一个非 ys-powers 的测试项目中 global install ys-powers
-2. 运行 `/html` 命令，观察 Claude Code 是否能成功读取 `skills/html-anything/SKILL.md` 和 `prompts/styles/_design.md`
-3. 检查 Claude Code 的日志或输出，看是否有 "file not found" 错误
-
-**如果验证失败**，修复方案：
-- 方案 A：使用环境变量（如果 Claude Code 支持）
-- 方案 B：使用绝对路径（不推荐，因用户主目录不同）
-- 方案 C：将 prompts 内容内联到 skill/agent 文件中（消除外部依赖）
-- 方案 D：如果确认 Claude Code 从 skill/agent 文件目录解析相对路径，则无需修改
-
----
-
-## 七、审计方法论
-
-本次审计采用以下方法：
-
-1. **自动化扫描**：4 个 subagent 并行扫描 `skills/`, `commands/`, `agents/`, `hooks/` 全部文件
-2. **模式匹配**：查找 `__file__`, `Path(__file__)`, `../`, `./`, `Path.cwd()`, `os.getcwd()`, `subprocess.run` 等模式
-3. **人工复核**：对扫描结果中的关键文件进行人工读取和上下文分析
-4. **运行时行为推断**：基于 global install 后的目录结构（`~/.claude/skills/`, `~/.claude/agents/` 等）推断路径解析结果
+- [ ] **`skills/idea-refine/SKILL.md:22`** — 选择修复方案（A/B/C/D）
+- [ ] **`agents/html-generator.md`** — 是否信任 Claude Code 路径解析，还是采用替代方案
+- [ ] **`skills/html-anything/SKILL.md`** — 是否信任 Claude Code 路径解析，还是内联 prompts 内容
+- [ ] **统一策略** — 是否制定全局路径引用规范，避免未来新增能力引入类似问题
 
 ---
 

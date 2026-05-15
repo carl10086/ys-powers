@@ -34,14 +34,7 @@ def get_target_dir(scope: str, target: Path | None = None) -> Path:
     return Path.cwd() / ".claude"
 
 
-def resolve_hooks_path_variable(scope: str, target_dir: Path) -> str:
-    """解析 hooks 路径变量替换值。"""
-    if scope == "global":
-        return str(target_dir.resolve())
-    return "${CLAUDE_PROJECT_DIR}/.claude"
-
-
-def do_install(project_root: Path, target_dir: Path, path_var: str, merge: bool) -> bool:
+def do_install(project_root: Path, target_dir: Path, scope: str, merge: bool) -> bool:
     """执行安装或更新。"""
     all_ok = True
 
@@ -49,13 +42,13 @@ def do_install(project_root: Path, target_dir: Path, path_var: str, merge: bool)
         if not install_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
-    if not inject_hooks(project_root, target_dir, path_var, merge=merge):
+    if not inject_hooks(project_root, target_dir, scope, merge=merge):
         all_ok = False
 
     return all_ok
 
 
-def do_uninstall(project_root: Path, target_dir: Path, path_var: str) -> bool:
+def do_uninstall(project_root: Path, target_dir: Path, scope: str) -> bool:
     """执行卸载。"""
     all_ok = True
 
@@ -63,7 +56,7 @@ def do_uninstall(project_root: Path, target_dir: Path, path_var: str) -> bool:
         if not uninstall_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
-    if not remove_hooks(project_root, target_dir, path_var):
+    if not remove_hooks(project_root, target_dir, scope):
         all_ok = False
 
     return all_ok
@@ -89,16 +82,15 @@ def main() -> int:
         return 1
 
     target_dir = get_target_dir(args.scope, args.target)
-    path_var = resolve_hooks_path_variable(args.scope, target_dir)
 
     print(f"项目根目录: {project_root}")
     print(f"目标根目录: {target_dir}")
     print()
 
     if args.action in ("install", "update"):
-        success = do_install(project_root, target_dir, path_var, merge=(args.action == "update"))
+        success = do_install(project_root, target_dir, args.scope, merge=(args.action == "update"))
     elif args.action == "uninstall":
-        success = do_uninstall(project_root, target_dir, path_var)
+        success = do_uninstall(project_root, target_dir, args.scope)
     else:
         # argparse 已限制 choices，此处不会到达
         parser.print_help()
