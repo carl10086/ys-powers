@@ -31,8 +31,8 @@ If a file already exists at the target path, overwrite it.
 
 ## Workflow
 
-1. **Read the skill guide.** Load `skills/html-anything/SKILL.md` and follow its Standard Workflow.
-2. **Load style guidance.** Read `prompts/styles/_design.md`, `prompts/styles/catalog.json`, and the matching source/style prompts.
+1. **Load the skill.** Invoke `skill: html-anything` to load the full workflow guide and style system.
+2. **Confirm style scope.** The skill will handle style guidance and prompt loading internally.
 3. **Choose auto style.** Pick internally; do not ask the user unless ambiguous.
 4. **Determine output path.** Apply the Output Path Rule above.
 5. **Build the page.** Generate HTML/CSS/JS directly. Keep it interactive, responsive, and content-specific.
