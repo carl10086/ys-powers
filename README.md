@@ -2,18 +2,54 @@
 
 `ys-powers` 是一套用于增强 Claude Code 工作流的本地能力集，包含 **skills**（场景化行为技能）、**commands**（显式调用命令）、**agents**（专用子智能体）、**rules**（编码规范）四类配置。
 
-## 快速开始
+## 安装
+
+ys-powers 提供两种安装方式，分别适用于不同场景：
+
+| 方式 | 命令 | 适用场景 |
+|------|------|----------|
+| **Global** | `make global-install` | 个人机器，所有项目共享同一套能力 |
+| **Local** | `make local-install [project-dir=/path]` | 特定项目，或需要项目独立配置 |
+
+### Global 安装（推荐）
 
 ```bash
-# 进入目标项目并安装
-cd /path/to/your-project
-python /path/to/ys-powers/install/local-install.py
-
-# 验证
-ls -la .claude/
+cd /path/to/ys-powers
+make global-install
 ```
 
-安装策略：`skills/` 文件夹级全量覆盖；`rules/`、`commands/` 文件级同名覆盖，保留目标独有文件。
+将 skills/commands/agents/rules/hooks 复制到 `~/.claude/`，并自动注册 SessionStart hook 到 `~/.claude/settings.json`。安装后，**任何项目**启动 Claude Code 时都会自动加载 ys-powers 的能力。
+
+### Local 安装
+
+```bash
+cd /path/to/ys-powers
+make local-install                  # 安装到当前目录
+make local-install project-dir=/path/to/project  # 安装到指定项目
+```
+
+将内容复制到 `<project>/.claude/`，并注册 hooks 到 `<project>/.claude/settings.local.json`。适用于：
+- 需要在特定项目使用定制版本
+- 团队共享同一套项目级配置
+- 避免全局安装影响其他项目
+
+### 安装策略
+
+| 目录 | 策略 | 说明 |
+|------|------|------|
+| `skills/`、`agents/` | 文件夹级全量覆盖 | 删除旧版本，复制新版本 |
+| `rules/`、`commands/`、`hooks/`、`references/` | 文件级同名覆盖 | 覆盖同名文件，保留目标独有文件 |
+| `hooks` 注册 | 合并去重 | 向 settings.json 追加 hooks，不覆盖用户已有配置 |
+
+### 路径兼容性
+
+Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项目目录，而非 `~/.claude/`**。因此：
+
+- **Hooks** 使用 `$HOME/.claude/...`（global）或 `${CLAUDE_PROJECT_DIR}/.claude/...`（local），由 shell 在运行时解析
+- **Skills** 内部使用 `./scripts/...` 相对路径，由 Claude Code 从 skill 文件所在目录解析
+- **Agents** 通过 `skill: <name>` 工具调用，不直接引用 skill 文件路径
+
+无需安装时修改任何文件内容，所有路径在运行时自解析。
 
 ## 按场景速查
 
