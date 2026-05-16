@@ -6,9 +6,9 @@ import sys
 from pathlib import Path
 
 
-def _load_hooks_config(project_root: Path, path_var: str) -> dict | None:
+def _load_hooks_config(project_root: Path, scope: str) -> dict | None:
     """
-    读取 hooks/hooks.json 并替换路径变量。
+    读取 hooks/hooks.json，local install 时替换路径前缀。
 
     Returns:
         转换后的 hooks dict，或 None（文件不存在/解析失败）
@@ -30,9 +30,10 @@ def _load_hooks_config(project_root: Path, path_var: str) -> dict | None:
         print("ℹ hooks.json 中没有 hooks 字段，跳过")
         return None
 
-    # 转换路径变量
     hooks_str = json.dumps(hooks_config["hooks"])
-    hooks_str = hooks_str.replace("${CLAUDE_PLUGIN_ROOT}", path_var)
+    if scope == "local":
+        # 假设：hooks.json 中所有 "$HOME/.claude" 出现均为 hooks 路径前缀
+        hooks_str = hooks_str.replace("$HOME/.claude", "${CLAUDE_PROJECT_DIR}/.claude")
     return json.loads(hooks_str)
 
 
@@ -54,8 +55,7 @@ def _backup_and_write_settings(settings_path: Path, settings: dict) -> bool:
 def inject_hooks(
     project_root: Path,
     target_dir: Path,
-    path_var: str,
-    merge: bool = False
+    scope: str
 ) -> bool:
     """
     将 hooks 注入目标 settings 文件。
@@ -63,21 +63,17 @@ def inject_hooks(
     Args:
         project_root: ys-powers 项目根目录
         target_dir: 目标目录（如 ~/.claude/ 或 ./.claude/）
-        path_var: 路径变量替换值
-        merge: 是否为 update 模式（当前行为与 install 一致，均为去重追加）
+        scope: 安装范围（"global" 或 "local"）
 
     Returns:
         是否注入成功
     """
-    # merge 参数为将来扩展预留（如 update 模式删除已不存在的 hooks）
-    _ = merge
-
-    converted_hooks = _load_hooks_config(project_root, path_var)
+    converted_hooks = _load_hooks_config(project_root, scope)
     if converted_hooks is None:
         return True
 
     # 确定目标 settings 文件
-    if target_dir == Path.home() / ".claude":
+    if scope == "global":
         settings_path = target_dir / "settings.json"
     else:
         settings_path = target_dir / "settings.local.json"
@@ -124,7 +120,7 @@ def inject_hooks(
 def remove_hooks(
     project_root: Path,
     target_dir: Path,
-    path_var: str
+    scope: str
 ) -> bool:
     """
     从目标 settings 文件中反注册 ys-powers 的 hooks。
@@ -134,17 +130,17 @@ def remove_hooks(
     Args:
         project_root: ys-powers 项目根目录
         target_dir: 目标目录
-        path_var: 路径变量替换值
+        scope: 安装范围（"global" 或 "local"）
 
     Returns:
         是否反注册成功（目标不存在视为成功）
     """
-    converted_hooks = _load_hooks_config(project_root, path_var)
+    converted_hooks = _load_hooks_config(project_root, scope)
     if converted_hooks is None:
         return True
 
     # 确定目标 settings 文件
-    if target_dir == Path.home() / ".claude":
+    if scope == "global":
         settings_path = target_dir / "settings.json"
     else:
         settings_path = target_dir / "settings.local.json"
