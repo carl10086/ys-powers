@@ -14,7 +14,8 @@ Doc Task Progress:
 - [ ] Step 4: Self-review against checklist
 - [ ] Step 5: Fix issues found
 - [ ] Step 6: Save to specified path
-- [ ] Step 7: Mark task complete
+- [ ] Step 7: Generate HTML preview and open in browser
+- [ ] Step 8: Mark task complete
 ```
 
 **Step 1: Read plan task**
@@ -109,7 +110,56 @@ If any checklist item fails, revise the content. Repeat Step 4 until all items p
 
 Save the document to the target path specified in the plan task. Confirm the path with the user if ambiguous.
 
-**Step 7: Mark complete**
+**Step 7: Generate HTML preview and open in browser**
+
+After the document is saved, automatically convert it to an HTML page for easier reading and sharing.
+
+Spawn the `html-generator` subagent using the Agent tool:
+
+```
+Agent tool:
+  subagent_type: "html-generator"
+  description: "Convert doc to HTML preview"
+  prompt: |
+    Input: <doc-file-path>
+    Input type: file
+    Working directory: <current-directory>
+    Generate HTML following skills/html-anything/SKILL.md.
+    Apply the Output Path Rule and return the result in the specified output format.
+```
+
+Wait for the subagent to complete and return its output.
+
+### Browser Open
+
+After receiving the file path from the subagent:
+
+1. Convert the absolute path to a `file://` URL
+2. Use the Chrome DevTools MCP to navigate to that URL
+3. The page opens for the user to review visually
+
+### Response to User
+
+Present the result in Chinese:
+
+```markdown
+**文档已完成**
+
+- 文档路径：`<doc-file-path>`
+- HTML 预览：`<html-file-path>`
+
+已在浏览器中打开 HTML 预览版。
+如需调整文档内容，直接描述修改需求。
+```
+
+### Rules
+
+1. **Mandatory**: Always execute this step. Do not skip even if the user does not explicitly request HTML preview.
+2. Always delegate HTML generation to the `html-generator` subagent. Do not build HTML directly in the primary agent.
+3. Pass the exact file path to the subagent without modification.
+4. If Chrome DevTools MCP is unavailable, still return the HTML path and ask the user to open it manually.
+
+**Step 8: Mark complete**
 
 Mark the task as complete in the plan and move to the next pending documentation task.
 
