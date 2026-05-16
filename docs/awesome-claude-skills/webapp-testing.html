@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>webapp-testing — Claude Skill 文档</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Brand */
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+
+      /* Secondary / tertiary */
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+
+      /* Surfaces */
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+
+      /* Text */
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+
+      /* Borders */
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+
+      /* Status */
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+
+      /* Typography */
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+
+      /* Spacing (4px base) */
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+
+      /* Radius */
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      margin-bottom: var(--space-4xl);
+      padding-bottom: var(--space-3xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-title {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+      line-height: 1.2;
+    }
+
+    .cover-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      color: var(--fg-2);
+      font-family: var(--font-mono);
+    }
+
+    .meta-chip .label {
+      color: var(--fg-muted);
+    }
+
+    .deck {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--fg-2);
+      max-width: 720px;
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      display: flex;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-3xl);
+      padding: var(--space-sm);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-lg);
+      overflow-x: auto;
+    }
+
+    .rail-tab {
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+    }
+
+    .rail-tab:hover {
+      color: var(--fg-2);
+      background: var(--surface-container);
+    }
+
+    .rail-tab.active {
+      color: var(--on-primary);
+      background: var(--primary);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      letter-spacing: -0.01em;
+    }
+
+    .section-body {
+      padding-left: var(--space-3xl);
+    }
+
+    @media (max-width: 640px) {
+      .section-body {
+        padding-left: 0;
+      }
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+    }
+
+    .claim-card-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-sm);
+      color: var(--fg-1);
+    }
+
+    .claim-card-body {
+      color: var(--fg-2);
+      line-height: 1.7;
+    }
+
+    .claim-card-body p + p {
+      margin-top: var(--space-md);
+    }
+
+    /* Lists */
+    .styled-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .styled-list li {
+      position: relative;
+      padding-left: var(--space-xl);
+      margin-bottom: var(--space-md);
+      color: var(--fg-2);
+    }
+
+    .styled-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Decision Tree */
+    .decision-tree {
+      background: var(--surface-container);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      overflow-x: auto;
+    }
+
+    .decision-tree pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--fg-2);
+      margin: 0;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 14px;
+    }
+
+    .fact-table thead th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--surface-container-high);
+      border-bottom: 2px solid var(--border-strong);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      color: var(--fg-1);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .fact-table tbody td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      vertical-align: top;
+    }
+
+    .fact-table tbody tr:hover {
+      background: var(--surface-container-low);
+    }
+
+    .fact-table .col-scenario {
+      font-weight: 600;
+      color: var(--fg-1);
+      white-space: nowrap;
+    }
+
+    .fact-table .do {
+      color: var(--green);
+    }
+
+    .fact-table .dont {
+      color: var(--red);
+    }
+
+    /* Code Blocks */
+    .code-block {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin: var(--space-xl) 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--fg-1);
+      margin: 0;
+    }
+
+    .code-block .comment {
+      color: var(--fg-muted);
+    }
+
+    .code-block .prompt {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      margin-top: var(--space-3xl);
+      padding-top: var(--space-3xl);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .evidence-title {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .source-spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .source-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+
+    .source-card-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xs);
+    }
+
+    .source-card-value {
+      font-size: 14px;
+      color: var(--fg-2);
+      word-break: break-word;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      margin-top: var(--space-3xl);
+      padding: var(--space-xl);
+      background: var(--surface-container);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+    }
+
+    .question-panel-title {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .question-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .question-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      font-size: 14px;
+    }
+
+    .question-list li:last-child {
+      border-bottom: none;
+    }
+
+    .question-list li::before {
+      content: "?";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      color: var(--on-primary);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: var(--space-md);
+      flex-shrink: 0;
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: var(--primary-fixed);
+      border-left: 4px solid var(--primary);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .caveat-box p {
+      color: var(--fg-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .caveat-box strong {
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .cover-title {
+        font-size: 1.75rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .fact-table {
+        font-size: 13px;
+      }
+
+      .fact-table thead th,
+      .fact-table tbody td {
+        padding: var(--space-sm);
+      }
+    }
+
+    /* Focus states */
+    *:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Print styles */
+    @media print {
+      .reader-rail {
+        display: none;
+      }
+
+      .document-shell {
+        max-width: 100%;
+      }
+
+      body {
+        background: white;
+        color: black;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover / Masthead -->
+    <header class="cover">
+      <h1 class="cover-title">webapp-testing</h1>
+      <div class="cover-meta">
+        <span class="meta-chip"><span class="label">来源</span> awesome-claude-skills</span>
+        <span class="meta-chip"><span class="label">维护者</span> Composio / 社区</span>
+        <span class="meta-chip"><span class="label">许可证</span> Apache 2.0</span>
+        <span class="meta-chip"><span class="label">类型</span> Skill 文档</span>
+      </div>
+      <div class="deck">
+        <p>使用 Python Playwright 测试本地 Web 应用，支持验证前端功能、调试 UI 行为、捕获浏览器截图和查看控制台日志。本 Skill 提供服务器生命周期管理、动态页面侦查和 Playwright 自动化测试的完整工作流。</p>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail" role="tablist" aria-label="文档章节导航">
+      <button class="rail-tab active" role="tab" aria-selected="true" onclick="scrollToSection('positioning')">定位</button>
+      <button class="rail-tab" role="tab" onclick="scrollToSection('triggers')">触发时机</button>
+      <button class="rail-tab" role="tab" onclick="scrollToSection('capabilities')">核心能力</button>
+      <button class="rail-tab" role="tab" onclick="scrollToSection('decision-tree')">决策树</button>
+      <button class="rail-tab" role="tab" onclick="scrollToSection('key-points')">关键要点</button>
+      <button class="rail-tab" role="tab" onclick="scrollToSection('examples')">示例</button>
+      <button class="rail-tab" role="tab" onclick="scrollToSection('relations')">关联</button>
+    </nav>
+
+    <!-- Section 1: 定位 -->
+    <section class="body-section" id="positioning">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2 class="section-title">定位</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-body">
+            <p>webapp-testing 是一套面向本地 Web 应用的自动化测试方案，基于 Python Playwright 实现。它解决了前端开发中常见的测试痛点：动态页面渲染、服务器生命周期管理、多服务协调以及测试证据收集。</p>
+            <p>该 Skill 的核心设计理念是「侦查-行动（Reconnaissance-Then-Action）」—— 在执行操作前先观察页面状态，基于实际渲染结果做出决策，而非依赖硬编码的选择器或等待时间。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: 触发时机 -->
+    <section class="body-section" id="triggers">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2 class="section-title">触发时机</h2>
+      </div>
+      <div class="section-body">
+        <ul class="styled-list">
+          <li>需要自动化测试本地运行的 Web 应用时</li>
+          <li>需要捕获页面截图用于 UI 审查或回归测试时</li>
+          <li>需要检查浏览器控制台错误或网络请求时</li>
+          <li>需要与动态页面交互并验证行为时</li>
+        </ul>
+        <div class="caveat-box">
+          <p><strong>不适用场景：</strong>纯静态 HTML 页面（可直接读取文件分析，无需启动浏览器）</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: 核心能力 -->
+    <section class="body-section" id="capabilities">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2 class="section-title">核心能力</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-title">1. 服务器生命周期管理</div>
+          <div class="claim-card-body">
+            <p><code>scripts/with_server.py</code> 自动启动/停止后端和前端服务器，解决本地测试的服务依赖问题。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">2. 动态页面侦查</div>
+          <div class="claim-card-body">
+            <p>先导航并等待 <code>networkidle</code>，再截图或检查 DOM，最后基于渲染状态识别选择器。避免在页面未就绪时执行操作。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">3. Playwright 脚本</div>
+          <div class="claim-card-body">
+            <p>原生 Python Playwright 自动化，支持复杂的用户交互、表单填写、点击、滚动等操作。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">4. 截图与日志</div>
+          <div class="claim-card-body">
+            <p>捕获全页截图和控制台日志，为调试和回归测试提供可视化证据。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: 决策树 -->
+    <section class="body-section" id="decision-tree">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2 class="section-title">决策树</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-body">
+            <p>根据应用类型和服务器状态，选择正确的测试策略：</p>
+          </div>
+        </div>
+        <div class="decision-tree">
+          <pre>用户任务
+  ├── 静态 HTML?
+  │     ├── 是 → 直接读取文件识别选择器 → 编写 Playwright 脚本
+  │     └── 否（动态应用）
+  │           ├── 服务器已运行?
+  │           │     ├── 否 → 使用 with_server.py 启动 + 编写脚本
+  │           │     └── 是 → 侦查-行动模式
+  │           │                 1. 导航并等待 networkidle
+  │           │                 2. 截图或检查 DOM
+  │           │                 3. 从渲染状态识别选择器
+  │           │                 4. 使用发现的选择器执行操作</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: 关键要点 -->
+    <section class="body-section" id="key-points">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">关键要点</h2>
+      </div>
+      <div class="section-body">
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>场景</th>
+              <th>正确做法</th>
+              <th>错误做法</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-scenario">动态应用</td>
+              <td class="do">先 wait_for_load_state('networkidle') 再检查 DOM</td>
+              <td class="dont">未等待直接检查选择器</td>
+            </tr>
+            <tr>
+              <td class="col-scenario">脚本使用</td>
+              <td class="do">先 --help 查看用法，作为黑盒直接调用</td>
+              <td class="dont">直接阅读大脚本源码</td>
+            </tr>
+            <tr>
+              <td class="col-scenario">多服务器</td>
+              <td class="do">使用 with_server.py 同时管理多个服务</td>
+              <td class="dont">手动分别启动</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 6: 示例 -->
+    <section class="body-section" id="examples">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2 class="section-title">多服务器示例</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-body">
+            <p>同时启动后端和前端服务器，并在它们就绪后执行测试脚本：</p>
+          </div>
+        </div>
+        <div class="code-block">
+          <pre><span class="prompt">$</span> python scripts/with_server.py \
+  --server "cd backend && python server.py" --port 3000 \
+  --server "cd frontend && npm run dev" --port 5173 \
+  -- python your_automation.py</pre>
+        </div>
+        <div class="caveat-box">
+          <p><strong>提示：</strong>with_server.py 会等待所有指定的端口就绪后再执行测试脚本，测试结束后自动关闭所有启动的服务进程。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: 关联 -->
+    <section class="body-section" id="relations">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2 class="section-title">与 ys-powers 的关联</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-title">与 artifacts-builder 的关系</div>
+          <div class="claim-card-body">
+            <p><code>artifacts-builder</code> 构建前端 artifact，<code>webapp-testing</code> 测试 Web 应用。两者互补，构成完整的「构建-测试」闭环。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">借鉴价值</div>
+          <div class="claim-card-body">
+            <p>其「侦查-行动（Reconnaissance-Then-Action）」模式是处理动态 Web 内容的通用最佳实践；其「服务器生命周期管理」封装解决了本地测试的常见痛点。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">搬运建议</div>
+          <div class="claim-card-body">
+            <p>高价值。前端测试是开发工作流中的刚需，且 Playwright 是当前主流的浏览器自动化方案。<code>with_server.py</code> 的黑盒化设计尤其值得借鉴。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Evidence Margin -->
+    <div class="evidence-margin">
+      <h3 class="evidence-title">元信息</h3>
+      <div class="source-spread">
+        <div class="source-card">
+          <div class="source-card-label">来源</div>
+          <div class="source-card-value">refer/awesome-claude-skills/webapp-testing/SKILL.md</div>
+        </div>
+        <div class="source-card">
+          <div class="source-card-label">维护者</div>
+          <div class="source-card-value">Composio / 社区</div>
+        </div>
+        <div class="source-card">
+          <div class="source-card-label">许可证</div>
+          <div class="source-card-value">Apache 2.0（详见 LICENSE.txt）</div>
+        </div>
+        <div class="source-card">
+          <div class="source-card-label">生成日期</div>
+          <div class="source-card-value">2026-05-17</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h3 class="question-panel-title">常见问题</h3>
+      <ul class="question-list">
+        <li>如何判断页面是静态还是动态？静态页面可直接读取文件，动态页面需要浏览器渲染。</li>
+        <li>networkidle 等待多久？通常 0.5-2 秒，取决于网络状况和页面复杂度。</li>
+        <li>with_server.py 支持哪些类型的服务器？任何可通过命令行启动的 HTTP 服务。</li>
+        <li>如何查看控制台日志？使用 Playwright 的 page.on('console') 事件监听器。</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Simple tab navigation
+    function scrollToSection(id) {
+      const section = document.getElementById(id);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Update active tab
+        document.querySelectorAll('.rail-tab').forEach(tab => {
+          tab.classList.remove('active');
+          tab.setAttribute('aria-selected', 'false');
+        });
+        event.target.classList.add('active');
+        event.target.setAttribute('aria-selected', 'true');
+      }
+    }
+
+    // Intersection Observer for scroll spy
+    const sections = document.querySelectorAll('.body-section');
+    const tabs = document.querySelectorAll('.rail-tab');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tabs.forEach((tab, index) => {
+            if (tab.getAttribute('onclick') && tab.getAttribute('onclick').includes(id)) {
+              tabs.forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+              });
+              tab.classList.add('active');
+              tab.setAttribute('aria-selected', 'true');
+            }
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>

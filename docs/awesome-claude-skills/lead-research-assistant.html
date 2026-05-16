@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead Research Assistant — Skill Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0,0,0,0.06);
+  --border-strong: rgba(0,0,0,0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px; --space-lg: 16px;
+  --space-xl: 20px; --space-2xl: 24px; --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30,27,25,0.04);
+  --shadow-md: 0 4px 12px rgba(30,27,25,0.08);
+  --shadow-lg: 0 8px 24px rgba(30,27,25,0.12);
+  --shadow-accent: 0 8px 24px rgba(160,59,0,0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+body {
+  color: var(--fg-1);
+  background: var(--bg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+.document-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+}
+
+.cover {
+  padding: var(--space-4xl) var(--space-3xl);
+  background: linear-gradient(135deg, rgba(160,59,0,0.08) 0%, rgba(123,64,224,0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  margin-bottom: var(--space-3xl);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cover h1 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.gradient-text {
+  color: transparent;
+  background: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.deck {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 16px;
+  line-height: 1.65;
+  max-width: 640px;
+}
+
+.reader-rail {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-sm);
+  background: var(--surface-container-low);
+  border-radius: var(--radius-pill);
+  overflow-x: auto;
+}
+
+.reader-rail button {
+  min-height: 40px;
+  padding: 0 var(--space-lg);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+.reader-rail button.active {
+  color: var(--on-primary);
+  background: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+  box-shadow: var(--shadow-accent);
+}
+
+.body-section {
+  margin-bottom: var(--space-3xl);
+}
+
+.body-section h2 {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-headline);
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.02em;
+}
+
+.body-section h3 {
+  margin: var(--space-2xl) 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.body-section p {
+  margin: 0 0 var(--space-md);
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.body-section ul, .body-section ol {
+  margin: 0 0 var(--space-md);
+  padding-left: 24px;
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.body-section li {
+  margin-bottom: var(--space-sm);
+}
+
+.claim-card {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.claim-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.claim-card p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13.5px;
+}
+
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  font-size: 13.5px;
+}
+
+.fact-table th, .fact-table td {
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.fact-table th {
+  color: var(--fg-muted);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--surface-container-low);
+}
+
+.fact-table td {
+  color: var(--fg-2);
+}
+
+.fact-table tr:hover td {
+  background: var(--surface-container-low);
+}
+
+.evidence-margin {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin: var(--space-lg) 0;
+}
+
+.evidence-margin p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.caveat-box {
+  padding: var(--space-lg) var(--space-xl);
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.15);
+  border-radius: var(--radius-lg);
+  margin: var(--space-lg) 0;
+}
+
+.caveat-box strong {
+  color: var(--red);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.caveat-box p {
+  margin: var(--space-xs) 0 0;
+  color: var(--fg-2);
+  font-size: 13.5px;
+}
+
+.question-panel {
+  padding: var(--space-2xl);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  margin-top: var(--space-3xl);
+}
+
+.question-panel h3 {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-headline);
+  font-size: 20px;
+}
+
+.question-panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--fg-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.question-panel li {
+  margin-bottom: var(--space-sm);
+}
+
+.source-spread {
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-2xl);
+}
+
+.source-spread p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+
+.source-spread strong {
+  color: var(--fg-2);
+}
+
+pre.code-block {
+  padding: var(--space-lg);
+  background: var(--surface-container-high);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--fg-1);
+}
+
+.priority-high { color: var(--green); font-weight: 700; }
+.priority-medium { color: var(--yellow); font-weight: 700; }
+.priority-low { color: var(--fg-muted); }
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--primary-fixed);
+  color: var(--primary);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+@media (max-width: 640px) {
+  .document-shell {
+    padding: var(--space-lg) var(--space-md);
+  }
+  .cover {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+  .reader-rail {
+    border-radius: var(--radius-lg);
+  }
+  .fact-table {
+    font-size: 12px;
+  }
+  .fact-table th, .fact-table td {
+    padding: var(--space-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+  <header class="cover">
+    <p class="eyebrow">Claude Skill Documentation</p>
+    <h1>Lead Research <span class="gradient-text">Assistant</span></h1>
+    <p class="deck">通过分析产品定位和理想客户画像（ICP），识别高质量潜在客户，提供按匹配度排序的线索列表和个性化的接触策略。</p>
+  </header>
+
+  <nav class="reader-rail" aria-label="Section navigation">
+    <button class="active" data-section="overview">概览</button>
+    <button data-section="capabilities">核心能力</button>
+    <button data-section="workflow">指令流程</button>
+    <button data-section="output">输出格式</button>
+    <button data-section="relations">关联分析</button>
+  </nav>
+
+  <main>
+    <section class="body-section" id="overview">
+      <h2>定位与触发时机</h2>
+      <p>Lead Research Assistant 是一个专注于 B2B 销售研究场景的 Claude Skill，旨在帮助团队系统性地识别、评估和优先处理潜在客户线索。</p>
+
+      <div class="claim-card">
+        <strong>适用场景</strong>
+        <p>为产品或服务寻找潜在客户、准备合作伙伴或目标公司的 outreach 名单、进行销售拓展前调研目标账户、验证市场领域是否存在足够多的匹配客户。</p>
+      </div>
+
+      <div class="caveat-box">
+        <strong>不适用场景</strong>
+        <p>B2C 场景、或产品定位尚不明确的早期探索阶段。该 Skill 假设已有清晰的产品定义和目标市场认知。</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="capabilities">
+      <h2>核心能力</h2>
+
+      <div class="claim-card">
+        <strong>1. 业务理解</strong>
+        <p>分析产品价值主张、核心功能和解决的问题</p>
+      </div>
+      <div class="claim-card">
+        <strong>2. ICP 定义</strong>
+        <p>基于行业、公司规模、地理位置、技术栈、痛点等维度定义理想客户</p>
+      </div>
+      <div class="claim-card">
+        <strong>3. 线索搜索</strong>
+        <p>根据 ICP 搜索匹配的公司，利用招聘动态、技术栈、融资新闻等信号判断需求</p>
+      </div>
+      <div class="claim-card">
+        <strong>4. 优先级排序</strong>
+        <p>按匹配度（1-10 分）排序，考虑需求紧迫性、预算、竞争格局等</p>
+      </div>
+      <div class="claim-card">
+        <strong>5. 接触策略</strong>
+        <p>为每个线索提供个性化的 outreach 建议、决策人角色和 conversation starters</p>
+      </div>
+      <div class="claim-card">
+        <strong>6. 数据丰富</strong>
+        <p>收集决策人信息和公司上下文</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="workflow">
+      <h2>指令流程概览</h2>
+      <p>该 Skill 遵循一个结构化的五步流程，确保从理解产品到生成可执行线索的完整闭环：</p>
+
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>步骤</th>
+            <th>动作</th>
+            <th>输出</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. 理解产品</strong></td>
+            <td>分析代码库或产品描述，提取价值主张和核心功能</td>
+            <td>产品定位摘要</td>
+          </tr>
+          <tr>
+            <td><strong>2. 定义 ICP</strong></td>
+            <td>确定目标行业、公司规模、地理位置、痛点和技术要求</td>
+            <td>理想客户画像</td>
+          </tr>
+          <tr>
+            <td><strong>3. 搜索线索</strong></td>
+            <td>基于 ICP 搜索匹配公司，利用公开信号验证需求</td>
+            <td>候选线索清单</td>
+          </tr>
+          <tr>
+            <td><strong>4. 评分排序</strong></td>
+            <td>为每个线索计算匹配度分数并排序</td>
+            <td>优先级排序列表</td>
+          </tr>
+          <tr>
+            <td><strong>5. 生成输出</strong></td>
+            <td>提供公司名称、匹配理由、优先级、决策人、接触策略和价值主张</td>
+            <td>完整线索报告</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="body-section" id="output">
+      <h2>输出格式</h2>
+      <p>Skill 生成标准化的 Markdown 格式报告，包含以下结构：</p>
+
+      <div class="evidence-margin">
+        <p><strong>报告结构：</strong>Summary（线索统计）→ Top Leads（按优先级排序的详细线索卡片）→ 每个线索包含：公司名称、网站、匹配理由、优先级评分（1-10）、决策人角色、接触策略、针对该公司的产品价值主张</p>
+      </div>
+
+      <pre class="code-block"># Lead Research Results
+
+## Summary
+- Total leads found: [X]
+- High priority (8-10): [X]
+- Medium priority (5-7): [X]
+
+## Top Leads
+
+### 1. [Company Name]
+- **Website**: [URL]
+- **Why Fit**: [具体匹配理由]
+- **Priority**: [分数]/10
+- **Decision Maker**: [目标角色]
+- **Contact Strategy**: [个性化 outreach 建议]
+- **Value Prop**: [针对该公司的产品价值]</pre>
+    </section>
+
+    <section class="body-section" id="relations">
+      <h2>与 ys-powers 的关联</h2>
+
+      <div class="claim-card">
+        <strong>与 competitive-ads-extractor 的关系</strong>
+        <p><code>competitive-ads-extractor</code> 分析竞品广告策略，<code>lead-research-assistant</code> 分析潜在客户。两者都属于市场情报范畴，方向互补。</p>
+      </div>
+
+      <div class="claim-card">
+        <strong>借鉴价值</strong>
+        <p>其「产品分析 → ICP 定义 → 信号搜索 → 评分排序 → 策略输出」的五步流程是通用的 B2B 销售研究方法论。</p>
+      </div>
+
+      <div class="claim-card">
+        <strong>搬运建议</strong>
+        <p>中等价值。适合有销售或 BD 需求的团队。注意线索数据的准确性依赖公开信息源。</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="question-panel">
+    <h3>使用建议</h3>
+    <ul>
+      <li>确保产品定位清晰后再使用该 Skill，模糊的输入会导致模糊的输出</li>
+      <li>结合 <code>competitive-ads-extractor</code> 使用，形成完整的市场情报工作流</li>
+      <li>对生成的线索进行人工验证，公开信息可能存在滞后或不准确</li>
+      <li>优先跟进 High priority（8-10 分）线索，它们通常具有最高的转化潜力</li>
+      <li>定期更新 ICP 定义，随着产品演进，理想客户画像也会变化</li>
+    </ul>
+  </div>
+
+  <div class="source-spread">
+    <p><strong>来源：</strong>refer/awesome-claude-skills/lead-research-assistant/SKILL.md | <strong>维护者：</strong>Composio / 社区 | <strong>许可证：</strong>Apache 2.0</p>
+  </div>
+</div>
+
+<script>
+const sections = ['overview', 'capabilities', 'workflow', 'output', 'relations'];
+const navButtons = document.querySelectorAll('.reader-rail button');
+
+function setActiveSection(id) {
+  navButtons.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.section === id);
+  });
+}
+
+navButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.section;
+    const el = document.getElementById(target);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveSection(target);
+    }
+  });
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      setActiveSection(entry.target.id);
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+</script>
+</body>
+</html>

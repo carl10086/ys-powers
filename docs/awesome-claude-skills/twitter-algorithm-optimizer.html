@@ -1,0 +1,1280 @@
+<!doctype html>
+<html lang="zh-CN" data-ha-style="teaching">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Twitter Algorithm Optimizer — 交互式算法实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0f766e;
+  --primary-container: #115e59;
+  --primary-fixed: #ccfbf1;
+  --primary-fixed-dim: #99f6e4;
+  --on-primary: #ffffff;
+  --accent-glow: #14b8a6;
+  --secondary: #f59e0b;
+  --secondary-container: #d97706;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #f6fbfb;
+  --surface: #f6fbfb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #edf7f5;
+  --surface-container: #e5f1ee;
+  --surface-container-high: #d8e8e4;
+  --fg-1: #10201f;
+  --fg-2: #304c49;
+  --fg-muted: #647b78;
+  --border: rgba(15, 118, 110, 0.14);
+  --border-strong: rgba(15, 118, 110, 0.22);
+  --outline-variant: #99f6e4;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(16, 32, 31, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 32, 31, 0.08);
+  --shadow-lg: 0 8px 24px rgba(16, 32, 31, 0.12);
+  --shadow-accent: 0 8px 24px rgba(15, 118, 110, 0.18);
+  --gradient-primary: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+  --gradient-hero: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
+  --gradient-text: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #14b8a6;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+
+body {
+  color: var(--fg-1);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(15, 118, 110, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 118, 110, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button, select { font: inherit; }
+button { cursor: pointer; }
+
+.studio {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(300px, 380px);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+}
+
+.panel {
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.left-panel, .right-panel {
+  min-height: calc(100vh - 32px);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.left-panel { gap: var(--space-xl); }
+
+.eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+
+h1 {
+  margin-bottom: var(--space-md);
+  font-family: var(--font-headline);
+  font-size: clamp(28px, 4vw, 52px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.gradient-text {
+  color: transparent;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.intro {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.mode-card {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.mode-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.mode-card p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.controls {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.control-row label {
+  color: var(--fg-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  background: var(--surface-container);
+  border-radius: var(--radius-pill);
+}
+
+.segmented button, .pill-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--fg-2);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.segmented button.active, .pill-button.active {
+  color: var(--on-primary);
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-accent);
+}
+
+.pill-button {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-container-lowest);
+}
+
+.segmented button:active, .pill-button:active, .model-button:active {
+  transform: scale(0.97);
+}
+
+.model-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: auto;
+}
+
+.model-button {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-md);
+  color: var(--fg-2);
+  text-align: left;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.18s, box-shadow 0.18s;
+}
+
+.model-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.model-button.active {
+  color: var(--fg-1);
+  border-color: rgba(15, 118, 110, 0.35);
+  box-shadow: var(--shadow-accent);
+}
+
+.model-dot {
+  width: 12px;
+  height: 12px;
+  justify-self: center;
+  border-radius: 50%;
+  background: var(--model-color);
+  box-shadow: inset -3px -4px 8px rgba(16, 32, 31, 0.22), 0 0 0 5px rgba(15, 118, 110, 0.06);
+}
+
+.model-button span:nth-child(2) { font-weight: 800; }
+
+.model-button small {
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.stage-wrap {
+  position: relative;
+  min-height: calc(100vh - 32px);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(460px, 1fr) auto;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(246, 251, 251, 0.9)),
+    radial-gradient(circle at 50% 48%, rgba(15, 118, 110, 0.05), transparent 48%);
+}
+
+.stage-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-xl) 0;
+}
+
+.stage-header h2 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: clamp(24px, 3vw, 42px);
+  letter-spacing: -0.04em;
+}
+
+.stage-header p {
+  max-width: 520px;
+  margin: var(--space-sm) 0 0;
+  color: var(--fg-muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.scale-note {
+  align-self: flex-start;
+  min-width: 150px;
+  padding: var(--space-md) var(--space-lg);
+  color: var(--fg-2);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.algorithm-stage {
+  position: relative;
+  min-height: 560px;
+  margin: var(--space-md);
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(204, 251, 241, 0.8) 0 12%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08), transparent 48%),
+    linear-gradient(160deg, rgba(16, 32, 31, 0.95), rgba(31, 48, 47, 0.88) 50%, rgba(48, 76, 73, 0.82));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), var(--shadow-lg);
+}
+
+.algorithm-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.45) 0 1px, transparent 1.3px);
+  background-size: 72px 72px, 118px 118px;
+  background-position: 4px 13px, 34px 52px;
+  pointer-events: none;
+}
+
+.flow-step {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--orbit) * 2);
+  height: calc(var(--orbit) * 2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.flow-step.inner { border-color: rgba(153, 246, 228, 0.28); }
+.flow-step.outer { border-style: dashed; border-color: rgba(245, 158, 11, 0.2); }
+
+.algorithm-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(82px, 10vw, 132px);
+  height: clamp(82px, 10vw, 132px);
+  border: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 38% 34%, #ccfbf1 0 8%, #5eead4 24%, #14b8a6 62%, #0f766e 100%);
+  box-shadow: 0 0 45px rgba(20, 184, 166, 0.72), 0 0 96px rgba(153, 246, 228, 0.42);
+}
+
+.algorithm-hub::after {
+  content: "Twitter/X";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 12px);
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.76);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.model-marker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--size) * 1px);
+  height: calc(var(--size) * 1px);
+  min-width: 10px;
+  min-height: 10px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: var(--model-color);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08), 0 14px 34px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), height 0.35s cubic-bezier(0.4, 0, 0.2, 1), left 0.35s, top 0.35s, box-shadow 0.2s;
+}
+
+.model-marker::after {
+  content: attr(data-name);
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 9px);
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.model-marker:hover::after, .model-marker.active::after { opacity: 1; }
+
+.model-marker.active {
+  z-index: 4;
+  box-shadow: 0 0 0 9px rgba(153, 246, 228, 0.22), 0 0 54px rgba(153, 246, 228, 0.45);
+}
+
+.focus-card {
+  position: absolute;
+  left: var(--space-xl);
+  bottom: var(--space-xl);
+  z-index: 5;
+  width: min(380px, calc(100% - 40px));
+  padding: var(--space-lg);
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(18px);
+}
+
+.focus-card span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: rgba(204, 251, 241, 0.88);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.focus-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.focus-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.stage-footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  padding: 0 var(--space-xl) var(--space-xl);
+}
+
+.mini-stat {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.mini-stat span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.mini-stat strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.right-panel { gap: var(--space-lg); }
+
+.inspector-top {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.model-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-xl);
+  background: var(--model-color);
+  box-shadow: 0 0 0 10px rgba(15, 118, 110, 0.08);
+}
+
+.inspector-top h2 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.kind-pill {
+  display: inline-flex;
+  margin-top: var(--space-sm);
+  padding: 6px 10px;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.tagline {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.metric {
+  min-height: 98px;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.metric span {
+  display: block;
+  margin-bottom: var(--space-sm);
+  color: var(--fg-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 22px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.detail-section {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.detail-section h3 {
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.detail-section p, .detail-section li {
+  color: var(--fg-2);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.detail-section p:last-child { margin-bottom: 0; }
+
+.detail-section ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding-left: 18px;
+}
+
+.compare { margin-top: auto; }
+
+.compare-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.compare-head h3 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 17px;
+}
+
+.compare-head select {
+  max-width: 148px;
+  min-height: 36px;
+  padding: 0 var(--space-md);
+  color: var(--fg-2);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+.bar-row {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.bar-track {
+  position: relative;
+  height: 10px;
+  overflow: hidden;
+  background: var(--surface-container);
+  border-radius: var(--radius-pill);
+}
+
+.bar-track span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w);
+  border-radius: var(--radius-pill);
+  background: var(--gradient-primary);
+}
+
+.source-note {
+  margin: var(--space-md) 0 0;
+  color: var(--fg-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.signal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.signal-card {
+  padding: var(--space-md);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.signal-card span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--fg-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.signal-card strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+
+.signal-card p {
+  margin: var(--space-xs) 0 0;
+  color: var(--fg-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 1160px) {
+  .studio {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .right-panel {
+    grid-column: 1 / -1;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .inspector-top, .tagline, .metric-grid { grid-column: 1; }
+  .detail-section, .compare { grid-column: 2; }
+}
+
+@media (max-width: 820px) {
+  .studio {
+    display: block;
+    padding: var(--space-md);
+  }
+  .left-panel, .stage-wrap, .right-panel {
+    min-height: auto;
+    margin-bottom: var(--space-md);
+  }
+  .model-list {
+    grid-template-columns: 1fr 1fr;
+    margin-top: 0;
+  }
+  .stage-header, .stage-footer { display: block; }
+  .scale-note { margin-top: var(--space-md); }
+  .algorithm-stage { min-height: 520px; }
+  .stage-footer { padding: 0 var(--space-md) var(--space-md); }
+  .mini-stat { margin-top: var(--space-md); }
+  .right-panel { display: flex; }
+}
+
+@media (max-width: 560px) {
+  .studio {
+    padding: var(--space-sm);
+    overflow-x: hidden;
+  }
+  .left-panel, .right-panel {
+    padding: var(--space-lg);
+    overflow: hidden;
+  }
+  h1 {
+    font-size: 30px;
+    line-height: 1.02;
+  }
+  h1 .gradient-text { display: block; }
+  .intro { font-size: 14px; }
+  .model-list { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .signal-grid { grid-template-columns: 1fr; }
+  .algorithm-stage {
+    min-height: 460px;
+    margin: var(--space-sm);
+  }
+  .stage-header { padding: var(--space-lg) var(--space-lg) 0; }
+  .stage-header h2 { font-size: 26px; }
+  .scale-note {
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .metric strong {
+    font-size: 19px;
+    overflow-wrap: anywhere;
+  }
+  .focus-card {
+    left: var(--space-md);
+    bottom: var(--space-md);
+    width: calc(100% - 24px);
+  }
+  .model-marker::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<main class="studio lesson-shell object-lab">
+  <aside class="panel left-panel step-rail concept-drawer" aria-label="算法模型导航">
+    <section>
+      <p class="eyebrow">Interactive Algorithm Lab</p>
+      <h1>Twitter 算法 <span class="gradient-text">优化器</span></h1>
+      <p class="intro">基于 Twitter 开源推荐算法核心原理（Real-graph、SimClusters、TwHIN、Tweepcred），分析和优化推文以获得最大曝光和互动。</p>
+    </section>
+
+    <section class="mode-card">
+      <strong>算法拆解 → 信号映射 → 策略输出</strong>
+      <p>这个分析框架可复用到任何需要理解平台推荐机制的场景（如 LinkedIn、YouTube、TikTok）。</p>
+    </section>
+
+    <section class="controls try-control" aria-label="视图控制">
+      <div class="segmented" aria-label="显示模式">
+        <button class="active" type="button" data-scale="flow">推荐流程</button>
+        <button type="button" data-scale="signals">信号强度</button>
+      </div>
+      <button class="pill-button active" type="button" id="motionToggle">暂停动画</button>
+    </section>
+
+    <nav class="model-list" id="modelList" aria-label="算法模型列表"></nav>
+  </aside>
+
+  <section class="panel stage-wrap lesson-stage model-stage object-stage" aria-label="算法可视化舞台">
+    <header class="stage-header">
+      <div>
+        <p class="eyebrow" id="stageEyebrow">Twitter 推荐流程</p>
+        <h2 id="stageTitle">候选检索 → 排名预测 → 过滤 → 投放</h2>
+        <p id="stageCopy">理解算法如何决定你的推文能否出现在用户时间线上。</p>
+      </div>
+      <div class="scale-note" id="scaleNote">流程模式：展示推荐系统的四个核心阶段</div>
+    </header>
+
+    <div class="algorithm-stage" id="algorithmStage" aria-label="算法流程可视化">
+      <div class="flow-step inner" style="--orbit: 9%;"></div>
+      <div class="flow-step inner" style="--orbit: 14%;"></div>
+      <div class="flow-step inner" style="--orbit: 19%;"></div>
+      <div class="flow-step inner" style="--orbit: 24%;"></div>
+      <div class="flow-step outer" style="--orbit: 32%;"></div>
+      <div class="flow-step outer" style="--orbit: 39%;"></div>
+      <div class="flow-step outer" style="--orbit: 45%;"></div>
+      <div class="flow-step outer" style="--orbit: 49%;"></div>
+      <div class="algorithm-hub" aria-label="Twitter/X 平台"></div>
+      <div id="modelMarkers"></div>
+      <article class="focus-card" aria-live="polite">
+        <span id="focusKind">核心模型</span>
+        <strong id="focusName">Real-graph</strong>
+        <p id="focusText">预测粉丝互动可能性，是推文获得初始曝光的关键。</p>
+      </article>
+    </div>
+
+    <footer class="stage-footer" aria-label="选中模型快速统计">
+      <div class="mini-stat">
+        <span>影响权重</span>
+        <strong id="quickWeight">高</strong>
+      </div>
+      <div class="mini-stat">
+        <span>优化难度</span>
+        <strong id="quickDifficulty">中</strong>
+      </div>
+      <div class="mini-stat">
+        <span>见效速度</span>
+        <strong id="quickSpeed">快</strong>
+      </div>
+    </footer>
+  </section>
+
+  <aside class="panel right-panel inspector-panel check-yourself recap-strip" aria-label="模型检查器">
+    <section class="inspector-top">
+      <div class="model-preview" id="modelPreview" style="--model-color: #0f766e;"></div>
+      <div>
+        <p class="eyebrow">选中模型</p>
+        <h2 id="modelName">Real-graph</h2>
+        <span class="kind-pill" id="modelKind">核心推荐模型</span>
+      </div>
+    </section>
+
+    <p class="tagline" id="modelTagline">预测粉丝互动可能性</p>
+
+    <section class="metric-grid" aria-label="模型指标">
+      <div class="metric">
+        <span>核心功能</span>
+        <strong id="metricFunction">粉丝互动预测</strong>
+      </div>
+      <div class="metric">
+        <span>关键信号</span>
+        <strong id="metricSignals">点赞、回复、转发</strong>
+      </div>
+      <div class="metric">
+        <span>优化策略</span>
+        <strong id="metricStrategy">提问比陈述获更多回复</strong>
+      </div>
+      <div class="metric">
+        <span>注意事项</span>
+        <strong id="metricCaveat">避免诱导互动</strong>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h3>为什么重要</h3>
+      <p id="systemRole">Real-graph 是 Twitter 推荐系统的核心组件，它直接决定了你的推文能否获得初始曝光。高 Real-graph 得分意味着你的内容更有可能被推送给粉丝。</p>
+    </section>
+
+    <section class="detail-section">
+      <h3>三个实用技巧</h3>
+      <ul id="factList">
+        <li>在推文开头提出问题，激发用户回复欲望</li>
+        <li>使用投票功能增加互动率</li>
+        <li>回复评论延长对话链条</li>
+      </ul>
+    </section>
+
+    <section class="detail-section">
+      <h3>互动信号分类</h3>
+      <div class="signal-grid" id="signalGrid">
+        <div class="signal-card">
+          <span>显性信号</span>
+          <strong>点赞、回复</strong>
+          <p>直接互动行为</p>
+        </div>
+        <div class="signal-card">
+          <span>隐性信号</span>
+          <strong>点击、停留</strong>
+          <p>间接兴趣指标</p>
+        </div>
+        <div class="signal-card">
+          <span>传播信号</span>
+          <strong>转发、引用</strong>
+          <p>内容扩散能力</p>
+        </div>
+        <div class="signal-card">
+          <span>负面信号</span>
+          <strong>屏蔽、静音</strong>
+          <p>内容质量警告</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-section compare compare-control">
+      <div class="compare-head">
+        <h3>模型对比</h3>
+        <select id="compareSelect" aria-label="对比模型"></select>
+      </div>
+      <div id="compareBars"></div>
+      <p class="source-note">基于 Twitter 开源算法文档。权重为相对估算，实际值可能随平台更新而变化。</p>
+    </section>
+  </aside>
+</main>
+
+<script>
+const DATA = {
+  models: [
+    {
+      id: "real-graph",
+      name: "Real-graph",
+      kind: "核心推荐模型",
+      tagline: "预测粉丝互动可能性",
+      weight: "高",
+      difficulty: "中",
+      speed: "快",
+      function: "粉丝互动预测",
+      signals: "点赞、回复、转发",
+      strategy: "提问比陈述获更多回复",
+      caveat: "避免诱导互动",
+      systemRole: "Real-graph 是 Twitter 推荐系统的核心组件，它直接决定了你的推文能否获得初始曝光。高 Real-graph 得分意味着你的内容更有可能被推送给粉丝。",
+      color: "#0f766e",
+      facts: [
+        "在推文开头提出问题，激发用户回复欲望",
+        "使用投票功能增加互动率",
+        "回复评论延长对话链条"
+      ],
+      metrics: {
+        influence: 90,
+        complexity: 60,
+        speed: 85
+      }
+    },
+    {
+      id: "simclusters",
+      name: "SimClusters",
+      kind: "社区发现模型",
+      tagline: "识别社区共鸣度",
+      weight: "高",
+      difficulty: "高",
+      speed: "中",
+      function: "社区归属识别",
+      signals: "话题标签、关注关系",
+      strategy: "创作紧密社区共鸣的内容",
+      caveat: "避免过度细分",
+      systemRole: "SimClusters 通过分析用户行为和兴趣，将用户划分为不同的社区集群。理解你的目标社区特征，可以显著提高内容的相关性和传播效果。",
+      color: "#7b40e0",
+      facts: [
+        "研究目标社区的热门话题和语言风格",
+        "使用社区内流行的标签和术语",
+        "参与社区讨论建立归属感"
+      ],
+      metrics: {
+        influence: 85,
+        complexity: 80,
+        speed: 70
+      }
+    },
+    {
+      id: "twhin",
+      name: "TwHIN",
+      kind: "知识图谱模型",
+      tagline: "用户与内容主题匹配",
+      weight: "中",
+      difficulty: "高",
+      speed: "慢",
+      function: "主题图谱匹配",
+      signals: "内容主题、用户兴趣",
+      strategy: "保持在垂直领域或清晰标记主题转换",
+      caveat: "避免频繁切换主题",
+      systemRole: "TwHIN 构建了一个庞大的知识图谱，连接用户、内容和主题。保持一致的主题焦点有助于算法理解你的专业领域，从而更精准地推荐内容。",
+      color: "#4d44e3",
+      facts: [
+        "选择 2-3 个核心主题持续深耕",
+        "在简介中清晰标注专业领域",
+        "使用一致的话题标签体系"
+      ],
+      metrics: {
+        influence: 75,
+        complexity: 85,
+        speed: 60
+      }
+    },
+    {
+      id: "tweepcred",
+      name: "Tweepcred",
+      kind: "信誉评分模型",
+      tagline: "用户信誉/权威度评分",
+      weight: "高",
+      difficulty: "高",
+      speed: "慢",
+      function: "用户信誉评估",
+      signals: "账号历史、互动质量",
+      strategy: "通过持续互动建立信誉",
+      caveat: "需要长期坚持",
+      systemRole: "Tweepcred 评估用户的整体信誉和权威性。高信誉账户获得更多分发机会。这是一个长期积累的指标，无法通过短期操作快速提升。",
+      color: "#f59e0b",
+      facts: [
+        "保持稳定的发布频率",
+        "与高质量账号互动",
+        "避免违规内容和垃圾信息"
+      ],
+      metrics: {
+        influence: 95,
+        complexity: 90,
+        speed: 40
+      }
+    }
+  ]
+};
+
+const state = {
+  selected: "real-graph",
+  compare: "simclusters",
+  scale: "flow",
+  moving: true,
+  phase: 0
+};
+
+const els = {
+  modelList: document.getElementById("modelList"),
+  modelMarkers: document.getElementById("modelMarkers"),
+  stageTitle: document.getElementById("stageTitle"),
+  stageCopy: document.getElementById("stageCopy"),
+  stageEyebrow: document.getElementById("stageEyebrow"),
+  scaleNote: document.getElementById("scaleNote"),
+  motionToggle: document.getElementById("motionToggle"),
+  focusKind: document.getElementById("focusKind"),
+  focusName: document.getElementById("focusName"),
+  focusText: document.getElementById("focusText"),
+  quickWeight: document.getElementById("quickWeight"),
+  quickDifficulty: document.getElementById("quickDifficulty"),
+  quickSpeed: document.getElementById("quickSpeed"),
+  modelPreview: document.getElementById("modelPreview"),
+  modelName: document.getElementById("modelName"),
+  modelKind: document.getElementById("modelKind"),
+  modelTagline: document.getElementById("modelTagline"),
+  metricFunction: document.getElementById("metricFunction"),
+  metricSignals: document.getElementById("metricSignals"),
+  metricStrategy: document.getElementById("metricStrategy"),
+  metricCaveat: document.getElementById("metricCaveat"),
+  systemRole: document.getElementById("systemRole"),
+  factList: document.getElementById("factList"),
+  compareSelect: document.getElementById("compareSelect"),
+  compareBars: document.getElementById("compareBars")
+};
+
+function modelById(id) {
+  return DATA.models.find((m) => m.id === id) || DATA.models[0];
+}
+
+function markerSize(model) {
+  if (state.scale === "signals") {
+    return 24 + (model.metrics.influence / 100) * 80;
+  }
+  return 32;
+}
+
+function orbitRadius(model) {
+  if (state.scale === "signals") {
+    return 15 + (100 - model.metrics.influence) * 0.4;
+  }
+  const index = DATA.models.findIndex((m) => m.id === model.id);
+  return 18 + index * 9.5;
+}
+
+function orbitAngle(model, index) {
+  const base = index * 44 - 24;
+  if (!state.moving) return base;
+  const speed = 12 / Math.sqrt(model.metrics.complexity || 50);
+  return base + state.phase * speed;
+}
+
+function setModel(id) {
+  state.selected = id;
+  renderAll();
+}
+
+function renderShell() {
+  els.modelList.innerHTML = DATA.models.map((model) => `
+    <button class="model-button ${model.id === state.selected ? "active" : ""}" type="button" data-id="${model.id}" style="--model-color: ${model.color};">
+      <span class="model-dot"></span>
+      <span>${model.name}</span>
+      <small>${model.kind}</small>
+    </button>
+  `).join("");
+
+  els.modelMarkers.innerHTML = DATA.models.map((model) => `
+    <button class="model-marker ${model.id === state.selected ? "active" : ""}" type="button" data-id="${model.id}" data-name="${model.name}" style="--model-color: ${model.color}; --size: ${markerSize(model)};"></button>
+  `).join("");
+
+  els.compareSelect.innerHTML = DATA.models.map((model) => `
+    <option value="${model.id}" ${model.id === state.compare ? "selected" : ""}>${model.name}</option>
+  `).join("");
+
+  els.modelList.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => setModel(button.dataset.id));
+  });
+  els.modelMarkers.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => setModel(button.dataset.id));
+  });
+}
+
+function positionModels() {
+  const markers = els.modelMarkers.querySelectorAll(".model-marker");
+  markers.forEach((marker, index) => {
+    const model = DATA.models[index];
+    const radius = orbitRadius(model);
+    const angle = orbitAngle(model, index) * Math.PI / 180;
+    const x = 50 + Math.cos(angle) * radius;
+    const y = 50 + Math.sin(angle) * radius * 0.74;
+    marker.style.left = `${x}%`;
+    marker.style.top = `${y}%`;
+    marker.style.setProperty("--size", markerSize(model));
+  });
+}
+
+function renderSelected() {
+  const model = modelById(state.selected);
+  els.stageTitle.textContent = model.name;
+  els.stageCopy.textContent = model.systemRole;
+  els.stageEyebrow.textContent = model.kind;
+  els.focusKind.textContent = model.kind;
+  els.focusName.textContent = model.name;
+  els.focusText.textContent = model.tagline;
+  els.quickWeight.textContent = model.weight;
+  els.quickDifficulty.textContent = model.difficulty;
+  els.quickSpeed.textContent = model.speed;
+
+  els.modelPreview.style.setProperty("--model-color", model.color);
+  els.modelName.textContent = model.name;
+  els.modelKind.textContent = model.kind;
+  els.modelTagline.textContent = model.tagline;
+  els.metricFunction.textContent = model.function;
+  els.metricSignals.textContent = model.signals;
+  els.metricStrategy.textContent = model.strategy;
+  els.metricCaveat.textContent = model.caveat;
+  els.systemRole.textContent = model.systemRole;
+  els.factList.innerHTML = model.facts.map((fact) => `<li>${fact}</li>`).join("");
+}
+
+function renderCompare() {
+  const selected = modelById(state.selected);
+  const compared = modelById(state.compare);
+  const metrics = [
+    {
+      label: "影响力",
+      a: selected.metrics.influence,
+      b: compared.metrics.influence,
+      max: 100,
+      format: (value) => `${value}%`
+    },
+    {
+      label: "复杂度",
+      a: selected.metrics.complexity,
+      b: compared.metrics.complexity,
+      max: 100,
+      format: (value) => `${value}%`
+    },
+    {
+      label: "见效速度",
+      a: selected.metrics.speed,
+      b: compared.metrics.speed,
+      max: 100,
+      format: (value) => `${value}%`
+    }
+  ];
+
+  els.compareBars.innerHTML = metrics.map((metric) => {
+    const aWidth = Math.max(4, metric.a / metric.max * 100);
+    const bWidth = Math.max(4, metric.b / metric.max * 100);
+    return `
+      <div class="bar-row">
+        <div class="bar-label"><span>${metric.label} · ${selected.name}</span><span>${metric.format(metric.a)}</span></div>
+        <div class="bar-track"><span style="--w: ${aWidth}%;"></span></div>
+        <div class="bar-label"><span>${metric.label} · ${compared.name}</span><span>${metric.format(metric.b)}</span></div>
+        <div class="bar-track"><span style="--w: ${bWidth}%; background: linear-gradient(135deg, #7b40e0, #4d44e3);"></span></div>
+      </div>
+    `;
+  }).join("");
+}
+
+function updateActiveStates() {
+  document.querySelectorAll(".model-button, .model-marker").forEach((node) => {
+    node.classList.toggle("active", node.dataset.id === state.selected);
+  });
+  document.querySelectorAll("[data-scale]").forEach((node) => {
+    node.classList.toggle("active", node.dataset.scale === state.scale);
+  });
+  els.scaleNote.textContent = state.scale === "flow"
+    ? "流程模式：展示推荐系统的四个核心阶段"
+    : "信号模式：展示各模型的影响力和复杂度";
+  els.motionToggle.textContent = state.moving ? "暂停动画" : "播放动画";
+  els.motionToggle.classList.toggle("active", state.moving);
+}
+
+function renderAll() {
+  renderShell();
+  renderSelected();
+  renderCompare();
+  updateActiveStates();
+  positionModels();
+}
+
+document.querySelectorAll("[data-scale]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.scale = button.dataset.scale;
+    updateActiveStates();
+    positionModels();
+  });
+});
+
+els.motionToggle.addEventListener("click", () => {
+  state.moving = !state.moving;
+  updateActiveStates();
+});
+
+els.compareSelect.addEventListener("change", (event) => {
+  state.compare = event.target.value;
+  renderCompare();
+});
+
+let last = performance.now();
+function tick(now) {
+  const delta = Math.min(40, now - last);
+  last = now;
+  if (state.moving) {
+    state.phase += delta * 0.035;
+    positionModels();
+  }
+  requestAnimationFrame(tick);
+}
+
+renderAll();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="teaching">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MCP Builder — 构建高质量 MCP Server 的交互式指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0f766e;
+  --primary-container: #115e59;
+  --primary-fixed: #ccfbf1;
+  --secondary-container: #f59e0b;
+  --bg: #f6fbfb;
+  --surface: #f6fbfb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #edf7f5;
+  --surface-container: #e5f1ee;
+  --surface-container-high: #d8e8e4;
+  --fg-1: #10201f;
+  --fg-2: #304c49;
+  --fg-muted: #647b78;
+  --border: rgba(15, 118, 110, 0.14);
+  --gradient-hero: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
+  --gradient-text: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(16, 32, 31, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 32, 31, 0.08);
+  --shadow-lg: 0 8px 24px rgba(16, 32, 31, 0.12);
+  --shadow-accent: 0 8px 24px rgba(15, 118, 110, 0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+body {
+  color: var(--fg-1);
+  background: var(--bg);
+  background-image:
+    linear-gradient(rgba(15, 118, 110, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 118, 110, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button, select { font: inherit; }
+button { cursor: pointer; }
+
+/* ===== Studio Layout ===== */
+.studio {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(300px, 380px);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+}
+
+.panel {
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.left-panel, .right-panel {
+  min-height: calc(100vh - 32px);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+.left-panel { gap: var(--space-xl); }
+
+.eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+h1 {
+  margin-bottom: var(--space-md);
+  font-family: var(--font-headline);
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+.gradient-text {
+  color: transparent;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.intro {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+/* ===== Mode Card ===== */
+.mode-card {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.mode-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.mode-card p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ===== Controls ===== */
+.controls { display: grid; gap: var(--space-md); }
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+}
+.control-row label {
+  color: var(--fg-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  background: var(--surface-container);
+  border-radius: var(--radius-pill);
+}
+.segmented button, .pill-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--fg-2);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.segmented button.active, .pill-button.active {
+  color: #fff;
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-accent);
+}
+.pill-button {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-container-lowest);
+}
+.segmented button:active, .pill-button:active, .phase-button:active {
+  transform: scale(0.97);
+}
+
+/* ===== Phase List ===== */
+.phase-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: auto;
+}
+.phase-button {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-md);
+  color: var(--fg-2);
+  text-align: left;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.18s, box-shadow 0.18s;
+}
+.phase-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.phase-button.active {
+  color: var(--fg-1);
+  border-color: rgba(15, 118, 110, 0.35);
+  box-shadow: var(--shadow-accent);
+}
+.phase-num {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-container);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.phase-button.active .phase-num {
+  background: var(--primary);
+  color: #fff;
+}
+.phase-button span:nth-child(2) {
+  font-weight: 800;
+  font-size: 13.5px;
+}
+.phase-button small {
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ===== Stage ===== */
+.stage-wrap {
+  position: relative;
+  min-height: calc(100vh - 32px);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(460px, 1fr) auto;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(246, 251, 251, 0.9)),
+    radial-gradient(circle at 50% 48%, rgba(16, 32, 31, 0.05), transparent 48%);
+}
+.stage-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-xl) 0;
+}
+.stage-header h2 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: clamp(24px, 3vw, 42px);
+  letter-spacing: -0.04em;
+}
+.stage-header p {
+  max-width: 520px;
+  margin: var(--space-sm) 0 0;
+  color: var(--fg-muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.scale-note {
+  align-self: flex-start;
+  min-width: 150px;
+  padding: var(--space-md) var(--space-lg);
+  color: var(--fg-2);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ===== MCP Stage ===== */
+.mcp-stage {
+  position: relative;
+  min-height: 560px;
+  margin: var(--space-md);
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(15, 118, 110, 0.08) 0 12%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.06), transparent 48%),
+    linear-gradient(160deg, rgba(16, 32, 31, 0.95), rgba(20, 45, 42, 0.88) 50%, rgba(28, 60, 55, 0.82));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), var(--shadow-lg);
+}
+.mcp-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.45) 0 1px, transparent 1.3px);
+  background-size: 72px 72px, 118px 118px;
+  background-position: 4px 13px, 34px 52px;
+  pointer-events: none;
+}
+
+/* Protocol rings */
+.protocol-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--orbit) * 2);
+  height: calc(var(--orbit) * 2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.protocol-ring.inner { border-color: rgba(204, 251, 241, 0.28); }
+.protocol-ring.outer { border-style: dashed; border-color: rgba(245, 158, 11, 0.2); }
+
+/* Center hub */
+.hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(82px, 10vw, 132px);
+  height: clamp(82px, 10vw, 132px);
+  border: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 38% 34%, #ccfbf1 0 8%, #5eead4 24%, #0f766e 62%, #115e59 100%);
+  box-shadow: 0 0 45px rgba(15, 118, 110, 0.72), 0 0 96px rgba(204, 251, 241, 0.42);
+}
+.hub::after {
+  content: "MCP";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 12px);
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.76);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Tool markers */
+.tool-marker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--size) * 1px);
+  height: calc(var(--size) * 1px);
+  min-width: 10px;
+  min-height: 10px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background-color: transparent;
+  background-image: var(--tool-image);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08), 0 14px 34px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), height 0.35s cubic-bezier(0.4, 0, 0.2, 1), left 0.35s, top 0.35s, box-shadow 0.2s;
+}
+.tool-marker::after {
+  content: attr(data-name);
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 9px);
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.tool-marker:hover::after, .tool-marker.active::after { opacity: 1; }
+.tool-marker.active {
+  z-index: 4;
+  box-shadow: 0 0 0 9px rgba(204, 251, 241, 0.22), 0 0 54px rgba(204, 251, 241, 0.45);
+}
+
+/* Focus card */
+.focus-card {
+  position: absolute;
+  left: var(--space-xl);
+  bottom: var(--space-xl);
+  z-index: 5;
+  width: min(380px, calc(100% - 40px));
+  padding: var(--space-lg);
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(18px);
+}
+.focus-card span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: rgba(204, 251, 241, 0.88);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.focus-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+.focus-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Stage footer */
+.stage-footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  padding: 0 var(--space-xl) var(--space-xl);
+}
+.mini-stat {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.mini-stat span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.mini-stat strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+/* ===== Right Panel ===== */
+.right-panel { gap: var(--space-lg); }
+.inspector-top {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+.tool-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-xl);
+  background-color: rgba(255, 255, 255, 0.58);
+  background-image: var(--tool-image);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  box-shadow: 0 0 0 10px rgba(15, 118, 110, 0.08);
+}
+.inspector-top h2 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.kind-pill {
+  display: inline-flex;
+  margin-top: var(--space-sm);
+  padding: 6px 10px;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 900;
+}
+.tagline {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+.metric {
+  min-height: 98px;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.metric span {
+  display: block;
+  margin-bottom: var(--space-sm);
+  color: var(--fg-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.metric strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 22px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.detail-section {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.detail-section h3 {
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.detail-section p, .detail-section li {
+  color: var(--fg-2);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.detail-section p:last-child { margin-bottom: 0; }
+.detail-section ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding-left: 18px;
+}
+.compare { margin-top: auto; }
+.compare-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+.compare-head h3 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 17px;
+}
+.compare-head select {
+  max-width: 148px;
+  min-height: 36px;
+  padding: 0 var(--space-md);
+  color: var(--fg-2);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+.bar-row {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.bar-track {
+  position: relative;
+  height: 10px;
+  overflow: hidden;
+  background: var(--surface-container);
+  border-radius: var(--radius-pill);
+}
+.bar-track span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w);
+  border-radius: var(--radius-pill);
+  background: var(--gradient-primary);
+}
+.source-note {
+  margin: var(--space-md) 0 0;
+  color: var(--fg-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ===== Principle Cards ===== */
+.principle-card {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-md);
+}
+.principle-card h4 {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--primary);
+}
+.principle-card p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1160px) {
+  .studio { grid-template-columns: 280px minmax(0, 1fr); }
+  .right-panel {
+    grid-column: 1 / -1;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .inspector-top, .tagline, .metric-grid { grid-column: 1; }
+  .detail-section, .compare { grid-column: 2; }
+}
+
+@media (max-width: 820px) {
+  .studio {
+    display: block;
+    padding: var(--space-md);
+  }
+  .left-panel, .stage-wrap, .right-panel {
+    min-height: auto;
+    margin-bottom: var(--space-md);
+  }
+  .phase-list {
+    grid-template-columns: 1fr 1fr;
+    margin-top: 0;
+  }
+  .stage-header, .stage-footer { display: block; }
+  .scale-note { margin-top: var(--space-md); }
+  .mcp-stage { min-height: 520px; }
+  .stage-footer { padding: 0 var(--space-md) var(--space-md); }
+  .mini-stat { margin-top: var(--space-md); }
+  .right-panel { display: flex; }
+}
+
+@media (max-width: 560px) {
+  .studio {
+    padding: var(--space-sm);
+    overflow-x: hidden;
+  }
+  .left-panel, .right-panel {
+    padding: var(--space-lg);
+    overflow: hidden;
+  }
+  h1 { font-size: 30px; line-height: 1.02; }
+  h1 .gradient-text { display: block; }
+  .intro { font-size: 14px; }
+  .phase-list { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .mcp-stage {
+    min-height: 460px;
+    margin: var(--space-sm);
+  }
+  .stage-header { padding: var(--space-lg) var(--space-lg) 0; }
+  .stage-header h2 { font-size: 26px; }
+  .scale-note {
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .metric strong {
+    font-size: 19px;
+    overflow-wrap: anywhere;
+  }
+  .focus-card {
+    left: var(--space-md);
+    bottom: var(--space-md);
+    width: calc(100% - 24px);
+  }
+  .tool-marker::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<main class="studio lesson-shell object-lab">
+  <aside class="panel left-panel step-rail concept-drawer" aria-label="MCP Builder controls">
+    <section>
+      <p class="eyebrow">Interactive guide</p>
+      <h1>MCP <span class="gradient-text">Builder</span></h1>
+      <p class="intro">指导开发者创建高质量的 MCP（Model Context Protocol）Server。不是简单包装 API，而是构建面向工作流的高影响力工具，让 LLM 能够通过精心设计的工具与外部服务交互。</p>
+    </section>
+
+    <section class="mode-card">
+      <strong>Agent-centric 设计</strong>
+      <p>不是简单包装 API endpoint，而是构建面向工作流的高影响力工具。工具命名和分组反映人类的任务思考方式。</p>
+    </section>
+
+    <section class="controls try-control" aria-label="View controls">
+      <div class="segmented" aria-label="View mode">
+        <button class="active" type="button" data-view="phases">四阶段</button>
+        <button type="button" data-view="principles">设计原则</button>
+      </div>
+    </section>
+
+    <nav class="phase-list" id="phaseList" aria-label="Development phases"></nav>
+  </aside>
+
+  <section class="panel stage-wrap lesson-stage model-stage object-stage" aria-label="MCP development stage">
+    <header class="stage-header">
+      <div>
+        <p class="eyebrow" id="stageEyebrow">开发流程</p>
+        <h2 id="stageTitle">Phase 1: 深度研究与规划</h2>
+        <p id="stageCopy">理解 Agent-centric 设计原则，研读 MCP 协议文档，研究目标服务的 API，制定实现计划。</p>
+      </div>
+      <div class="scale-note" id="stageNote">Python / TypeScript 双栈支持</div>
+    </header>
+
+    <div class="mcp-stage" id="mcpStage" aria-label="MCP protocol visualization">
+      <div class="protocol-ring inner" style="--orbit: 9%;"></div>
+      <div class="protocol-ring inner" style="--orbit: 14%;"></div>
+      <div class="protocol-ring inner" style="--orbit: 19%;"></div>
+      <div class="protocol-ring inner" style="--orbit: 24%;"></div>
+      <div class="protocol-ring outer" style="--orbit: 32%;"></div>
+      <div class="protocol-ring outer" style="--orbit: 39%;"></div>
+      <div class="protocol-ring outer" style="--orbit: 45%;"></div>
+      <div class="protocol-ring outer" style="--orbit: 49%;"></div>
+      <div class="hub" aria-label="MCP Protocol"></div>
+      <div id="toolMarkers"></div>
+      <article class="focus-card" aria-live="polite">
+        <span id="focusKind">核心能力</span>
+        <strong id="focusName">Agent-centric 设计</strong>
+        <p id="focusText">构建面向工作流的高影响力工具，而非简单包装 API endpoint。</p>
+      </article>
+    </div>
+
+    <footer class="stage-footer" aria-label="Phase quick stats">
+      <div class="mini-stat">
+        <span>核心能力</span>
+        <strong id="quickCapability">5</strong>
+      </div>
+      <div class="mini-stat">
+        <span>开发阶段</span>
+        <strong id="quickPhase">4</strong>
+      </div>
+      <div class="mini-stat">
+        <span>支持语言</span>
+        <strong id="quickLang">2</strong>
+      </div>
+    </footer>
+  </section>
+
+  <aside class="panel right-panel inspector-panel check-yourself recap-strip" aria-label="Phase inspector">
+    <section class="inspector-top">
+      <div class="tool-preview" id="toolPreview"></div>
+      <div>
+        <p class="eyebrow">Selected phase</p>
+        <h2 id="phaseName">Phase 1</h2>
+        <span class="kind-pill" id="phaseKind">研究与规划</span>
+      </div>
+    </section>
+
+    <p class="tagline" id="phaseTagline">深度理解 Agent 需求，制定实现计划</p>
+
+    <section class="metric-grid" aria-label="Phase metrics">
+      <div class="metric">
+        <span>关键产出</span>
+        <strong id="metricOutput">工具清单</strong>
+      </div>
+      <div class="metric">
+        <span>时间投入</span>
+        <strong id="metricTime">20%</strong>
+      </div>
+      <div class="metric">
+        <span>风险等级</span>
+        <strong id="metricRisk">低</strong>
+      </div>
+      <div class="metric">
+        <span>验证方式</span>
+        <strong id="metricVerify">文档评审</strong>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h3>关键任务</h3>
+      <ul id="taskList"></ul>
+    </section>
+
+    <section class="detail-section">
+      <h3>交付物清单</h3>
+      <ul id="deliverableList"></ul>
+    </section>
+
+    <section class="detail-section compare compare-control">
+      <div class="compare-head">
+        <h3>阶段对比</h3>
+        <select id="compareSelect" aria-label="Comparison phase"></select>
+      </div>
+      <div id="compareBars"></div>
+      <p class="source-note">基于典型 MCP Server 开发项目的经验估算</p>
+    </section>
+  </aside>
+</main>
+
+<script>
+const DATA = {
+  phases: [
+    {
+      id: "phase1",
+      name: "Phase 1",
+      subtitle: "深度研究与规划",
+      tagline: "深度理解 Agent 需求，制定实现计划",
+      kind: "研究与规划",
+      capability: "Agent-centric 设计",
+      capabilityDesc: "构建面向工作流的高影响力工具，而非简单包装 API endpoint",
+      output: "工具清单",
+      time: "20%",
+      risk: "低",
+      verify: "文档评审",
+      tasks: [
+        "理解 Agent-centric 设计原则",
+        "研读 MCP 协议文档（modelcontextprotocol.io/llms-full.txt）",
+        "研读对应语言的 SDK 文档（Python / TypeScript）",
+        "彻底研究目标服务的 API 文档（端点、认证、限流、错误码）",
+        "制定实现计划：工具选择、共享工具、输入/输出设计、错误处理策略"
+      ],
+      deliverables: [
+        "API 文档分析报告",
+        "工具设计规格书",
+        "错误处理策略文档",
+        "项目结构规划"
+      ],
+      color: "#0f766e",
+      orbit: 12,
+      size: 28
+    },
+    {
+      id: "phase2",
+      name: "Phase 2",
+      subtitle: "实现",
+      tagline: "搭建项目结构，实现核心工具集",
+      kind: "开发实现",
+      capability: "上下文优化",
+      capabilityDesc: "针对 LLM 有限的上下文窗口，返回高信号信息而非 exhaustive 数据转储",
+      output: "可运行代码",
+      time: "40%",
+      risk: "中",
+      verify: "单元测试",
+      tasks: [
+        "搭建项目结构",
+        "实现认证和连接管理",
+        "开发核心工具集",
+        "设计响应格式和分页策略",
+        "实现错误处理和重试逻辑"
+      ],
+      deliverables: [
+        "MCP Server 核心代码",
+        "工具实现文档",
+        "单元测试套件",
+        "集成测试用例"
+      ],
+      color: "#0d9488",
+      orbit: 18,
+      size: 32
+    },
+    {
+      id: "phase3",
+      name: "Phase 3",
+      subtitle: "测试与评估",
+      tagline: "创建真实场景测试，验证 Agent 端到端能力",
+      kind: "测试验证",
+      capability: "可操作的错误消息",
+      capabilityDesc: "错误信息应指导 Agent 走向正确使用模式，而非仅诊断问题",
+      output: "测试报告",
+      time: "25%",
+      risk: "高",
+      verify: "场景测试",
+      tasks: [
+        "创建真实使用场景的测试用例",
+        "验证 Agent 能否使用工具完成端到端任务",
+        "根据测试结果优化工具设计",
+        "评估工具命名和分组是否合理"
+      ],
+      deliverables: [
+        "端到端测试报告",
+        "Agent 使用日志分析",
+        "工具优化建议",
+        "性能基准测试"
+      ],
+      color: "#f59e0b",
+      orbit: 26,
+      size: 30
+    },
+    {
+      id: "phase4",
+      name: "Phase 4",
+      subtitle: "文档与发布",
+      tagline: "编写使用说明，发布到注册表",
+      kind: "文档发布",
+      capability: "自然任务细分",
+      capabilityDesc: "工具命名和分组反映人类的任务思考方式，使用一致前缀便于 Agent 发现",
+      output: "文档包",
+      time: "15%",
+      risk: "低",
+      verify: "用户验收",
+      tasks: [
+        "编写工具使用说明",
+        "提供示例对话和预期输出",
+        "发布到 MCP Server 注册表或内部仓库",
+        "收集早期用户反馈"
+      ],
+      deliverables: [
+        "README 文档",
+        "API 参考手册",
+        "示例对话集",
+        "发布包"
+      ],
+      color: "#7c3aed",
+      orbit: 34,
+      size: 26
+    }
+  ],
+  principles: [
+    {
+      id: "workflow",
+      name: "面向工作流",
+      desc: "合并相关操作（如 schedule_event 同时检查可用性和创建事件）",
+      category: "设计原则"
+    },
+    {
+      id: "context",
+      name: "上下文预算",
+      desc: "提供 concise vs detailed 响应格式，默认使用人类可读标识符而非技术 ID",
+      category: "设计原则"
+    },
+    {
+      id: "error",
+      name: "教育性错误",
+      desc: "错误消息中建议具体下一步：Try using filter='active_only' to reduce results",
+      category: "设计原则"
+    },
+    {
+      id: "prefix",
+      name: "一致前缀",
+      desc: "相关工具使用一致前缀以便 Agent 发现（如 calendar_*）",
+      category: "设计原则"
+    }
+  ]
+};
+
+const state = {
+  selected: "phase1",
+  compare: "phase2",
+  view: "phases",
+  moving: true,
+  phase: 0
+};
+
+const els = {
+  phaseList: document.getElementById("phaseList"),
+  toolMarkers: document.getElementById("toolMarkers"),
+  stageEyebrow: document.getElementById("stageEyebrow"),
+  stageTitle: document.getElementById("stageTitle"),
+  stageCopy: document.getElementById("stageCopy"),
+  stageNote: document.getElementById("stageNote"),
+  focusKind: document.getElementById("focusKind"),
+  focusName: document.getElementById("focusName"),
+  focusText: document.getElementById("focusText"),
+  quickCapability: document.getElementById("quickCapability"),
+  quickPhase: document.getElementById("quickPhase"),
+  quickLang: document.getElementById("quickLang"),
+  toolPreview: document.getElementById("toolPreview"),
+  phaseName: document.getElementById("phaseName"),
+  phaseKind: document.getElementById("phaseKind"),
+  phaseTagline: document.getElementById("phaseTagline"),
+  metricOutput: document.getElementById("metricOutput"),
+  metricTime: document.getElementById("metricTime"),
+  metricRisk: document.getElementById("metricRisk"),
+  metricVerify: document.getElementById("metricVerify"),
+  taskList: document.getElementById("taskList"),
+  deliverableList: document.getElementById("deliverableList"),
+  compareSelect: document.getElementById("compareSelect"),
+  compareBars: document.getElementById("compareBars")
+};
+
+function phaseById(id) {
+  return DATA.phases.find((p) => p.id === id) || DATA.phases[0];
+}
+
+function toolImageStyle(phase) {
+  return `--tool-image: radial-gradient(circle at 30% 30%, ${phase.color}, ${phase.color}88 40%, transparent 70%);`;
+}
+
+function orbitRadius(phase, index) {
+  return phase.orbit;
+}
+
+function orbitAngle(phase, index) {
+  const base = index * 90 - 45;
+  if (!state.moving) return base;
+  const speed = 8 / (index + 1);
+  return base + state.phase * speed;
+}
+
+function setPhase(id) {
+  state.selected = id;
+  renderAll();
+}
+
+function renderShell() {
+  els.phaseList.innerHTML = DATA.phases.map((phase, index) => `
+    <button class="phase-button ${phase.id === state.selected ? "active" : ""}" type="button" data-id="${phase.id}">
+      <span class="phase-num">${index + 1}</span>
+      <span>${phase.name}</span>
+      <small>${phase.subtitle}</small>
+    </button>
+  `).join("");
+
+  els.toolMarkers.innerHTML = DATA.phases.map((phase, index) => `
+    <button class="tool-marker ${phase.id === state.selected ? "active" : ""}" type="button" data-id="${phase.id}" data-name="${phase.name}" style="--tool-color: ${phase.color}; --size: ${phase.size}; ${toolImageStyle(phase)}"></button>
+  `).join("");
+
+  els.compareSelect.innerHTML = DATA.phases.map((phase) => `
+    <option value="${phase.id}" ${phase.id === state.compare ? "selected" : ""}>${phase.name}</option>
+  `).join("");
+
+  els.phaseList.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => setPhase(button.dataset.id));
+  });
+  els.toolMarkers.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => setPhase(button.dataset.id));
+  });
+}
+
+function positionTools() {
+  const markers = els.toolMarkers.querySelectorAll(".tool-marker");
+  markers.forEach((marker, index) => {
+    const phase = DATA.phases[index];
+    const radius = orbitRadius(phase, index);
+    const angle = orbitAngle(phase, index) * Math.PI / 180;
+    const x = 50 + Math.cos(angle) * radius;
+    const y = 50 + Math.sin(angle) * radius * 0.74;
+    marker.style.left = `${x}%`;
+    marker.style.top = `${y}%`;
+    marker.style.setProperty("--size", phase.size);
+  });
+}
+
+function renderSelected() {
+  const phase = phaseById(state.selected);
+  els.stageEyebrow.textContent = "开发流程";
+  els.stageTitle.textContent = `${phase.name}: ${phase.subtitle}`;
+  els.stageCopy.textContent = phase.tagline;
+  els.focusKind.textContent = "核心能力";
+  els.focusName.textContent = phase.capability;
+  els.focusText.textContent = phase.capabilityDesc;
+  els.quickCapability.textContent = "5";
+  els.quickPhase.textContent = "4";
+  els.quickLang.textContent = "2";
+
+  els.toolPreview.style.setProperty("--tool-image", `radial-gradient(circle at 30% 30%, ${phase.color}, ${phase.color}88 40%, transparent 70%)`);
+  els.phaseName.textContent = phase.name;
+  els.phaseKind.textContent = phase.kind;
+  els.phaseTagline.textContent = phase.tagline;
+  els.metricOutput.textContent = phase.output;
+  els.metricTime.textContent = phase.time;
+  els.metricRisk.textContent = phase.risk;
+  els.metricVerify.textContent = phase.verify;
+  els.taskList.innerHTML = phase.tasks.map((task) => `<li>${task}</li>`).join("");
+  els.deliverableList.innerHTML = phase.deliverables.map((d) => `<li>${d}</li>`).join("");
+}
+
+function renderCompare() {
+  const selected = phaseById(state.selected);
+  const compared = phaseById(state.compare);
+  const timeToValue = (t) => parseInt(t);
+  const riskToValue = (r) => ({低: 1, 中: 2, 高: 3}[r] || 1);
+
+  const metrics = [
+    {
+      label: "时间投入",
+      a: timeToValue(selected.time),
+      b: timeToValue(compared.time),
+      max: 40,
+      format: (v) => `${v}%`
+    },
+    {
+      label: "风险等级",
+      a: riskToValue(selected.risk),
+      b: riskToValue(compared.risk),
+      max: 3,
+      format: (v) => ({1: "低", 2: "中", 3: "高"}[v] || "低")
+    }
+  ];
+
+  els.compareBars.innerHTML = metrics.map((metric) => {
+    const aWidth = Math.max(4, metric.a / metric.max * 100);
+    const bWidth = Math.max(4, metric.b / metric.max * 100);
+    return `
+      <div class="bar-row">
+        <div class="bar-label"><span>${metric.label} · ${selected.name}</span><span>${metric.format(metric.a)}</span></div>
+        <div class="bar-track"><span style="--w: ${aWidth}%;"></span></div>
+        <div class="bar-label"><span>${metric.label} · ${compared.name}</span><span>${metric.format(metric.b)}</span></div>
+        <div class="bar-track"><span style="--w: ${bWidth}%; background: linear-gradient(135deg, #7b40e0, #4d44e3);"></span></div>
+      </div>
+    `;
+  }).join("");
+}
+
+function updateActiveStates() {
+  document.querySelectorAll(".phase-button, .tool-marker").forEach((node) => {
+    node.classList.toggle("active", node.dataset.id === state.selected);
+  });
+  document.querySelectorAll("[data-view]").forEach((node) => {
+    node.classList.toggle("active", node.dataset.view === state.view);
+  });
+}
+
+function renderAll() {
+  renderShell();
+  renderSelected();
+  renderCompare();
+  updateActiveStates();
+  positionTools();
+}
+
+document.querySelectorAll("[data-view]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.view = button.dataset.view;
+    updateActiveStates();
+  });
+});
+
+els.compareSelect.addEventListener("change", (event) => {
+  state.compare = event.target.value;
+  renderCompare();
+});
+
+let last = performance.now();
+function tick(now) {
+  const delta = Math.min(40, now - last);
+  last = now;
+  if (state.moving) {
+    state.phase += delta * 0.035;
+    positionTools();
+  }
+  requestAnimationFrame(tick);
+}
+
+renderAll();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

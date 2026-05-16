@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>skill-creator - Claude Skill 创建指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+  --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+  --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--fg-1);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Document Shell */
+.document-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-4xl) var(--space-xl);
+}
+
+@media (max-width: 640px) {
+  .document-shell {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+}
+
+/* Cover */
+.cover {
+  margin-bottom: var(--space-5xl);
+  padding-bottom: var(--space-4xl);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.cover-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface-container);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xl);
+}
+
+.cover-badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+}
+
+.cover h1 {
+  font-family: var(--font-headline);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+  margin-bottom: var(--space-lg);
+}
+
+.cover-subtitle {
+  font-size: 1.125rem;
+  color: var(--fg-2);
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+/* Deck */
+.deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-3xl);
+}
+
+.deck-item {
+  padding: var(--space-lg);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.deck-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-xs);
+}
+
+.deck-value {
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--fg-1);
+}
+
+/* Reader Rail */
+.reader-rail {
+  position: sticky;
+  top: var(--space-2xl);
+  float: left;
+  width: 180px;
+  margin-left: -200px;
+  margin-right: var(--space-xl);
+  padding-right: var(--space-lg);
+  border-right: 1px solid var(--border);
+}
+
+.reader-rail ul {
+  list-style: none;
+}
+
+.reader-rail li {
+  margin-bottom: var(--space-xs);
+}
+
+.reader-rail a {
+  display: block;
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--fg-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.reader-rail a:hover,
+.reader-rail a.active {
+  color: var(--primary);
+  background: var(--surface-container);
+}
+
+@media (max-width: 1100px) {
+  .reader-rail {
+    position: relative;
+    float: none;
+    width: 100%;
+    margin: 0 0 var(--space-3xl) 0;
+    padding: 0 0 var(--space-xl) 0;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reader-rail ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .reader-rail li {
+    margin: 0;
+  }
+}
+
+/* Body Sections */
+.body-section {
+  margin-bottom: var(--space-5xl);
+}
+
+.body-section h2 {
+  font-family: var(--font-headline);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--primary);
+  display: inline-block;
+}
+
+.body-section h3 {
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: var(--space-3xl) 0 var(--space-lg);
+  color: var(--fg-1);
+}
+
+.body-section h4 {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: var(--space-2xl) 0 var(--space-md);
+  color: var(--fg-2);
+}
+
+.body-section p {
+  margin-bottom: var(--space-lg);
+  color: var(--fg-2);
+}
+
+.body-section ul,
+.body-section ol {
+  margin: var(--space-lg) 0;
+  padding-left: var(--space-xl);
+  color: var(--fg-2);
+}
+
+.body-section li {
+  margin-bottom: var(--space-sm);
+}
+
+/* Claim Cards */
+.claim-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-xl) 0;
+  position: relative;
+}
+
+.claim-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.claim-card h4 {
+  margin-top: 0;
+  color: var(--primary);
+}
+
+/* Fact Tables */
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-xl) 0;
+  font-size: 14px;
+}
+
+.fact-table th,
+.fact-table td {
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.fact-table th {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+  background: var(--surface-container);
+}
+
+.fact-table tr:hover td {
+  background: var(--surface-container-low);
+}
+
+/* Evidence Margin */
+.evidence-margin {
+  background: var(--surface-container);
+  border-left: 3px solid var(--primary);
+  padding: var(--space-lg) var(--space-xl);
+  margin: var(--space-xl) 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.evidence-margin p {
+  margin: 0;
+  font-style: italic;
+  color: var(--fg-2);
+}
+
+.evidence-margin .source {
+  display: block;
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  font-style: normal;
+}
+
+/* Code Blocks */
+pre {
+  background: var(--surface-container-high);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: var(--space-xl) 0;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--surface-container);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Caveat Box */
+.caveat-box {
+  background: linear-gradient(135deg, rgba(160, 59, 0, 0.05) 0%, rgba(123, 64, 224, 0.05) 100%);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-xl) 0;
+}
+
+.caveat-box h4 {
+  margin-top: 0;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.caveat-box h4::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Question Panel */
+.question-panel {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin-top: var(--space-4xl);
+}
+
+.question-panel h3 {
+  margin-top: 0;
+  font-family: var(--font-headline);
+  font-size: 1.25rem;
+}
+
+.question-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.question-panel li {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.question-panel li::before {
+  content: '→';
+  color: var(--primary);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.question-panel li:last-child {
+  border-bottom: none;
+}
+
+/* Source Spread */
+.source-spread {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-lg);
+  margin: var(--space-xl) 0;
+}
+
+.source-card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  transition: box-shadow 0.2s ease;
+}
+
+.source-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.source-card .meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+
+.source-card h4 {
+  margin: 0 0 var(--space-sm);
+  font-size: 1rem;
+}
+
+.source-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--fg-muted);
+}
+
+/* Level Indicators */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: var(--space-sm);
+}
+
+.level-1 {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--green);
+}
+
+.level-2 {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--blue);
+}
+
+.level-3 {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--yellow);
+}
+
+/* Strong emphasis */
+strong {
+  font-weight: 600;
+  color: var(--fg-1);
+}
+
+/* Section anchor offset for sticky nav */
+section[id] {
+  scroll-margin-top: var(--space-4xl);
+}
+
+/* Print styles */
+@media print {
+  .reader-rail {
+    display: none;
+  }
+
+  .document-shell {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .cover {
+    page-break-after: always;
+  }
+
+  .body-section {
+    page-break-inside: avoid;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <div class="cover-badge">Claude Skill</div>
+    <h1>skill-creator</h1>
+    <p class="cover-subtitle">指导开发者创建高质量的 Claude Skill，涵盖结构设计、渐进式加载原则、元数据编写和打包分发</p>
+
+    <div class="deck">
+      <div class="deck-item">
+        <div class="deck-label">来源</div>
+        <div class="deck-value">Composio / 社区</div>
+      </div>
+      <div class="deck-item">
+        <div class="deck-label">许可证</div>
+        <div class="deck-value">Apache 2.0</div>
+      </div>
+      <div class="deck-item">
+        <div class="deck-label">维护者</div>
+        <div class="deck-value">社区</div>
+      </div>
+      <div class="deck-item">
+        <div class="deck-label">价值评级</div>
+        <div class="deck-value">极高</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Reader Rail -->
+  <nav class="reader-rail">
+    <ul>
+      <li><a href="#positioning" class="active">定位</a></li>
+      <li><a href="#triggers">触发时机</a></li>
+      <li><a href="#capabilities">核心能力</a></li>
+      <li><a href="#anatomy">解剖结构</a></li>
+      <li><a href="#principles">设计原则</a></li>
+      <li><a href="#loading">渐进式加载</a></li>
+      <li><a href="#relationship">与 ys-powers 关联</a></li>
+    </ul>
+  </nav>
+
+  <!-- Body Content -->
+  <main>
+
+    <section id="positioning" class="body-section">
+      <h2>定位</h2>
+      <p>skill-creator 是 Skill 生态的「元 skill」。它指导开发者创建高质量的 Claude Skill，涵盖 Skill 的结构设计、渐进式加载原则、元数据编写和打包分发。</p>
+
+      <div class="caveat-box">
+        <h4>不适用场景</h4>
+        <p>仅需一次性提示词（prompt）而无需复用结构的场景。skill-creator 专注于可复用、可分发的 Skill 架构设计，而非临时性提示词优化。</p>
+      </div>
+    </section>
+
+    <section id="triggers" class="body-section">
+      <h2>触发时机</h2>
+      <ul>
+        <li>需要为特定工作流或领域创建自定义 Claude Skill 时</li>
+        <li>评估或改进现有 Skill 的质量时</li>
+        <li>理解 Claude Skill 的架构和最佳实践时</li>
+      </ul>
+    </section>
+
+    <section id="capabilities" class="body-section">
+      <h2>核心能力</h2>
+
+      <div class="claim-card">
+        <h4>1. Skill 架构指导</h4>
+        <p>解释 Skill 的组成结构：SKILL.md + scripts/ + references/ + assets/</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>2. 元数据优化</h4>
+        <p>指导如何编写高质量的 <code>name</code> 和 <code>description</code>，确保 Claude 在正确时机触发 Skill</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>3. 渐进式加载设计</h4>
+        <p>利用三级加载系统管理上下文效率，平衡信息丰富度与上下文窗口限制</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>4. 资源组织</h4>
+        <p>区分 scripts/（可执行代码）、references/（参考文档）、assets/（输出资源）</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>5. 验证与迭代</h4>
+        <p>通过具体用例验证 Skill 设计，基于反馈迭代优化</p>
+      </div>
+    </section>
+
+    <section id="anatomy" class="body-section">
+      <h2>Skill 解剖结构</h2>
+
+      <pre><code>skill-name/
+├── SKILL.md              # 必需：YAML frontmatter + Markdown 指令
+│   ├── name:             # 必需：skill 名称
+│   └── description:      # 必需：触发时机描述
+├── scripts/              # 可选：可执行脚本（Python/Bash 等）
+├── references/           # 可选：参考文档（按需加载）
+└── assets/               # 可选：输出资源（模板、图标、字体等）</code></pre>
+
+      <div class="evidence-margin">
+        <p>SKILL.md 是 Skill 的唯一必需文件。它包含 YAML frontmatter（元数据）和 Markdown 指令（行为定义）。scripts/、references/、assets/ 都是可选的扩展目录。</p>
+        <span class="source">来源：refer/awesome-claude-skills/skill-creator/SKILL.md</span>
+      </div>
+    </section>
+
+    <section id="principles" class="body-section">
+      <h2>关键设计原则</h2>
+
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>原则</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>元数据质量</strong></td>
+            <td><code>name</code> 和 <code>description</code> 决定 Skill 何时被使用，使用第三人称（"This skill should be used when..."）</td>
+          </tr>
+          <tr>
+            <td><strong>避免重复</strong></td>
+            <td>信息应只存在于 SKILL.md 或 references 之一，优先将详细内容放入 references</td>
+          </tr>
+          <tr>
+            <td><strong>Script 黑盒化</strong></td>
+            <td>脚本可在不读入上下文的情况下执行，适合确定性和重复性任务</td>
+          </tr>
+          <tr>
+            <td><strong>References 按需加载</strong></td>
+            <td>> 10k 词的参考文件应在 SKILL.md 中提供 grep 搜索模式</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="loading" class="body-section">
+      <h2>渐进式加载系统</h2>
+      <p>skill-creator 的核心创新是三级渐进式加载设计，这是管理大上下文的核心技术：</p>
+
+      <h3>三级加载架构</h3>
+
+      <div class="claim-card">
+        <span class="level-badge level-1">Level 1</span>
+        <strong>元数据（~100 词）</strong>
+        <p style="margin: var(--space-sm) 0 0;">始终在上下文中。包含 name 和 description，决定 Skill 何时被触发。</p>
+      </div>
+
+      <div class="claim-card">
+        <span class="level-badge level-2">Level 2</span>
+        <strong>SKILL.md 正文（&lt; 5000 词）</strong>
+        <p style="margin: var(--space-sm) 0 0;">Skill 触发时加载。包含完整的指令、规则和行为定义。</p>
+      </div>
+
+      <div class="claim-card">
+        <span class="level-badge level-3">Level 3</span>
+        <strong>Bundle 资源</strong>
+        <p style="margin: var(--space-sm) 0 0;">按需加载，无上限。包括 references/、scripts/、assets/ 中的详细资源。</p>
+      </div>
+
+      <div class="evidence-margin">
+        <p>渐进式加载的设计哲学：让 Claude 只在需要时加载大量内容，保持常规上下文的轻量。这与 ys-powers 自身的 Skill 设计理念完全一致。</p>
+        <span class="source">设计原则：上下文效率优先</span>
+      </div>
+    </section>
+
+    <section id="relationship" class="body-section">
+      <h2>与 ys-powers 的关联</h2>
+
+      <h3>与 mcp-builder 的关系</h3>
+      <p><code>mcp-builder</code> 教「如何构建 MCP Server」，<code>skill-creator</code> 教「如何构建 Claude Skill」。两者是不同层面的能力扩展：</p>
+      <ul>
+        <li><strong>MCP</strong>：用于连接外部系统（工具、API、数据源）</li>
+        <li><strong>Skill</strong>：用于封装工作流知识（提示词、规则、最佳实践）</li>
+      </ul>
+
+      <h3>借鉴价值</h3>
+      <div class="source-spread">
+        <div class="source-card">
+          <div class="meta">核心技术</div>
+          <h4>渐进式加载</h4>
+          <p>管理大上下文的核心技术，直接适用于 ys-powers 自身的 Skill 设计</p>
+        </div>
+        <div class="source-card">
+          <div class="meta">机制</div>
+          <h4>元数据驱动触发</h4>
+          <p>解释为什么好的 description 至关重要，影响 Skill 的命中准确率</p>
+        </div>
+      </div>
+
+      <div class="caveat-box">
+        <h4>搬运建议</h4>
+        <p><strong>极高价值。</strong>这是 Skill 生态的「元 skill」，所有 ys-powers 的 Skill 开发者都应参考。建议在 ys-powers 中创建对应的 skill-creator 文档或 skill 模板。</p>
+      </div>
+    </section>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h3>下一步行动</h3>
+      <ul>
+        <li>在 ys-powers 的 skills/ 目录下创建基于 skill-creator 指导的 Skill 模板</li>
+        <li>将渐进式加载原则应用到现有 Skill 的上下文优化中</li>
+        <li>审查现有 Skill 的元数据质量，确保 description 准确描述触发时机</li>
+        <li>为团队创建 Skill 开发规范文档，统一命名和结构标准</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <footer style="margin-top: var(--space-5xl); padding-top: var(--space-2xl); border-top: 1px solid var(--border); text-align: center; color: var(--fg-muted); font-size: 13px;">
+    <p>来源：refer/awesome-claude-skills/skill-creator/SKILL.md · 生成时间：2026-05-17</p>
+  </footer>
+
+</div>
+
+<script>
+// Active nav highlighting on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.reader-rail a');
+
+function updateActiveNav() {
+  const scrollPos = window.scrollY + 100;
+
+  sections.forEach((section, index) => {
+    const top = section.offsetTop;
+    const bottom = top + section.offsetHeight;
+
+    if (scrollPos >= top && scrollPos < bottom) {
+      navLinks.forEach(link => link.classList.remove('active'));
+      if (navLinks[index]) {
+        navLinks[index].classList.add('active');
+      }
+    }
+  });
+}
+
+window.addEventListener('scroll', updateActiveNav);
+updateActiveNav();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>template-skill — Claude Skill 标准模板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg-1);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* Document shell */
+.document-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+}
+
+/* Cover / masthead */
+.cover {
+  margin-bottom: var(--space-4xl);
+  padding-bottom: var(--space-3xl);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.cover-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-md);
+}
+
+.cover-title {
+  font-family: var(--font-headline);
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--fg-1);
+  margin-bottom: var(--space-lg);
+}
+
+.cover-title .highlight {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cover-deck {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  max-width: 640px;
+}
+
+/* Reader rail */
+.reader-rail {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-3xl);
+  flex-wrap: wrap;
+}
+
+.rail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-container);
+  color: var(--fg-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.rail-chip:hover {
+  background: var(--surface-container-high);
+  border-color: var(--outline-variant);
+}
+
+.rail-chip.active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.rail-chip .count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* Body sections */
+.body-section {
+  margin-bottom: var(--space-4xl);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.section-number {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 28px;
+}
+
+.section-title {
+  font-family: var(--font-headline);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg-1);
+}
+
+.section-body {
+  padding-left: calc(28px + var(--space-md));
+}
+
+/* Claim cards */
+.claim-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  transition: box-shadow 0.2s ease;
+}
+
+.claim-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.claim-card-title {
+  font-family: var(--font-headline);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  color: var(--fg-1);
+}
+
+.claim-card-body {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+
+/* Lists inside claim cards */
+.claim-card-body ul,
+.claim-card-body ol {
+  margin: var(--space-md) 0 var(--space-md) var(--space-lg);
+}
+
+.claim-card-body li {
+  margin-bottom: var(--space-sm);
+}
+
+.claim-card-body li:last-child {
+  margin-bottom: 0;
+}
+
+/* Fact table */
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  font-size: 14px;
+}
+
+.fact-table th,
+.fact-table td {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.fact-table th {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  background: var(--surface-container);
+}
+
+.fact-table tr:hover td {
+  background: var(--surface-container-low);
+}
+
+/* Code blocks */
+.code-block {
+  background: var(--surface-container-high);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin: var(--space-lg) 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fg-1);
+}
+
+.code-block .comment {
+  color: var(--fg-muted);
+}
+
+.code-block .keyword {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.code-block .string {
+  color: var(--secondary-container);
+}
+
+/* Evidence margin */
+.evidence-margin {
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  background: var(--surface-container);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.evidence-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.evidence-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  font-style: italic;
+}
+
+/* Caveat box */
+.caveat-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.03) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-xl) 0;
+}
+
+.caveat-box-title {
+  font-family: var(--font-headline);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--yellow);
+  margin-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.caveat-box-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+
+/* Question panel */
+.question-panel {
+  margin-top: var(--space-4xl);
+  padding-top: var(--space-3xl);
+  border-top: 1px solid var(--border-strong);
+}
+
+.question-panel-title {
+  font-family: var(--font-headline);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: var(--space-xl);
+  color: var(--fg-1);
+}
+
+.question-list {
+  list-style: none;
+}
+
+.question-list li {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--fg-2);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.question-list li::before {
+  content: "?";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-container-high);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Source spread */
+.source-spread {
+  margin-top: var(--space-3xl);
+  padding-top: var(--space-3xl);
+  border-top: 1px solid var(--border-strong);
+}
+
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.source-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.source-card-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.source-card-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg-1);
+}
+
+/* Search */
+.search-box {
+  position: sticky;
+  top: var(--space-lg);
+  z-index: 10;
+  margin-bottom: var(--space-3xl);
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  padding-left: calc(var(--space-lg) + 24px);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-container-lowest);
+  color: var(--fg-1);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238d7166' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: var(--space-md) center;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(160, 59, 0, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--fg-muted);
+}
+
+/* Reading mode density */
+.density-compact .claim-card {
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.density-compact .section-body {
+  padding-left: 0;
+}
+
+.density-compact .section-header {
+  margin-bottom: var(--space-md);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .document-shell {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .section-body {
+    padding-left: 0;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .reader-rail {
+    gap: var(--space-xs);
+  }
+
+  .source-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cover-title {
+    font-size: 26px;
+  }
+}
+
+/* Print */
+@media print {
+  .reader-rail,
+  .search-box {
+    display: none;
+  }
+
+  .document-shell {
+    max-width: none;
+    padding: 0;
+  }
+
+  .claim-card {
+    break-inside: avoid;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Hidden for filtering */
+.hidden {
+  display: none !important;
+}
+
+/* Highlight for search */
+mark {
+  background: var(--primary-fixed);
+  color: var(--fg-1);
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <!-- Search -->
+  <div class="search-box">
+    <input type="text" class="search-input" placeholder="搜索内容..." id="searchInput">
+  </div>
+
+  <!-- Cover -->
+  <header class="cover">
+    <div class="cover-eyebrow">Claude Skill / 标准模板</div>
+    <h1 class="cover-title"><span class="highlight">template-skill</span> — Claude Skill 的标准模板</h1>
+    <p class="cover-deck">
+      提供最小可运行的目录结构和文件骨架，作为创建新 Skill 的起点。包含标准 YAML frontmatter、Markdown 指令格式，以及与 ys-powers 生态的关联说明。
+    </p>
+  </header>
+
+  <!-- Reader rail -->
+  <nav class="reader-rail">
+    <button class="rail-chip active" data-mode="full" onclick="setMode('full')">
+      完整内容
+    </button>
+    <button class="rail-chip" data-mode="summary" onclick="setMode('summary')">
+      快速概览
+    </button>
+    <button class="rail-chip" data-mode="structure" onclick="setMode('structure')">
+      结构分析
+    </button>
+  </nav>
+
+  <!-- Body -->
+  <main id="contentBody">
+
+    <!-- Section 1: Positioning -->
+    <section class="body-section" data-section="positioning">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2 class="section-title">定位</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-body">
+            <p>Claude Skill 的标准模板，提供最小可运行的目录结构和文件骨架，作为创建新 Skill 的起点。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Triggers -->
+    <section class="body-section" data-section="triggers">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2 class="section-title">触发时机</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-title">适用场景</div>
+          <div class="claim-card-body">
+            <ul>
+              <li>从零开始创建新 Claude Skill 需要参考标准结构时</li>
+              <li>快速搭建 Skill 原型验证想法时</li>
+              <li>教学演示 Skill 的基本组成部分时</li>
+            </ul>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">不适用场景</div>
+          <div class="claim-card-body">
+            <ul>
+              <li>已有成熟 Skill 需要修改</li>
+              <li>使用 <code>skill-creator</code> / <code>skill-share</code> 自动生成时</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Core capabilities -->
+    <section class="body-section" data-section="capabilities">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2 class="section-title">核心能力</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-title">1. 最小结构</div>
+          <div class="claim-card-body">提供标准目录布局和必需的 YAML frontmatter</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">2. 快速启动</div>
+          <div class="claim-card-body">复制模板后即可开始编写 Skill 逻辑</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">3. 规范示例</div>
+          <div class="claim-card-body">展示正确的 <code>name</code> 和 <code>description</code> 格式</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Directory structure -->
+    <section class="body-section" data-section="structure">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2 class="section-title">目录结构</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-body">
+            <pre class="code-block">template-skill/
+└── <span class="keyword">SKILL.md</span>          <span class="comment"># 必需：包含 YAML frontmatter + Markdown 指令</span></pre>
+          </div>
+        </div>
+        <div class="evidence-margin">
+          <div class="evidence-label">设计要点</div>
+          <div class="evidence-text">
+            极简的单文件结构 —— 整个 Skill 仅需一个 SKILL.md 文件即可运行，体现了 Claude Skills "最小可运行" 的设计理念。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Template content -->
+    <section class="body-section" data-section="template">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">模板内容</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-body">
+            <pre class="code-block"><span class="keyword">---</span>
+<span class="keyword">name</span>: template-skill
+<span class="keyword">description</span>: Replace with description of the skill and when Claude should use it.
+<span class="keyword">---</span>
+
+<span class="comment"># Insert instructions below</span></pre>
+          </div>
+        </div>
+        <div class="caveat-box">
+          <div class="caveat-box-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            关键约束
+          </div>
+          <div class="caveat-box-body">
+            <code>description</code> 字段至关重要 —— 它直接决定 Claude 何时触发该 Skill。描述应当清晰说明 Skill 的功能和适用场景，避免过于笼统导致误触发或遗漏触发。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Relationship with ys-powers -->
+    <section class="body-section" data-section="relationship">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2 class="section-title">与 ys-powers 的关联</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <div class="claim-card-title">与 skill-creator 的关系</div>
+          <div class="claim-card-body">
+            <p><code>template-skill</code> 是「最小模板」，<code>skill-creator</code> 是「完整开发指南」。前者适合快速启动，后者适合深度设计。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">借鉴价值</div>
+          <div class="claim-card-body">
+            <p>无特别独特的设计，但其极简结构可作为 ys-powers 内部快速创建 Skill 的脚手架。</p>
+          </div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">搬运建议</div>
+          <div class="claim-card-body">
+            <p><strong>低价值</strong>。模板本身过于简单，建议直接使用 <code>skill-creator</code> 的能力。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Metadata -->
+    <section class="body-section" data-section="metadata">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2 class="section-title">元信息</h2>
+      </div>
+      <div class="section-body">
+        <div class="source-grid">
+          <div class="source-card">
+            <div class="source-card-label">来源</div>
+            <div class="source-card-value">refer/awesome-claude-skills/template-skill/SKILL.md</div>
+          </div>
+          <div class="source-card">
+            <div class="source-card-label">维护者</div>
+            <div class="source-card-value">Composio / 社区</div>
+          </div>
+          <div class="source-card">
+            <div class="source-card-label">许可证</div>
+            <div class="source-card-value">Apache 2.0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Question panel -->
+  <div class="question-panel">
+    <h3 class="question-panel-title">使用 checklist</h3>
+    <ul class="question-list">
+      <li>是否需要从零创建新 Skill，而非修改现有 Skill？</li>
+      <li>是否需要快速验证一个 Skill 想法，而非完整设计？</li>
+      <li>是否已了解 <code>skill-creator</code> 的能力，确认不需要更完整的开发指南？</li>
+      <li>是否正确填写了 <code>name</code> 和 <code>description</code> 字段？</li>
+    </ul>
+  </div>
+
+  <!-- Source spread -->
+  <div class="source-spread">
+    <h3 class="question-panel-title">源文档信息</h3>
+    <div class="source-grid">
+      <div class="source-card">
+        <div class="source-card-label">原始文件</div>
+        <div class="source-card-value">docs/awesome-claude-skills/template-skill.md</div>
+      </div>
+      <div class="source-card">
+        <div class="source-card-label">生成时间</div>
+        <div class="source-card-value">2026-05-17</div>
+      </div>
+      <div class="source-card">
+        <div class="source-card-label">样式系统</div>
+        <div class="source-card-value">Document Review (Clockless)</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Reading mode switching
+function setMode(mode) {
+  document.querySelectorAll('.rail-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.mode === mode);
+  });
+
+  const body = document.getElementById('contentBody');
+  const sections = document.querySelectorAll('.body-section');
+
+  if (mode === 'full') {
+    body.classList.remove('density-compact');
+    sections.forEach(s => s.classList.remove('hidden'));
+  } else if (mode === 'summary') {
+    body.classList.add('density-compact');
+    sections.forEach(s => s.classList.remove('hidden'));
+    // Hide code blocks and detailed evidence in summary mode
+    document.querySelectorAll('.code-block, .evidence-margin, .caveat-box').forEach(el => {
+      el.style.display = mode === 'summary' ? 'none' : '';
+    });
+  } else if (mode === 'structure') {
+    body.classList.remove('density-compact');
+    // Show only structure-related sections
+    sections.forEach(s => {
+      const sectionType = s.dataset.section;
+      const isStructure = ['positioning', 'structure', 'template', 'metadata'].includes(sectionType);
+      s.classList.toggle('hidden', !isStructure);
+    });
+  }
+
+  // Reset code blocks visibility when not summary
+  if (mode !== 'summary') {
+    document.querySelectorAll('.code-block, .evidence-margin, .caveat-box').forEach(el => {
+      el.style.display = '';
+    });
+  }
+}
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+let searchTimeout;
+
+searchInput.addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => performSearch(e.target.value), 150);
+});
+
+function performSearch(query) {
+  const sections = document.querySelectorAll('.body-section');
+
+  if (!query.trim()) {
+    sections.forEach(s => {
+      s.classList.remove('hidden');
+      unhighlight(s);
+    });
+    return;
+  }
+
+  const lowerQuery = query.toLowerCase();
+
+  sections.forEach(section => {
+    const text = section.textContent.toLowerCase();
+    const hasMatch = text.includes(lowerQuery);
+    section.classList.toggle('hidden', !hasMatch);
+
+    if (hasMatch) {
+      highlight(section, lowerQuery);
+    } else {
+      unhighlight(section);
+    }
+  });
+}
+
+function highlight(element, query) {
+  unhighlight(element);
+
+  const walker = document.createTreeWalker(
+    element,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+
+  const nodesToReplace = [];
+  let node;
+  while (node = walker.nextNode()) {
+    if (node.parentElement.tagName === 'MARK') continue;
+    const lowerText = node.textContent.toLowerCase();
+    if (lowerText.includes(query)) {
+      nodesToReplace.push(node);
+    }
+  }
+
+  nodesToReplace.forEach(node => {
+    const span = document.createElement('span');
+    const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+    span.innerHTML = node.textContent.replace(regex, '<mark>$1</mark>');
+    node.parentNode.replaceChild(span, node);
+  });
+}
+
+function unhighlight(element) {
+  element.querySelectorAll('mark').forEach(mark => {
+    const parent = mark.parentNode;
+    parent.replaceChild(document.createTextNode(mark.textContent), mark);
+    parent.normalize();
+  });
+}
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Keyboard shortcut for search
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+</script>
+</body>
+</html>
