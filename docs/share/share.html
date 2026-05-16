@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ys-powers: AI Coding 工作流增强</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg-1);
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Document Shell */
+.document-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl);
+}
+
+/* Cover / Masthead */
+.cover {
+  background: var(--surface-container-low);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-5xl) var(--space-4xl);
+  margin-bottom: var(--space-4xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(160, 59, 0, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cover-title {
+  font-family: var(--font-headline);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin-bottom: var(--space-xl);
+  color: var(--fg-1);
+}
+
+.cover-title .accent {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-container) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cover-meta {
+  display: flex;
+  gap: var(--space-xl);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+}
+
+.cover-meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.deck {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--fg-2);
+  max-width: 720px;
+  margin-top: var(--space-2xl);
+}
+
+/* TL;DR Box */
+.tldr-box {
+  background: var(--surface-container);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin: var(--space-3xl) 0;
+}
+
+.tldr-box h3 {
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin-bottom: var(--space-lg);
+}
+
+.tldr-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.tldr-list li {
+  position: relative;
+  padding-left: var(--space-xl);
+  color: var(--fg-2);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.tldr-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* Reader Rail */
+.reader-rail {
+  position: sticky;
+  top: var(--space-2xl);
+  align-self: start;
+}
+
+.reader-rail h4 {
+  font-family: var(--font-headline);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-lg);
+}
+
+.rail-nav {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.rail-nav a {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--fg-2);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.rail-nav a:hover {
+  background: var(--surface-container);
+  color: var(--fg-1);
+  border-left-color: var(--primary);
+}
+
+.rail-nav a.active {
+  background: var(--surface-container);
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 500;
+}
+
+/* Layout Grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-4xl);
+  align-items: start;
+}
+
+/* Body Sections */
+.body-section {
+  margin-bottom: var(--space-5xl);
+}
+
+.body-section h2 {
+  font-family: var(--font-headline);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-xl);
+  color: var(--fg-1);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.body-section h3 {
+  font-family: var(--font-headline);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: var(--space-3xl) 0 var(--space-lg);
+  color: var(--fg-1);
+}
+
+.body-section h4 {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: var(--space-2xl) 0 var(--space-md);
+  color: var(--fg-2);
+}
+
+.body-section p {
+  margin-bottom: var(--space-lg);
+  color: var(--fg-2);
+  line-height: 1.7;
+}
+
+/* Pull Quotes */
+.pull-quote {
+  background: var(--surface-container);
+  border-left: 3px solid var(--primary);
+  padding: var(--space-xl) var(--space-2xl);
+  margin: var(--space-2xl) 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  color: var(--fg-1);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.pull-quote cite {
+  display: block;
+  margin-top: var(--space-md);
+  font-size: 0.85rem;
+  font-style: normal;
+  color: var(--fg-muted);
+}
+
+/* Claim Cards */
+.claim-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+}
+
+.claim-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.claim-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.claim-card h4 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.claim-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--fg-2);
+}
+
+/* Fact Tables */
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-xl) 0;
+  font-size: 0.95rem;
+}
+
+.fact-table th,
+.fact-table td {
+  text-align: left;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.fact-table th {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+  background: var(--surface-container);
+}
+
+.fact-table tr:hover {
+  background: var(--surface-container-low);
+}
+
+/* Lists */
+.body-section ul,
+.body-section ol {
+  margin: var(--space-lg) 0 var(--space-lg) var(--space-xl);
+  color: var(--fg-2);
+}
+
+.body-section li {
+  margin-bottom: var(--space-sm);
+  line-height: 1.6;
+}
+
+/* Code */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--surface-container);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--fg-1);
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Evidence Margin */
+.evidence-margin {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-2xl) 0;
+}
+
+.evidence-margin h4 {
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-md);
+}
+
+/* Question Panel */
+.question-panel {
+  background: linear-gradient(135deg, var(--surface-container) 0%, var(--surface-container-low) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin: var(--space-3xl) 0;
+}
+
+.question-panel h3 {
+  margin-top: 0;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+}
+
+.question-list {
+  list-style: none;
+  margin: var(--space-lg) 0 0;
+  padding: 0;
+}
+
+.question-list li {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-2);
+  font-size: 0.95rem;
+}
+
+.question-list li:last-child {
+  border-bottom: none;
+}
+
+/* Mermaid Diagram Placeholder */
+.diagram-box {
+  background: var(--surface-container);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl);
+  text-align: center;
+  margin: var(--space-2xl) 0;
+  color: var(--fg-muted);
+}
+
+.diagram-box .diagram-title {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  color: var(--fg-2);
+}
+
+/* Phase Tags */
+.phase-tag {
+  display: inline-block;
+  background: var(--primary-fixed);
+  color: var(--primary);
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: var(--space-sm);
+}
+
+/* Command Badge */
+.command-badge {
+  display: inline-block;
+  background: var(--surface-container-high);
+  border: 1px solid var(--border-strong);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--fg-1);
+  margin-right: var(--space-sm);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-rail {
+    position: static;
+    order: -1;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .rail-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .rail-nav a {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+
+  .document-shell {
+    padding: var(--space-lg);
+  }
+
+  .cover {
+    padding: var(--space-3xl) var(--space-xl);
+  }
+}
+
+/* Print */
+@media print {
+  .reader-rail { display: none; }
+  .cover { background: white; }
+  body { font-size: 12pt; }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+  <!-- Cover / Masthead -->
+  <header class="cover">
+    <div class="cover-meta">
+      <span>📄 技术文档</span>
+      <span>•</span>
+      <span>约 3,500 字</span>
+      <span>•</span>
+      <span>阅读时间 12 分钟</span>
+    </div>
+    <h1 class="cover-title">ys-powers: <span class="accent">AI Coding 工作流增强</span></h1>
+    <div class="deck">
+      从 Prompt Engineering 到 Harness Engineering 的演进路径，以及一套覆盖 coding 全流程的六阶段工作流方法论：spec → plan → build → test → review → ship。
+    </div>
+
+    <div class="tldr-box">
+      <h3>核心要点</h3>
+      <ul class="tldr-list">
+        <li>AI Coding 正在经历从单次 prompt 优化到完整系统架构设计的范式转移，核心挑战是 Harness 而非 Agent 本身。</li>
+        <li>Agent 的四类典型失效模式：一步到位综合征、过早宣布胜利、过早标记完成、环境启动困难。</li>
+        <li>ys-powers 通过 commands → skills → subagents 三层抽象，将开发周期切分为六阶段主干流程加横向支撑能力。</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <h4>目录</h4>
+      <ul class="rail-nav">
+        <li><a href="#refer" class="active">项目速览</a></li>
+        <li><a href="#intro">介绍</a></li>
+        <li><a href="#approach">实现思路</a></li>
+        <li><a href="#spec">/spec 详解</a></li>
+        <li><a href="#plan">/plan 详解</a></li>
+        <li><a href="#build">/build 详解</a></li>
+        <li><a href="#test">/test 详解</a></li>
+        <li><a href="#review">/ys-review 详解</a></li>
+        <li><a href="#ship">/ship 详解</a></li>
+        <li><a href="#aux">辅助命令</a></li>
+        <li><a href="#html">为什么用 HTML</a></li>
+      </ul>
+    </nav>
+
+    <!-- Body Sheet -->
+    <main>
+      <!-- Section: Refer -->
+      <section class="body-section" id="refer">
+        <h2>项目速览</h2>
+
+        <h3>自研项目（4 个）</h3>
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number">1</span>
+            <h4>spec-coding（即 ys-powers）</h4>
+          </div>
+          <p>覆盖 coding 全流程，核心抽象层次：commands → skills → subagent → reference。<br>
+          <a href="https://github.com/carl10086/ys-powers">github.com/carl10086/ys-powers</a></p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number">2</span>
+            <h4>cc-view</h4>
+          </div>
+          <p>TypeScript 实现，用来观察和管理 Claude Code 的底层运行时。<br>
+          <a href="https://github.com/carl10086/cc-view">github.com/carl10086/cc-view</a></p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number">3</span>
+            <h4>ys-code</h4>
+          </div>
+          <p>TypeScript 实现，基于 pi-mono 架构复刻 Claude Code，帮助你彻底搞清楚每一个命令背后到底发生了什么。<br>
+          <a href="https://github.com/carl10086/ys-code">github.com/carl10086/ys-code</a></p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number">4</span>
+            <h4>cc-switch-tui / cc-notify</h4>
+          </div>
+          <p>Rust 实现的多模型切换工具，解决传统 cc-switch 的两个痛点：不支持同时启用多个模型；会污染唯一的 settings.json。cc-notify 为 Claude Code 提供更友好的通知体验。<br>
+          <a href="https://github.com/carl10086/cc-switch-tui">github.com/carl10086/cc-switch-tui</a></p>
+        </div>
+
+        <h3>配套推荐工具</h3>
+        <ul>
+          <li><strong>cmux</strong>：多窗口支持，命令行体验更舒服</li>
+          <li><strong>mdr</strong>：<a href="https://github.com/CleverCloud/mdr">github.com/CleverCloud/mdr</a> — 终端 Markdown 渲染器</li>
+          <li><strong>opencli</strong>：<a href="https://github.com/jackwener/opencli">github.com/jackwener/opencli</a></li>
+        </ul>
+      </section>
+
+      <!-- Section: Introduction -->
+      <section class="body-section" id="intro">
+        <h2>1. 介绍</h2>
+
+        <h3>1.1 AI Coding 的三阶段演进</h3>
+
+        <p><strong>Prompt Engineering（2022–2024）</strong>关注<strong>单次交互</strong>的优化 —— 通过 Few-shot Learning、Chain-of-Thought、角色设定等技巧，让模型在一次对话中给出更好的回答。它的核心隐喻是"写好一封邮件"。</p>
+
+        <p><strong>Context Engineering（2025）</strong>向前迈了一步，关注的是"<strong>给 Agent 看什么</strong>" —— 动态构建的上下文窗口中应该填充哪些文档、对话历史、工具定义和 RAG 检索结果。Shopify CEO Tobi Lütke 将其类比为"给邮件附上所有正确的附件"。这一阶段的核心突破是认识到：<strong>模型的表现上限取决于上下文的质量，而非 prompt 的措辞</strong>。</p>
+
+        <p><strong>Harness Engineering（2026）</strong>则站在更高的抽象层次，不再只关注"一次对话"或"一次上下文窗口"，而是设计跨越多个会话、多个 Agent 角色、多个执行阶段的<strong>完整系统架构</strong>。正如 OpenAI 工程师 Ryan Lopopolo 在团队用 Agent 构建百万行代码产品后总结的：</p>
+
+        <blockquote class="pull-quote">
+          "Agents aren't hard; the Harness is hard."
+          <cite>— Ryan Lopopolo, OpenAI</cite>
+        </blockquote>
+
+        <h3>1.2 Coding Agent 的四类典型问题</h3>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number" style="background: var(--red);">1</span>
+            <h4>One-shot Syndrome（试图一步到位）</h4>
+          </div>
+          <p>Agent 拿到复杂需求后，倾向于在单个上下文窗口内完成全部工作。实现到一半时上下文已被消耗大半，模型开始出现幻觉、循环输出、格式错误的 Tool Call。Anthropic 的经验数据表明，上下文窗口的 Sweet Spot 在 <strong>40% 以下填充率</strong>；超过此阈值，输出质量快速衰退。</p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number" style="background: var(--yellow); color: var(--fg-1);">2</span>
+            <h4>Premature Victory Declaration（过早宣布胜利）</h4>
+          </div>
+          <p>Agent 完成部分工作就宣布任务结束，核心功能尚未实现或验证。这在实践中极为常见 —— Agent 输出"编码完成"，但实际上<strong>编译都过不了</strong>。</p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number" style="background: var(--yellow); color: var(--fg-1);">3</span>
+            <h4>Premature Feature Completion（过早标记功能完成）</h4>
+          </div>
+          <p>Agent 认为功能已实现，但未做端到端测试验证，部署后才发现关键路径不通。Anthropic 的解决方案是引入 Browser Automation（Puppeteer MCP）做自动化的端到端验证截图。</p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-header">
+            <span class="claim-number" style="background: var(--blue);">4</span>
+            <h4>Cold Start Problem（环境启动困难）</h4>
+          </div>
+          <p>多次会话间缺乏持久化记忆，每次新会话都要花大量 Token 重新理解项目结构，真正用于编码的 Token Budget 被严重挤压。</p>
+        </div>
+      </section>
+
+      <!-- Section: Approach -->
+      <section class="body-section" id="approach">
+        <h2>2. 实现思路</h2>
+
+        <p>Spec 编程的本质，是把<strong>传统工程的编程思想</strong>和<strong>个人操作习惯</strong>结合起来以提升效率。无论是 super-powers、gsd、gstack、agent-skills，还是后面层出不穷的新方法论，底层思路相通。</p>
+
+        <h3>2.1 三层抽象</h3>
+        <ul>
+          <li><strong><code>commands</code></strong>：把你自己对工作流的理解，用 workflow 的方式组织起来，编排多个 skill 与 subagent 协作</li>
+          <li><strong><code>skills</code></strong>：可复用的工程最佳实践，<strong>无状态</strong></li>
+          <li><strong><code>subagents</code></strong>：隔离主上下文、防止污染的关键工具，在大型任务中非常有用</li>
+        </ul>
+
+        <h3>2.2 开发全阶段总览</h3>
+
+        <p>ys-powers 把一个完整的开发周期切成 <strong>6 个主干阶段</strong>，每个阶段对应一个显式 <code>/command</code>，背后由 1 个或多个 skill 提供方法论；主干之外再挂调试 / 提交 / 经验沉淀等横向支撑能力。</p>
+
+        <div class="diagram-box">
+          <div class="diagram-title">六阶段工作流</div>
+          <p style="font-family: var(--font-mono); font-size: 0.9rem;">
+            /spec (构思) → /plan (规划) → /build (构建) → /test (验证) → /ys-review (审查) → /ship (交付)
+          </p>
+          <p style="margin-top: var(--space-md); font-size: 0.85rem;">
+            虚线支撑：debugging ← build → source-driven / context-eng<br>
+            gc (随时提交) ← review → sop-add (沉淀经验)
+          </p>
+        </div>
+
+        <ul>
+          <li><strong>实线主干</strong>：构思 → 规划 → 构建 → 验证 → 审查 → 交付，有严格顺序</li>
+          <li><strong>虚线支撑</strong>：主干任一节点按需触发的横向能力，非强制步骤</li>
+        </ul>
+
+        <h3>2.3 详解 spec 阶段（以 /spec 为例）</h3>
+
+        <p><code>/spec</code> 是 command、skills、subagent 三种抽象协同最完整的范例，内部分四个 Phase：</p>
+
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Skill / Tool</th>
+              <th>目标</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="phase-tag">Phase 1</span></td>
+              <td><code>explore-then-ask</code></td>
+              <td>探索上下文、与用户沟通、收敛想法</td>
+            </tr>
+            <tr>
+              <td><span class="phase-tag">Phase 2</span></td>
+              <td><code>prepare-workspace</code></td>
+              <td>处理 Git 操作：创建 worktree、新建 feature 分支</td>
+            </tr>
+            <tr>
+              <td><span class="phase-tag">Phase 3</span></td>
+              <td><code>spec-driven-development</code></td>
+              <td>从 6 个维度产出结构化设计文档</td>
+            </tr>
+            <tr>
+              <td><span class="phase-tag">Phase 4</span></td>
+              <td><code>html-generator</code> subagent</td>
+              <td>生成人类自包含、易阅读的 HTML 文档（可选）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Phase 1 内部又包含三个关键动作：<code>search-sop</code>（搜索历史经验）、调查上下文（高成本动作，当前用内置 LSP server 缓解）、<code>ask-question</code>（主动澄清需求）。Phase 3 的 6 个维度包括：目标、命令、项目结构、代码风格、测试策略、边界。</p>
+      </section>
+
+      <!-- Section: /plan -->
+      <section class="body-section" id="plan">
+        <h2>/plan — 规划阶段</h2>
+
+        <p><code>/plan</code>（invokes → <code>planning-and-task-breakdown</code>）的核心任务是把 spec 拆成<strong>小且可验证</strong>的增量任务，并建立依赖顺序。</p>
+
+        <h4>执行步骤</h4>
+        <ol>
+          <li><strong>读取 spec</strong>：优先使用本会话已生成的 spec；否则到 <code>docs/ys-powers/specs/</code> 找最新 spec；再否则询问用户</li>
+          <li><strong>进入 plan mode</strong>：只读，不修改代码。在此模式下分析代码库，识别组件间的依赖图</li>
+          <li><strong>垂直切片</strong>：按"薄垂直切片"原则拆任务：每个任务应覆盖一个<strong>完整用户路径</strong>的端到端实现，而不是按水平分层（先全部 DAO，再全部 Service）</li>
+          <li><strong>编写任务</strong>：每个任务必须包含：清晰的任务描述、验收标准（acceptance criteria）、验证步骤（how to verify）、与前后任务的依赖关系</li>
+          <li><strong>阶段间加 checkpoint</strong>：在关键节点设置 checkpoint，确保 task 之间有过渡验证点</li>
+          <li><strong>人工 review</strong>：把 plan 呈现给用户确认，而不是直接保存</li>
+          <li><strong>保存 plan</strong>：确认后保存到 <code>docs/ys-powers/plans/YYYY-MM-DD-&lt;feature-name&gt;.md</code></li>
+        </ol>
+      </section>
+
+      <!-- Section: /build -->
+      <section class="body-section" id="build">
+        <h2>/build — 构建阶段</h2>
+
+        <p><code>/build</code>（combines → <code>incremental-implementation</code> + <code>test-driven-development</code>；fallback → <code>debugging-and-error-recovery</code>）负责按 plan 逐个 task 增量实现，严格遵循 RED-GREEN-REFACTOR。</p>
+
+        <h4>执行步骤</h4>
+        <ol>
+          <li><strong>读取 plan</strong>，挑选下一个 pending task</li>
+          <li><strong>读验收标准</strong>：先读 task 的 acceptance criteria，明确"做到什么程度算完成"</li>
+          <li><strong>加载上下文</strong>：读取相关现有代码、设计模式、类型定义</li>
+          <li><strong>写失败测试（RED）</strong>：先写测试，描述期望行为。此时测试<strong>必须失败</strong></li>
+          <li><strong>最小实现（GREEN）</strong>：写<strong>最少</strong>的代码让测试通过</li>
+          <li><strong>运行完整测试套件</strong>：检查是否有回归</li>
+          <li><strong>运行构建验证编译</strong>：确保类型检查、lint、编译都通过</li>
+          <li><strong>提交</strong>：用描述性 message 提交当前 task 的变更</li>
+          <li><strong>标记完成</strong>，自动推进到下一个 pending task</li>
+        </ol>
+
+        <div class="evidence-margin">
+          <h4>失败路径</h4>
+          <p>任何步骤失败 → 自动转入 <code>debugging-and-error-recovery</code> skill，系统性地定位根因，修复后再回到当前步骤。</p>
+        </div>
+      </section>
+
+      <!-- Section: /test -->
+      <section class="body-section" id="test">
+        <h2>/test — 验证阶段</h2>
+
+        <p><code>/test</code>（invokes → <code>test-driven-development</code>；conditional → <code>browser-testing-with-devtools</code>）按场景走两条路径。</p>
+
+        <h4>路径 A — 新功能</h4>
+        <ol>
+          <li>写测试描述期望行为（它们应该<strong>失败</strong>）</li>
+          <li>实现代码使测试通过</li>
+          <li>重构，同时保持所有测试绿色</li>
+        </ol>
+
+        <h4>路径 B — Bug 修复（Prove-It pattern）</h4>
+        <ol>
+          <li>写一个能<strong>重现 bug</strong> 的测试（它必须失败）</li>
+          <li>确认测试确实失败</li>
+          <li>实现修复</li>
+          <li>确认测试通过</li>
+          <li>运行完整测试套件检查回归</li>
+        </ol>
+
+        <div class="evidence-margin">
+          <h4>浏览器场景</h4>
+          <p>如果变更涉及浏览器运行代码，额外调用 <code>browser-testing-with-devtools</code>，通过 Chrome DevTools MCP 做真实运行时验证（截图、网络请求、DOM 状态）。</p>
+        </div>
+      </section>
+
+      <!-- Section: /ys-review -->
+      <section class="body-section" id="review">
+        <h2>/ys-review — 审查阶段</h2>
+
+        <p><code>/ys-review</code>（invokes → <code>code-review-and-quality</code>；recommends → <code>security-and-hardening</code>、<code>performance-optimization</code>）对当前变更（staged 或最近 commit）做<strong>五轴结构化审查</strong>。</p>
+
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>轴</th>
+              <th>关注点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Correctness</strong></td>
+              <td>是否匹配 spec？边界情况是否处理？测试是否充分？</td>
+            </tr>
+            <tr>
+              <td><strong>Readability</strong></td>
+              <td>命名是否清晰？逻辑是否直观？组织是否良好？</td>
+            </tr>
+            <tr>
+              <td><strong>Architecture</strong></td>
+              <td>是否遵循既有模式？边界是否干净？抽象层级是否恰当？</td>
+            </tr>
+            <tr>
+              <td><strong>Security</strong></td>
+              <td>输入是否验证？密钥是否安全？认证/授权是否检查？</td>
+            </tr>
+            <tr>
+              <td><strong>Performance</strong></td>
+              <td>是否有 N+1 查询？是否有无界操作？</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>所有发现按 <strong>Critical / Important / Suggestion</strong> 三级分类，输出结构化 review，包含：具体 file:line 引用、问题描述、修复建议。</p>
+      </section>
+
+      <!-- Section: /ship -->
+      <section class="body-section" id="ship">
+        <h2>/ship — 交付阶段</h2>
+
+        <p><code>/ship</code>（invokes → <code>shipping-and-launch</code>；orchestrates → <code>code-reviewer</code> / <code>security-auditor</code> / <code>test-engineer</code>）是 <strong>fan-out orchestrator</strong>，核心机制是并行 specialist 审查 + 主上下文合并决策。</p>
+
+        <h4>Phase A — 并行 fan-out</h4>
+        <p>在同一轮 assistant turn 中同时 spawn 三个 subagent，让它们独立执行：</p>
+        <ul>
+          <li><strong><code>code-reviewer</code></strong>：对 staged changes 或最近 commit 做五轴审查</li>
+          <li><strong><code>security-auditor</code></strong>：漏洞与威胁模型审查（OWASP Top 10、密钥处理、认证/授权、依赖 CVE）</li>
+          <li><strong><code>test-engineer</code></strong>：测试覆盖率分析（幸福路径、边界情况、错误路径、并发场景的缺口）</li>
+        </ul>
+
+        <div class="evidence-margin">
+          <h4>约束</h4>
+          <p>subagent 之间不共享状态、不互相调用；每个 subagent 有独立上下文窗口，只返回 report 到主会话；如果用户在 <code>.claude/agents/</code> 或 <code>~/.claude/agents/</code> 中定义了同名 agent，优先使用用户自定义版本。</p>
+        </div>
+
+        <h4>Phase B — 主上下文合并</h4>
+        <p>三个 report 回来后，主 agent 在单一会话中综合六个维度：</p>
+        <ol>
+          <li><strong>Code Quality</strong>：汇总 Critical/Important 发现，去重</li>
+          <li><strong>Security</strong>：把 Critical/High 安全发现提升为 launch blockers</li>
+          <li><strong>Performance</strong>：从 code-reviewer 性能轴提取，交叉检查 Core Web Vitals</li>
+          <li><strong>Accessibility</strong>：键盘导航、屏幕阅读器、对比度</li>
+          <li><strong>Infrastructure</strong>：环境变量、数据库迁移、监控、feature flags</li>
+          <li><strong>Documentation</strong>：README、ADRs、changelog</li>
+        </ol>
+
+        <h4>Phase C — 决策与回滚</h4>
+        <p>输出单一结论：</p>
+        <ul>
+          <li><strong>Ship Decision: GO | NO-GO</strong></li>
+          <li><strong>Blockers</strong>（必须修复才能上线）</li>
+          <li><strong>Recommended fixes</strong>（建议修复）</li>
+          <li><strong>Acknowledged risks</strong>（接受风险上线）</li>
+          <li><strong>Rollback plan</strong>（触发条件、精确步骤、恢复时间目标 RTO）—— GO 决策的<strong>强制前置条件</strong></li>
+        </ul>
+
+        <div class="evidence-margin">
+          <h4>规则</h4>
+          <p>三个 persona <strong>必须并行</strong>，串行调用失去意义；任何 persona 返回 Critical finding，<strong>默认 NO-GO</strong>，除非用户明确接受风险；小变更（≤2 文件、≤50 行、不碰 auth/payments/data/config）可跳过 fan-out。</p>
+        </div>
+      </section>
+
+      <!-- Section: Auxiliary Commands -->
+      <section class="body-section" id="aux">
+        <h2>辅助命令速览</h2>
+
+        <p>主干之外还有一组工具型 command，大多属于 <strong>embedded-workflow</strong>（流程写在 command 本体，不显式委托 skill），按场景随调随用：</p>
+
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>类别</th>
+              <th>命令</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2">重构与简化</td>
+              <td><span class="command-badge">/refactor</span></td>
+              <td>先 <code>brainstorming</code> 出方案，再用 TDD 守住行为</td>
+            </tr>
+            <tr>
+              <td><span class="command-badge">/code-simplify</span></td>
+              <td>降低复杂度，不改行为</td>
+            </tr>
+            <tr>
+              <td rowspan="3">Git 与版本</td>
+              <td><span class="command-badge">/gc</span></td>
+              <td>完整 Git 工作流 — 分支 / 提交 / 推送 / PR 一步完成</td>
+            </tr>
+            <tr>
+              <td><span class="command-badge">/local-commit</span></td>
+              <td>极简本地提交 — 暂存 → 生成 message → 确认 → 提交</td>
+            </tr>
+            <tr>
+              <td><span class="command-badge">/s2m</span></td>
+              <td>worktree 工作完成后安全回到 main 并清理</td>
+            </tr>
+            <tr>
+              <td rowspan="4">理解与沉淀</td>
+              <td><span class="command-badge">/teach-code</span></td>
+              <td>由浅入深逐层讲解任意代码模块</td>
+            </tr>
+            <tr>
+              <td><span class="command-badge">/doc-codebase</span></td>
+              <td>分析代码库并生成 <code>ARCHITECTURE.md</code></td>
+            </tr>
+            <tr>
+              <td><span class="command-badge">/easy-analysis</span></td>
+              <td>对复杂文档做宏观概览 + 逐段精读 + 引用分析</td>
+            </tr>
+            <tr>
+              <td><span class="command-badge">/sop-add</span></td>
+              <td>把当前会话经验抽取为可复用 SOP</td>
+            </tr>
+            <tr>
+              <td>元能力</td>
+              <td><span class="command-badge">/wskill</span></td>
+              <td>写新 skill — 先 <code>explore-then-ask</code> 收敛，再走 <code>writing-skills</code> 生成</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section: Why HTML -->
+      <section class="body-section" id="html">
+        <h2>2.5 为什么用 HTML 而不是 Markdown 打通"人类 ↔ AI"</h2>
+
+        <p>HTML 作为 AI 与人类之间的交互媒介，正在获得越来越多的认可。相比 Markdown，HTML 提供了：</p>
+
+        <ul>
+          <li><strong>结构化表达</strong>：嵌套标签天然支持层级、引用、表格、代码块等复杂结构</li>
+          <li><strong>交互可能性</strong>：内嵌 CSS/JS 可实现折叠、筛选、搜索、可视化等交互</li>
+          <li><strong>视觉层次</strong>：通过样式系统传递信息优先级，而非仅靠标题层级</li>
+          <li><strong>自包含性</strong>：单个 HTML 文件即可包含完整样式和交互，易于分享和存档</li>
+        </ul>
+
+        <div class="evidence-margin">
+          <h4>参考资料</h4>
+          <ul style="margin: 0; list-style: none;">
+            <li>• <a href="https://x.com/karpathy/status/2053872850101285137">Andrej Karpathy 推文</a></li>
+            <li>• <a href="https://thariqs.github.io/html-effectiveness/">Thariq Shihipar 示例站点</a></li>
+            <li>• <a href="https://simonwillison.net/2026/May/8/unreasonable-effectiveness-of-html/">Simon Willison: Using Claude Code — The Unreasonable Effectiveness of HTML</a></li>
+            <li>• <a href="https://artifact.land">artifact.land</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Question Panel -->
+      <div class="question-panel">
+        <h3>延伸阅读与思考</h3>
+        <ul class="question-list">
+          <li>你的团队目前处于 AI Coding 三阶段演进的哪个位置？</li>
+          <li>在你的实践中，哪类 Agent 失效模式最常见？</li>
+          <li>如何将 ys-powers 的六阶段工作流适配到你现有的开发流程中？</li>
+          <li>HTML 作为 AI 输出格式，在你的工作场景中有什么潜在应用？</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// Active nav highlighting on scroll
+const sections = document.querySelectorAll('.body-section[id]');
+const navLinks = document.querySelectorAll('.rail-nav a');
+
+function onScroll() {
+  const scrollPos = window.scrollY + 100;
+
+  sections.forEach((section, idx) => {
+    const top = section.offsetTop;
+    const bottom = top + section.offsetHeight;
+
+    if (scrollPos >= top && scrollPos < bottom) {
+      navLinks.forEach(link => link.classList.remove('active'));
+      const activeLink = document.querySelector(`.rail-nav a[href="#${section.id}"]`);
+      if (activeLink) activeLink.classList.add('active');
+    }
+  });
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+</script>
+</body>
+</html>
