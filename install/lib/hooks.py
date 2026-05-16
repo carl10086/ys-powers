@@ -32,6 +32,7 @@ def _load_hooks_config(project_root: Path, scope: str) -> dict | None:
 
     hooks_str = json.dumps(hooks_config["hooks"])
     if scope == "local":
+        # 假设：hooks.json 中所有 "$HOME/.claude" 出现均为 hooks 路径前缀
         hooks_str = hooks_str.replace("$HOME/.claude", "${CLAUDE_PROJECT_DIR}/.claude")
     return json.loads(hooks_str)
 
@@ -54,8 +55,7 @@ def _backup_and_write_settings(settings_path: Path, settings: dict) -> bool:
 def inject_hooks(
     project_root: Path,
     target_dir: Path,
-    scope: str,
-    merge: bool = False
+    scope: str
 ) -> bool:
     """
     将 hooks 注入目标 settings 文件。
@@ -64,20 +64,16 @@ def inject_hooks(
         project_root: ys-powers 项目根目录
         target_dir: 目标目录（如 ~/.claude/ 或 ./.claude/）
         scope: 安装范围（"global" 或 "local"）
-        merge: 是否为 update 模式（当前行为与 install 一致，均为去重追加）
 
     Returns:
         是否注入成功
     """
-    # merge 参数为将来扩展预留（如 update 模式删除已不存在的 hooks）
-    _ = merge
-
     converted_hooks = _load_hooks_config(project_root, scope)
     if converted_hooks is None:
         return True
 
     # 确定目标 settings 文件
-    if target_dir == Path.home() / ".claude":
+    if scope == "global":
         settings_path = target_dir / "settings.json"
     else:
         settings_path = target_dir / "settings.local.json"
@@ -144,7 +140,7 @@ def remove_hooks(
         return True
 
     # 确定目标 settings 文件
-    if target_dir == Path.home() / ".claude":
+    if scope == "global":
         settings_path = target_dir / "settings.json"
     else:
         settings_path = target_dir / "settings.local.json"

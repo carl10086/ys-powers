@@ -34,7 +34,7 @@ def get_target_dir(scope: str, target: Path | None = None) -> Path:
     return Path.cwd() / ".claude"
 
 
-def do_install(project_root: Path, target_dir: Path, scope: str, merge: bool) -> bool:
+def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
     """执行安装或更新。"""
     all_ok = True
 
@@ -42,7 +42,7 @@ def do_install(project_root: Path, target_dir: Path, scope: str, merge: bool) ->
         if not install_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
-    if not inject_hooks(project_root, target_dir, scope, merge=merge):
+    if not inject_hooks(project_root, target_dir, scope):
         all_ok = False
 
     return all_ok
@@ -88,7 +88,7 @@ def main() -> int:
     print()
 
     if args.action in ("install", "update"):
-        success = do_install(project_root, target_dir, args.scope, merge=(args.action == "update"))
+        success = do_install(project_root, target_dir, args.scope)
     elif args.action == "uninstall":
         success = do_uninstall(project_root, target_dir, args.scope)
     else:
