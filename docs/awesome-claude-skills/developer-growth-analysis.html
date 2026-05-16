@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Growth Analysis — Skill Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover */
+    .cover {
+      margin-bottom: var(--space-4xl);
+      padding-bottom: var(--space-3xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .deck {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-width: 640px;
+      margin-bottom: var(--space-xl);
+    }
+
+    .meta-strip {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    .meta-strip span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .meta-strip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-3xl);
+      padding: var(--space-sm);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-lg);
+      overflow-x: auto;
+    }
+
+    .reader-rail a {
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg-2);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .reader-rail a:hover,
+    .reader-rail a.active {
+      background: var(--surface-container-high);
+      color: var(--fg-1);
+    }
+
+    .reader-rail a.active {
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+      letter-spacing: -0.01em;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: var(--space-2xl) 0 var(--space-md);
+      color: var(--fg-1);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-md);
+      color: var(--fg-2);
+    }
+
+    .body-section ul,
+    .body-section ol {
+      margin: var(--space-md) 0 var(--space-lg) var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .claim-card .claim-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: var(--space-sm);
+    }
+
+    .claim-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      display: inline;
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      border-left: 3px solid var(--primary);
+      padding-left: var(--space-lg);
+      margin: var(--space-lg) 0;
+      color: var(--fg-muted);
+      font-size: 14px;
+    }
+
+    /* Pull Quote */
+    .pull-quote {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--fg-1);
+      border-left: 4px solid var(--primary);
+      padding-left: var(--space-xl);
+      margin: var(--space-2xl) 0;
+      font-style: italic;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-lg) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th,
+    .fact-table td {
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fact-table th {
+      font-weight: 600;
+      color: var(--fg-1);
+      background: var(--surface-container-low);
+    }
+
+    .fact-table td {
+      color: var(--fg-2);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Code Block */
+    pre {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--fg-1);
+      margin: var(--space-lg) 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-top: var(--space-3xl);
+    }
+
+    .question-panel h3 {
+      margin-top: 0;
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+    }
+
+    .question-panel ul {
+      margin: var(--space-md) 0 0 var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    /* Source Spread */
+    .source-spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .source-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .source-card .source-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .source-card .source-value {
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.04) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+    }
+
+    .caveat-box .caveat-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .caveat-box p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--fg-2);
+    }
+
+    /* Tag */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--surface-container-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg-2);
+      margin-right: var(--space-xs);
+      margin-bottom: var(--space-xs);
+    }
+
+    .tag-primary {
+      background: var(--primary-fixed);
+      border-color: var(--primary-fixed-dim);
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .cover h1 {
+        font-size: 1.75rem;
+      }
+
+      .reader-rail {
+        gap: var(--space-xs);
+      }
+
+      .reader-rail a {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 12px;
+      }
+
+      .source-spread {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      .reader-rail a {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-label">Claude Code Skill</div>
+      <h1>developer-growth-analysis</h1>
+      <p class="deck">
+        通过分析用户近期的 Claude Code 聊天历史，识别编码模式、技术短板和成长方向，
+        并自动从 HackerNews 筛选相关学习资源，生成个性化成长报告。
+      </p>
+      <div class="meta-strip">
+        <span><span class="dot"></span> Apache 2.0</span>
+        <span>来源: awesome-claude-skills</span>
+        <span>维护者: Composio / 社区</span>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <a href="#positioning" class="active">定位</a>
+      <a href="#triggers">触发时机</a>
+      <a href="#capabilities">核心能力</a>
+      <a href="#workflow">指令流程</a>
+      <a href="#report">报告结构</a>
+      <a href="#relation">关联分析</a>
+    </nav>
+
+    <!-- Body: Positioning -->
+    <section class="body-section" id="positioning">
+      <h2>定位</h2>
+      <p>
+        <code>developer-growth-analysis</code> 是一个面向开发者个人成长的分析型 skill。
+        它不依赖外部测评或主观自评，而是基于用户<strong>真实的编码对话历史</strong>，
+        通过模式识别和证据驱动的方式，发现实际工作中的技术偏好、反复遇到的瓶颈，
+        以及可量化的进步轨迹。
+      </p>
+      <div class="pull-quote">
+        "基于历史行为提供洞察"——将聊天记录转化为自我提升的反馈源
+      </div>
+    </section>
+
+    <!-- Body: Triggers -->
+    <section class="body-section" id="triggers">
+      <h2>触发时机</h2>
+      <p>以下场景适合调用此 skill：</p>
+      <ul>
+        <li>希望了解自己近期的开发习惯和模式时</li>
+        <li>想识别具体的技术短板或反复遇到的挑战时</li>
+        <li>需要针对性的学习资源推荐（基于实际工作而非泛泛而谈）时</li>
+        <li>希望跟踪自己在多个项目中的进步情况时</li>
+      </ul>
+      <div class="caveat-box">
+        <span class="caveat-icon">⚠️</span>
+        <p><strong>不适用场景：</strong>首次使用 Claude Code、无足够聊天记录（&lt; 24 小时）时。分析需要一定量的历史数据才能识别有意义的模式。</p>
+      </div>
+    </section>
+
+    <!-- Body: Core Capabilities -->
+    <section class="body-section" id="capabilities">
+      <h2>核心能力</h2>
+      <div class="claim-card">
+        <span class="claim-number">1</span>
+        <h4>聊天记录读取</h4>
+        <p>访问 <code>~/.claude/history.jsonl</code>，提取过去 24-48 小时的对话记录，作为分析的数据源。</p>
+      </div>
+      <div class="claim-card">
+        <span class="claim-number">2</span>
+        <h4>开发模式识别</h4>
+        <p>分析项目类型、技术栈、问题类别、解决思路，构建用户编码行为的特征画像。</p>
+      </div>
+      <div class="claim-card">
+        <span class="claim-number">3</span>
+        <h4>改进点检测</h4>
+        <p>基于实际对话内容识别 3-5 个具体改进方向，避免空泛建议。</p>
+      </div>
+      <div class="claim-card">
+        <span class="claim-number">4</span>
+        <h4>个性化报告</h4>
+        <p>生成包含工作摘要、改进领域、行动建议的结构化报告。</p>
+      </div>
+      <div class="claim-card">
+        <span class="claim-number">5</span>
+        <h4>资源策展</h4>
+        <p>从 HackerNews 搜索与改进领域相关的高质量文章和讨论，实现外部资源与内部需求的精准匹配。</p>
+      </div>
+      <div class="claim-card">
+        <span class="claim-number">6</span>
+        <h4>Slack 推送</h4>
+        <p>自动将完整报告发送到用户的 Slack 私信，便于回顾和跟踪。</p>
+      </div>
+    </section>
+
+    <!-- Body: Workflow -->
+    <section class="body-section" id="workflow">
+      <h2>指令流程概览</h2>
+      <p>整个分析流程分为 5 个阶段，形成完整的闭环：</p>
+      <ol>
+        <li><strong>读取历史</strong>：解析 <code>~/.claude/history.jsonl</code>，按时间戳过滤最近 1-2 天的记录</li>
+        <li><strong>模式分析</strong>：
+          <ul>
+            <li>项目与领域（后端、前端、DevOps、数据等）</li>
+            <li>使用的技术栈（语言、框架、工具）</li>
+            <li>问题类型（性能优化、调试、功能实现、重构等）</li>
+            <li>遇到的挑战（重复提问、多轮尝试才解决的知识盲区）</li>
+          </ul>
+        </li>
+        <li><strong>改进点识别</strong>：基于证据提出 3-5 个具体、可执行的改进方向</li>
+        <li><strong>生成报告</strong>：包含工作概述、改进领域、具体建议、学习资源、行动项</li>
+        <li><strong>推送报告</strong>：通过 Slack API 发送到用户私信</li>
+      </ol>
+    </section>
+
+    <!-- Body: Report Structure -->
+    <section class="body-section" id="report">
+      <h2>报告示例结构</h2>
+      <p>生成的报告采用 Markdown 格式，结构清晰，便于阅读和后续处理：</p>
+      <pre><code># Developer Growth Report
+
+## Overview
+- Projects worked on: [list]
+- Technologies used: [list]
+- Primary focus areas: [list]
+
+## Improvement Areas
+1. Advanced TypeScript patterns — struggled with type safety in [project]
+2. Error handling and validation — patched several null-check bugs
+3. Async/await patterns — race conditions and timing issues observed
+
+## Learning Resources
+- [HackerNews article 1] — directly addresses TypeScript generics
+- [HackerNews article 2] — defensive programming patterns
+
+## Action Items
+- [ ] Review TypeScript utility types documentation
+- [ ] Add input validation to [specific module]</code></pre>
+    </section>
+
+    <!-- Body: Relation to ys-powers -->
+    <section class="body-section" id="relation">
+      <h2>与 ys-powers 的关联</h2>
+
+      <h3>现有能力对比</h3>
+      <p>ys-powers 中<strong>无类似的「个人成长分析」skill</strong>。<code>developer-growth-analysis</code> 创新性地将聊天记录转化为自我提升的反馈源，填补了个人开发者洞察的空白。</p>
+
+      <div class="evidence-margin">
+        此 skill 的闭环流程设计具有高度复用价值：本地数据读取 → 模式识别 → 外部资源策展 → 报告推送
+      </div>
+
+      <h3>借鉴价值</h3>
+      <p>其闭环流程可复用到任何需要<strong>「基于历史行为提供洞察」</strong>的场景：</p>
+      <ul>
+        <li>代码审查习惯分析</li>
+        <li>调试模式识别（帮助发现系统性盲点）</li>
+        <li>技术栈迁移追踪</li>
+        <li>团队协作效率评估</li>
+      </ul>
+
+      <h3>搬运建议</h3>
+      <div class="source-spread">
+        <div class="source-card">
+          <div class="source-label">价值评估</div>
+          <div class="source-value">高价值</div>
+        </div>
+        <div class="source-card">
+          <div class="source-label">适用场景</div>
+          <div class="source-value">个人成长 / 团队 1:1</div>
+        </div>
+        <div class="source-card">
+          <div class="source-label">集成要求</div>
+          <div class="source-value">Slack API 权限</div>
+        </div>
+      </div>
+      <p style="margin-top: var(--space-lg);">
+        对开发者个人成长和团队 1:1 反馈都非常有用。注意需要 Slack 集成权限，
+        在无法使用 Slack 的环境可考虑替换为邮件推送或本地文件输出。
+      </p>
+    </section>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h3>实施注意事项</h3>
+      <ul>
+        <li>确保 <code>~/.claude/history.jsonl</code> 文件可读且格式正确</li>
+        <li>Slack 推送需要预先配置 API token 和用户 ID 映射</li>
+        <li>HackerNews 搜索建议增加缓存机制，避免重复请求</li>
+        <li>报告生成频率建议控制在每日/每周，避免信息过载</li>
+        <li>敏感对话内容需脱敏处理，尤其是涉及业务逻辑的部分</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Smooth scroll for reader rail
+    document.querySelectorAll('.reader-rail a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Update active state
+          document.querySelectorAll('.reader-rail a').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
+
+    // Update active rail item on scroll
+    const sections = document.querySelectorAll('.body-section');
+    const railLinks = document.querySelectorAll('.reader-rail a');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          railLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -80% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>

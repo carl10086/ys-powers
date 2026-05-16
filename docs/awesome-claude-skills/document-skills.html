@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>document-skills — 办公文档处理技能集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 48px;
+  --space-5xl: 64px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+  --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+  --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+body {
+  color: var(--fg-1);
+  background: var(--bg);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Document shell */
+.document-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+}
+
+/* Cover */
+.cover {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4xl) var(--space-3xl);
+  margin-bottom: var(--space-3xl);
+  position: relative;
+  overflow: hidden;
+}
+.cover::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--gradient-hero);
+}
+.cover-title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-md);
+  line-height: 1.2;
+}
+.cover-scope {
+  color: var(--fg-muted);
+  font-size: 1rem;
+  margin: 0 0 var(--space-xl);
+  max-width: 640px;
+}
+.cover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+.cover-meta .meta-tag {
+  background: var(--surface-container);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: var(--space-xs) var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+/* Reader rail */
+.reader-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+}
+.reader-rail button {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--fg-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.reader-rail button:hover,
+.reader-rail button.active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+/* Body sections */
+.body-section {
+  margin-bottom: var(--space-4xl);
+}
+.section-title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  font-weight: 600;
+  margin: 0 0 var(--space-lg);
+  letter-spacing: -0.01em;
+}
+.section-lead {
+  color: var(--fg-2);
+  font-size: 1.05rem;
+  margin-bottom: var(--space-xl);
+  max-width: 680px;
+}
+
+/* Claim cards */
+.claim-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  transition: box-shadow 0.2s ease;
+}
+.claim-card:hover {
+  box-shadow: var(--shadow-md);
+}
+.claim-card h3 {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-sm);
+}
+.claim-card p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 0.95rem;
+}
+
+/* Fact tables */
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  font-size: 0.95rem;
+}
+.fact-table th,
+.fact-table td {
+  text-align: left;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+.fact-table th {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--fg-muted);
+  background: var(--surface-container);
+}
+.fact-table tr:hover td {
+  background: var(--surface-container-low);
+}
+
+/* Evidence margin */
+.evidence-margin {
+  background: var(--surface-container);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--space-lg) var(--space-xl);
+  margin: var(--space-lg) 0;
+}
+.evidence-margin .evidence-label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+}
+.evidence-margin p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--fg-2);
+}
+
+/* Caveat box */
+.caveat-box {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-xl);
+  margin: var(--space-xl) 0;
+}
+.caveat-box .caveat-title {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--yellow);
+  margin: 0 0 var(--space-sm);
+}
+.caveat-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--fg-2);
+}
+
+/* Question panel */
+.question-panel {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl);
+  margin-top: var(--space-4xl);
+}
+.question-panel h2 {
+  font-family: var(--font-headline);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-xl);
+}
+.question-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.question-list li {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--fg-2);
+}
+.question-list li:last-child {
+  border-bottom: none;
+}
+.question-list li::before {
+  content: "→";
+  color: var(--primary);
+  margin-right: var(--space-md);
+  font-weight: 600;
+}
+
+/* Source spread */
+.source-spread {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-lg);
+  margin: var(--space-xl) 0;
+}
+.source-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+}
+.source-card h4 {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-sm);
+}
+.source-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+}
+
+/* Reading mode visibility */
+.mode-summary .body-section .claim-card,
+.mode-summary .body-section .fact-table,
+.mode-summary .evidence-margin,
+.mode-summary .source-spread {
+  display: none;
+}
+.mode-summary .body-section .section-lead {
+  display: block;
+}
+.mode-evidence .section-lead {
+  display: none;
+}
+.mode-evidence .claim-card {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .document-shell {
+    padding: var(--space-xl) var(--space-md);
+  }
+  .cover {
+    padding: var(--space-3xl) var(--space-xl);
+  }
+  .reader-rail {
+    gap: var(--space-xs);
+  }
+  .reader-rail button {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.85rem;
+  }
+  .fact-table {
+    font-size: 0.85rem;
+  }
+  .fact-table th,
+  .fact-table td {
+    padding: var(--space-sm);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <h1 class="cover-title">document-skills</h1>
+    <p class="cover-scope">一套专业的办公文档处理技能集，覆盖 Word（docx）、PDF、PowerPoint（pptx）、Excel（xlsx）四类核心格式的创建、编辑、分析和转换。</p>
+    <div class="cover-meta">
+      <span class="meta-tag">来源：awesome-claude-skills</span>
+      <span class="meta-tag">维护者：Composio / 社区</span>
+      <span class="meta-tag">许可证：混合（docx/pdf 为 Proprietary）</span>
+    </div>
+  </header>
+
+  <!-- Reader rail -->
+  <nav class="reader-rail" id="readerRail">
+    <button class="active" data-mode="full">完整视图</button>
+    <button data-mode="summary">5 分钟概览</button>
+    <button data-mode="evidence">证据模式</button>
+  </nav>
+
+  <!-- Body -->
+  <main id="mainBody">
+
+    <!-- Section: Positioning -->
+    <section class="body-section">
+      <h2 class="section-title">定位与触发时机</h2>
+      <p class="section-lead">document-skills 专注于传统办公文档的自动化处理，与 ys-powers 的 html-anything 形成互补：HTML 适合 Web 展示，Office 文档适合正式交付。</p>
+
+      <div class="claim-card">
+        <h3>适用场景</h3>
+        <p>需要创建或修改 .docx、.pdf、.pptx、.xlsx 文件；从现有文档中提取文本、表格或元数据；合并、拆分或转换文档格式；处理文档中的修订痕迹或批注。</p>
+      </div>
+
+      <div class="claim-card">
+        <h3>不适用场景</h3>
+        <p>仅需阅读文档内容且已有其他工具（如 pandoc）可用时。此时应优先使用现有工具，避免过度工程化。</p>
+      </div>
+
+      <div class="evidence-margin">
+        <div class="evidence-label">来源引用</div>
+        <p>"与 ys-powers 现有能力的关系：ys-powers 的 html-anything 擅长生成 HTML 页面，而 document-skills 专注于传统办公文档。两者互补。"</p>
+      </div>
+    </section>
+
+    <!-- Section: Core Capabilities -->
+    <section class="body-section">
+      <h2 class="section-title">核心能力矩阵</h2>
+      <p class="section-lead">按文档类型划分的四大处理能力模块，每个模块覆盖创建、读取、编辑、转换全生命周期。</p>
+
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>格式</th>
+            <th>创建</th>
+            <th>读取/提取</th>
+            <th>编辑</th>
+            <th>特殊能力</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>DOCX</strong></td>
+            <td>python-docx 生成</td>
+            <td>pandoc → markdown</td>
+            <td>OOXML 编辑 / Redlining 修订</td>
+            <td>修订痕迹（track changes）</td>
+          </tr>
+          <tr>
+            <td><strong>PDF</strong></td>
+            <td>Python 库生成</td>
+            <td>pypdf.extract_text()</td>
+            <td>合并 / 拆分 / 重组</td>
+            <td>表单处理</td>
+          </tr>
+          <tr>
+            <td><strong>PPTX</strong></td>
+            <td>创建新幻灯片</td>
+            <td>提取文本、布局、模板</td>
+            <td>调整布局和设计</td>
+            <td>模板批量生成</td>
+          </tr>
+          <tr>
+            <td><strong>XLSX</strong></td>
+            <td>读写单元格</td>
+            <td>数据批量处理</td>
+            <td>公式与计算</td>
+            <td>图表生成</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section: Workflow Decision Tree -->
+    <section class="body-section">
+      <h2 class="section-title">工作流决策树</h2>
+      <p class="section-lead">根据任务类型和文档归属（自有/他人）选择最佳处理路径。</p>
+
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>任务</th>
+            <th>DOCX 推荐工作流</th>
+            <th>PDF 推荐工作流</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>仅读取内容</td>
+            <td>pandoc docx → markdown</td>
+            <td>pypdf.extract_text()</td>
+          </tr>
+          <tr>
+            <td>创建新文档</td>
+            <td>python-docx / OOXML</td>
+            <td>Python 库（reportlab 等）</td>
+          </tr>
+          <tr>
+            <td>编辑自有文档</td>
+            <td>基本 OOXML 编辑</td>
+            <td>合并/拆分/重组</td>
+          </tr>
+          <tr>
+            <td>编辑他人文档</td>
+            <td><strong>Redlining 修订模式</strong></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>法律/学术/政府文档</td>
+            <td><strong>Redlining 模式（强制）</strong></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="caveat-box">
+        <div class="caveat-title">重要提示</div>
+        <p>对于法律、学术、政府类文档，Redlining 修订模式是强制要求。这确保了所有修改都可追溯、可审计，符合专业文档处理的合规标准。</p>
+      </div>
+    </section>
+
+    <!-- Section: Relationship with ys-powers -->
+    <section class="body-section">
+      <h2 class="section-title">与 ys-powers 的关联</h2>
+      <p class="section-lead">document-skills 在 ys-powers 生态中的定位、借鉴价值与搬运建议。</p>
+
+      <div class="source-spread">
+        <div class="source-card">
+          <h4>能力互补</h4>
+          <p>html-anything 擅长生成 HTML 页面；document-skills 专注于传统办公文档。HTML 适合 Web 展示，Office 文档适合正式交付。</p>
+        </div>
+        <div class="source-card">
+          <h4>借鉴价值</h4>
+          <p>DOCX 的「修订模式（Redlining）」工作流对任何需要「安全编辑他人文档」的场景都有参考价值。</p>
+        </div>
+        <div class="source-card">
+          <h4>搬运建议</h4>
+          <p>中等价值。若 ys-powers 使用者经常需要处理 Office 文档，值得搬运。注意部分子 skill 使用 Proprietary 许可证。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Source Metadata -->
+    <section class="body-section">
+      <h2 class="section-title">元信息</h2>
+      <p class="section-lead">技术来源、维护状态与许可证信息。</p>
+
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>属性</th>
+            <th>值</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>来源路径</td>
+            <td><code>refer/awesome-claude-skills/document-skills/{docx,pdf,pptx,xlsx}/SKILL.md</code></td>
+          </tr>
+          <tr>
+            <td>维护者</td>
+            <td>Composio / 社区</td>
+          </tr>
+          <tr>
+            <td>许可证</td>
+            <td>docx 和 pdf 为 Proprietary（详见各子目录 LICENSE.txt），其余以目录内标注为准</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- Question panel -->
+  <aside class="question-panel">
+    <h2>后续可探讨的问题</h2>
+    <ul class="question-list">
+      <li>是否需要将 document-skills 的 Redlining 工作流整合进 ys-powers 的现有技能集？</li>
+      <li>如何处理 docx/pdf 子 skill 的 Proprietary 许可证限制？</li>
+      <li>在 ys-powers 中，html-anything 与 document-skills 的触发边界应如何界定？</li>
+      <li>是否需要为中文办公文档场景定制额外的处理能力？</li>
+    </ul>
+  </aside>
+
+</div>
+
+<script>
+// Reading mode switching
+const rail = document.getElementById('readerRail');
+const body = document.getElementById('mainBody');
+const buttons = rail.querySelectorAll('button');
+
+buttons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    buttons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const mode = btn.dataset.mode;
+    body.classList.remove('mode-summary', 'mode-evidence');
+
+    if (mode === 'summary') {
+      body.classList.add('mode-summary');
+    } else if (mode === 'evidence') {
+      body.classList.add('mode-evidence');
+    }
+  });
+});
+</script>
+</body>
+</html>

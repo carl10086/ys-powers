@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Name Brainstormer — Skill 文档</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover */
+    .cover {
+      margin-bottom: var(--space-4xl);
+      padding-bottom: var(--space-3xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .cover-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+    }
+
+    .cover-source {
+      font-size: 12px;
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .cover .deck {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-width: 640px;
+    }
+
+    /* Reader rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-xl);
+      float: left;
+      width: 180px;
+      margin-left: -200px;
+      padding-right: var(--space-lg);
+      font-size: 13px;
+      display: none;
+    }
+
+    @media (min-width: 1200px) {
+      .reader-rail { display: block; }
+      .document-shell { padding-left: 220px; }
+    }
+
+    .reader-rail ul {
+      list-style: none;
+      position: sticky;
+      top: 100px;
+    }
+
+    .reader-rail li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .reader-rail a {
+      color: var(--fg-muted);
+      text-decoration: none;
+      display: block;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .reader-rail a:hover,
+    .reader-rail a.active {
+      color: var(--primary);
+      background: var(--surface-container);
+    }
+
+    /* Body sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: var(--space-xl);
+      color: var(--fg-1);
+      letter-spacing: -0.01em;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 18px;
+      font-weight: 600;
+      margin: var(--space-2xl) 0 var(--space-md);
+      color: var(--fg-1);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-md);
+      color: var(--fg-2);
+    }
+
+    .body-section ul,
+    .body-section ol {
+      margin: var(--space-md) 0 var(--space-md) var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-sm);
+    }
+
+    .body-section strong {
+      color: var(--fg-1);
+      font-weight: 600;
+    }
+
+    /* Claim cards */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .claim-card h4 {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--fg-1);
+    }
+
+    .claim-card p {
+      font-size: 14px;
+      margin: 0;
+      color: var(--fg-2);
+    }
+
+    /* Fact table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-lg) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th,
+    .fact-table td {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fact-table th {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      background: var(--surface-container);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Evidence margin */
+    .evidence-margin {
+      border-left: 3px solid var(--primary);
+      padding-left: var(--space-lg);
+      margin: var(--space-xl) 0;
+      color: var(--fg-muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    /* Code blocks */
+    pre {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.5;
+      margin: var(--space-lg) 0;
+      color: var(--fg-1);
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      font-family: var(--font-headline);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--primary);
+      margin: var(--space-2xl) 0;
+      padding: var(--space-xl) var(--space-2xl);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-lg);
+      position: relative;
+    }
+
+    .pull-quote::before {
+      content: """;
+      font-size: 60px;
+      line-height: 1;
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-md);
+      opacity: 0.2;
+      color: var(--primary);
+    }
+
+    /* Question panel */
+    .question-panel {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-top: var(--space-2xl);
+    }
+
+    .question-panel h4 {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+    }
+
+    .question-panel ul {
+      margin: 0;
+      padding-left: var(--space-lg);
+      font-size: 14px;
+      color: var(--fg-2);
+    }
+
+    .question-panel li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Source spread */
+    .source-spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .source-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+
+    .source-card .label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .source-card .value {
+      font-size: 14px;
+      color: var(--fg-1);
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .cover h1 {
+        font-size: 28px;
+      }
+
+      .source-spread {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print */
+    @media print {
+      .reader-rail { display: none; }
+      .document-shell { padding: 0; max-width: 100%; }
+      body { background: white; color: black; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-meta">
+        <span class="cover-badge">Skill</span>
+        <span class="cover-source">awesome-claude-skills / Apache 2.0</span>
+      </div>
+      <h1>Domain Name Brainstormer</h1>
+      <p class="deck">
+        为新项目、产品或公司生成创意域名建议，并实时检查 <code>.com</code>、<code>.io</code>、<code>.dev</code>、<code>.ai</code> 等多 TLD 的可用性，将数小时的头脑风暴和手动查询压缩为几分钟。
+      </p>
+    </header>
+
+    <!-- Reader rail -->
+    <nav class="reader-rail" aria-label="目录">
+      <ul>
+        <li><a href="#positioning">定位</a></li>
+        <li><a href="#triggers">触发时机</a></li>
+        <li><a href="#capabilities">核心能力</a></li>
+        <li><a href="#workflow">指令流程</a></li>
+        <li><a href="#examples">使用示例</a></li>
+        <li><a href="#output">输出示例</a></li>
+        <li><a href="#relation">与 ys-powers 关联</a></li>
+        <li><a href="#meta">元信息</a></li>
+      </ul>
+    </nav>
+
+    <!-- Body -->
+    <main>
+      <section class="body-section" id="positioning">
+        <h2>定位</h2>
+        <p>
+          这是一个面向创业者、独立开发者和产品团队的域名命名助手。它不仅仅是随机生成单词组合，而是结合项目定位、目标受众和行业惯例，提供有品牌价值的命名方案，并即时验证域名可用性。
+        </p>
+        <div class="pull-quote">
+          将数小时的头脑风暴和手动查询压缩为几分钟
+        </div>
+      </section>
+
+      <section class="body-section" id="triggers">
+        <h2>触发时机</h2>
+        <ul>
+          <li>启动新项目或公司需要域名时</li>
+          <li>为产品、服务或个人品牌寻找在线标识时</li>
+          <li>首选域名已被注册，需要寻找替代方案时</li>
+          <li>需要检查特定关键词组合的域名可用性时</li>
+        </ul>
+        <div class="evidence-margin">
+          <strong>不适用场景：</strong>已有确定域名、仅需注册的场景
+        </div>
+      </section>
+
+      <section class="body-section" id="capabilities">
+        <h2>核心能力</h2>
+        <div class="source-spread">
+          <div class="claim-card">
+            <h4>1. 项目理解</h4>
+            <p>分析项目定位和目标受众，生成相关性高的命名方向</p>
+          </div>
+          <div class="claim-card">
+            <h4>2. 创意生成</h4>
+            <p>创建 memorable、品牌感强的域名选项</p>
+          </div>
+          <div class="claim-card">
+            <h4>3. 可用性检查</h4>
+            <p>实时验证 .com、.io、.dev、.ai、.app 等 TLD 的注册状态</p>
+          </div>
+          <div class="claim-card">
+            <h4>4. 替代建议</h4>
+            <p>当首选被占用时，提供变体、组合词或创意拼写方案</p>
+          </div>
+          <div class="claim-card">
+            <h4>5. 品牌洞察</h4>
+            <p>解释每个建议名称的优势和目标受众的感知效果</p>
+          </div>
+          <div class="claim-card">
+            <h4>6. 价格提示</h4>
+            <p>标注已被占用域名的预估收购价格（如有）</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="body-section" id="workflow">
+        <h2>指令流程概览</h2>
+        <ol>
+          <li><strong>理解项目</strong>：解析用户描述的项目类型、目标受众和核心关键词</li>
+          <li><strong>生成候选</strong>：基于语义关联、行业惯例和语言创意生成 10-15 个候选名称</li>
+          <li><strong>检查可用性</strong>：逐一查询各 TLD 的注册状态（可用 / 被占用 / 溢价）</li>
+          <li>
+            <strong>分级推荐</strong>：
+            <ul>
+              <li>首选推荐：短、易记、高度相关的可用域名</li>
+              <li>备选方案：不同 TLD 或轻微变体</li>
+              <li>创意方案：组合词、造词或隐喻式命名</li>
+            </ul>
+          </li>
+          <li><strong>品牌分析</strong>：为每个推荐解释其品牌传播价值</li>
+        </ol>
+      </section>
+
+      <section class="body-section" id="examples">
+        <h2>使用示例</h2>
+        <pre><code>I'm building a tool for developers to share code snippets. Suggest domain names.
+
+I need a domain name for my AI writing assistant.
+Prefer short names with .ai or .io extension.
+
+Suggest domain names using the words "pixel" or "studio"
+for my design agency</code></pre>
+      </section>
+
+      <section class="body-section" id="output">
+        <h2>输出示例</h2>
+        <pre><code>🎯 Domain Name Suggestions
+
+## Available (.com)
+1. ✓ snippetbox.com — Clear, memorable, available!
+2. ✓ codeclip.com — Short and snappy (8 characters)
+3. ✓ devpaste.com — Developer-focused
+
+## Available (Alternative TLDs)
+4. ✓ snippet.dev — Perfect for developer audience
+5. ✓ codebox.io — Tech-forward
+6. ✓ sharecode.app — Descriptive
+
+## Premium / Taken
+- codeshare.com (Taken, est. $2,500)
+- snippets.com (Taken, premium domain)
+
+🏆 Top Pick: snippet.dev
+🥈 Runner-up: snippetbox.com</code></pre>
+      </section>
+
+      <section class="body-section" id="relation">
+        <h2>与 ys-powers 的关联</h2>
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>现有能力关系</td>
+              <td>ys-powers 中无品牌命名或域名相关 skill，domain-name-brainstormer 填补了「产品启动」阶段的工具空白</td>
+            </tr>
+            <tr>
+              <td>借鉴价值</td>
+              <td>其「关键词提取 → 语义扩展 → 可用性验证 → 品牌分析」的四步流程可复用到任何命名场景（变量命名、项目命名、API 端点命名）</td>
+            </tr>
+            <tr>
+              <td>搬运建议</td>
+              <td>中等价值。适合独立开发者、创业者或产品团队。若 ys-powers 的使用者群体包含大量初创项目，值得搬运</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="body-section" id="meta">
+        <h2>元信息</h2>
+        <div class="source-spread">
+          <div class="source-card">
+            <div class="label">来源</div>
+            <div class="value">refer/awesome-claude-skills/domain-name-brainstormer/SKILL.md</div>
+          </div>
+          <div class="source-card">
+            <div class="label">维护者</div>
+            <div class="value">Composio / 社区</div>
+          </div>
+          <div class="source-card">
+            <div class="label">许可证</div>
+            <div class="value">Apache 2.0</div>
+          </div>
+        </div>
+
+        <div class="question-panel">
+          <h4>快速参考</h4>
+          <ul>
+            <li>适用：新项目启动、产品命名、品牌定位</li>
+            <li>不适用：已有域名的纯注册场景</li>
+            <li>核心流程：理解 → 生成 → 验证 → 推荐 → 分析</li>
+            <li>支持 TLD：.com / .io / .dev / .ai / .app</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Active nav highlighting on scroll
+    const sections = document.querySelectorAll('.body-section[id]');
+    const navLinks = document.querySelectorAll('.reader-rail a');
+
+    function onScroll() {
+      const scrollPos = window.scrollY + 120;
+      sections.forEach((section, i) => {
+        const top = section.offsetTop;
+        const bottom = top + section.offsetHeight;
+        if (scrollPos >= top && scrollPos < bottom) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.reader-rail a[href="#${section.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  </script>
+</body>
+</html>

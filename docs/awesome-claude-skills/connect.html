@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect — Claude 与 1000+ 应用的连接层</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-4xl) var(--space-xl);
+    }
+
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-2xl) var(--space-lg);
+      }
+    }
+
+    /* Cover */
+    .cover {
+      margin-bottom: var(--space-5xl);
+      padding-bottom: var(--space-4xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xl);
+    }
+
+    .cover-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover .lead {
+      font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--fg-2);
+      max-width: 640px;
+    }
+
+    /* Deck */
+    .deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-lg);
+      margin-top: var(--space-3xl);
+    }
+
+    .deck-item {
+      padding: var(--space-xl);
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+
+    .deck-item .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xs);
+    }
+
+    .deck-item .value {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-xl);
+      float: left;
+      width: 180px;
+      margin-left: -220px;
+      padding-right: var(--space-xl);
+    }
+
+    @media (max-width: 1100px) {
+      .reader-rail {
+        position: static;
+        float: none;
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: var(--space-3xl);
+        padding-right: 0;
+      }
+    }
+
+    .rail-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .rail-nav {
+      list-style: none;
+    }
+
+    .rail-nav li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .rail-nav a {
+      display: block;
+      padding: var(--space-sm) var(--space-md);
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .rail-nav a:hover,
+    .rail-nav a:focus {
+      background: var(--surface-container);
+      color: var(--fg-1);
+      outline: none;
+    }
+
+    .rail-nav a.active {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    /* Body Section */
+    .body-section {
+      margin-bottom: var(--space-5xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: clamp(1.375rem, 3vw, 1.75rem);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin: var(--space-3xl) 0 var(--space-md);
+    }
+
+    .body-section p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--fg-2);
+      margin-bottom: var(--space-lg);
+    }
+
+    .body-section ul,
+    .body-section ol {
+      margin: var(--space-lg) 0;
+      padding-left: var(--space-xl);
+    }
+
+    .body-section li {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--fg-2);
+      margin-bottom: var(--space-sm);
+    }
+
+    .body-section strong {
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    /* Claim Card */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .claim-card .claim-title {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .claim-card .claim-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: var(--primary);
+      border-radius: var(--radius-pill);
+      flex-shrink: 0;
+    }
+
+    .claim-card p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th,
+    .fact-table td {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fact-table th {
+      font-weight: 600;
+      color: var(--fg-1);
+      background: var(--surface-container);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .fact-table td {
+      color: var(--fg-2);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin: var(--space-xl) 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--fg-1);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .code-block .comment {
+      color: var(--fg-muted);
+    }
+
+    .code-block .keyword {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container-low);
+      border-left: 3px solid var(--primary);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .evidence-margin .source-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .evidence-margin p {
+      margin: 0;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--fg-2);
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: linear-gradient(135deg, rgba(160, 59, 0, 0.06) 0%, rgba(123, 64, 224, 0.04) 100%);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .caveat-box .caveat-title {
+      font-family: var(--font-headline);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .caveat-box p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-top: var(--space-3xl);
+    }
+
+    .question-panel h3 {
+      margin-top: 0;
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .question-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-lg) 0 0;
+    }
+
+    .question-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--fg-2);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .question-list li::before {
+      content: '?';
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      color: var(--on-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .question-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* Source Spread */
+    .source-spread {
+      margin-top: var(--space-3xl);
+      padding-top: var(--space-3xl);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .source-spread h3 {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+    }
+
+    .source-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .source-meta-item {
+      font-size: 13px;
+    }
+
+    .source-meta-item .meta-label {
+      color: var(--fg-muted);
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+
+    .source-meta-item .meta-value {
+      color: var(--fg-1);
+      font-weight: 600;
+    }
+
+    /* Flow Diagram */
+    .flow-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin: var(--space-xl) 0;
+    }
+
+    @media (min-width: 640px) {
+      .flow-diagram {
+        flex-direction: row;
+        align-items: stretch;
+      }
+    }
+
+    .flow-step {
+      flex: 1;
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      position: relative;
+    }
+
+    @media (min-width: 640px) {
+      .flow-step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-left: 12px solid var(--primary);
+        z-index: 1;
+      }
+    }
+
+    .flow-step .step-number {
+      width: 28px;
+      height: 28px;
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-headline);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+    }
+
+    .flow-step .step-title {
+      font-family: var(--font-headline);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-xs);
+    }
+
+    .flow-step .step-desc {
+      font-size: 13px;
+      color: var(--fg-muted);
+      line-height: 1.5;
+    }
+
+    /* App Grid */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--space-md);
+      margin: var(--space-xl) 0;
+    }
+
+    .app-item {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .app-item:hover {
+      border-color: var(--outline-variant);
+      box-shadow: var(--shadow-md);
+    }
+
+    .app-item .app-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      margin: 0 auto var(--space-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .app-item .app-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    .app-item .app-category {
+      font-size: 11px;
+      color: var(--fg-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* Print */
+    @media print {
+      .reader-rail { display: none; }
+      .document-shell { max-width: 100%; padding: 0; }
+      body { background: white; color: black; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-badge">Skill 文档</div>
+      <h1>Connect</h1>
+      <p class="lead">通过 Composio 将 Claude 连接到 1000+ 外部应用（Gmail、Slack、GitHub、Notion 等），让 Claude 从「生成文字建议」升级为「执行真实操作」。</p>
+
+      <div class="deck">
+        <div class="deck-item">
+          <div class="label">集成应用</div>
+          <div class="value">1000+</div>
+        </div>
+        <div class="deck-item">
+          <div class="label">驱动方式</div>
+          <div class="value">自然语言</div>
+        </div>
+        <div class="deck-item">
+          <div class="label">授权模式</div>
+          <div class="value">自动 OAuth</div>
+        </div>
+        <div class="deck-item">
+          <div class="label">工作流</div>
+          <div class="value">链式操作</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail" aria-label="文档导航">
+      <div class="rail-title">目录</div>
+      <ul class="rail-nav">
+        <li><a href="#positioning" class="active">定位</a></li>
+        <li><a href="#triggers">触发时机</a></li>
+        <li><a href="#capabilities">核心能力</a></li>
+        <li><a href="#workflow">指令流程</a></li>
+        <li><a href="#install">安装配置</a></li>
+        <li><a href="#relation">与 ys-powers 关联</a></li>
+        <li><a href="#meta">元信息</a></li>
+      </ul>
+    </nav>
+
+    <!-- Body -->
+    <main>
+      <section class="body-section" id="positioning">
+        <h2>定位</h2>
+        <p>Connect 是 Claude 与外部世界之间的通用连接层。它通过 Composio 平台提供对 1000 多个主流 SaaS 应用的统一访问能力，使 Claude 能够从纯粹的文字生成助手转变为能够实际执行操作的智能代理。</p>
+        <p>无论是发送邮件、创建 GitHub Issue、更新 Notion 文档，还是跨多个应用串联复杂工作流，Connect 都能通过自然语言指令自动完成工具路由、授权管理和操作执行。</p>
+      </section>
+
+      <section class="body-section" id="triggers">
+        <h2>触发时机</h2>
+        <p>在以下场景中，Connect 是首选能力：</p>
+        <ul>
+          <li><strong>实际执行操作</strong> — 需要 Claude 发送邮件、创建 Issue、发布 Slack 消息时</li>
+          <li><strong>数据操作</strong> — 需要更新数据库、添加日历事件、管理 CRM 记录时</li>
+          <li><strong>跨应用工作流</strong> — 需要串联多个应用的操作（如「从 GitHub 提取 bug 列表，总结后发 Slack」）时</li>
+        </ul>
+
+        <div class="caveat-box">
+          <div class="caveat-title">不适用场景</div>
+          <p>仅需文字建议、无需实际执行的场景不需要启用 Connect。对于纯咨询、分析、总结类任务，Claude 的原生能力已足够。</p>
+        </div>
+      </section>
+
+      <section class="body-section" id="capabilities">
+        <h2>核心能力</h2>
+
+        <div class="claim-card">
+          <div class="claim-title">1000+ 应用集成</div>
+          <p>覆盖邮件（Gmail、Outlook）、聊天（Slack、Discord、Teams）、开发（GitHub、GitLab、Jira）、文档（Notion、Google Docs）、数据（Sheets、Airtable、PostgreSQL）、CRM（HubSpot、Salesforce）等全品类 SaaS 应用。</p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-title">自然语言驱动</div>
+          <p>用日常语言描述需求，Claude 自动路由到正确工具。无需记忆特定命令或 API 名称。</p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-title">自动 OAuth 处理</div>
+          <p>首次使用某应用时自动引导授权流程，无需手动配置密钥或令牌。</p>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-title">链式操作</div>
+          <p>支持跨应用工作流，一步完成多系统协作。例如：从 GitHub 提取数据 → 分析总结 → 发送 Slack 通知 → 更新 Notion 文档。</p>
+        </div>
+
+        <h3>应用分类概览</h3>
+        <div class="app-grid">
+          <div class="app-item">
+            <div class="app-icon">&#9993;</div>
+            <div class="app-name">Gmail</div>
+            <div class="app-category">邮件</div>
+          </div>
+          <div class="app-item">
+            <div class="app-icon">&#128172;</div>
+            <div class="app-name">Slack</div>
+            <div class="app-category">聊天</div>
+          </div>
+          <div class="app-item">
+            <div class="app-icon">&#128190;</div>
+            <div class="app-name">GitHub</div>
+            <div class="app-category">开发</div>
+          </div>
+          <div class="app-item">
+            <div class="app-icon">&#128211;</div>
+            <div class="app-name">Notion</div>
+            <div class="app-category">文档</div>
+          </div>
+          <div class="app-item">
+            <div class="app-icon">&#128200;</div>
+            <div class="app-name">Sheets</div>
+            <div class="app-category">数据</div>
+          </div>
+          <div class="app-item">
+            <div class="app-icon">&#128101;</div>
+            <div class="app-name">HubSpot</div>
+            <div class="app-category">CRM</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="body-section" id="workflow">
+        <h2>指令流程概览</h2>
+        <p>Connect 的处理流程分为四个阶段，用户只需用自然语言描述需求，后续步骤自动完成：</p>
+
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <div class="step-number">1</div>
+            <div class="step-title">自然语言描述</div>
+            <div class="step-desc">用户描述要执行的操作，如 "Send email to sarah@acme.com about the launch"</div>
+          </div>
+          <div class="flow-step">
+            <div class="step-number">2</div>
+            <div class="step-title">工具路由</div>
+            <div class="step-desc">Composio Tool Router 从 1000+ 工具中匹配最合适的工具</div>
+          </div>
+          <div class="flow-step">
+            <div class="step-number">3</div>
+            <div class="step-title">自动授权</div>
+            <div class="step-desc">如首次使用，自动触发 OAuth 授权流程</div>
+          </div>
+          <div class="flow-step">
+            <div class="step-number">4</div>
+            <div class="step-title">执行与反馈</div>
+            <div class="step-desc">执行操作并返回结果给用户</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="body-section" id="install">
+        <h2>安装配置</h2>
+        <p>Connect 需要 Composio API Key 和对应语言的 SDK。配置过程分为两步：</p>
+
+        <div class="code-block">
+          <pre><span class="comment"># 获取免费 API Key: platform.composio.dev</span>
+<span class="keyword">export</span> COMPOSIO_API_KEY=<span class="comment">"your-key"</span>
+
+<span class="comment"># Python</span>
+pip install composio
+
+<span class="comment"># TypeScript</span>
+npm install @composio/core</pre>
+        </div>
+
+        <div class="evidence-margin">
+          <div class="source-label">配置提示</div>
+          <p>首次使用某个应用时，系统会自动引导 OAuth 授权流程。用户只需在弹出的授权页面中确认权限即可，无需手动创建应用或配置回调地址。</p>
+        </div>
+      </section>
+
+      <section class="body-section" id="relation">
+        <h2>与 ys-powers 的关联</h2>
+
+        <h3>与 composio-skills 的关系</h3>
+        <p><code>connect</code> 是 Composio 的「通用连接层」，提供「一句话执行任意操作」的通用能力；<code>composio-skills</code> 是「按应用细分的自动化 skill」，提供「按应用最佳实践编排」的结构化能力。两者互补：connect 负责快速执行，composio-skills 负责深度编排。</p>
+
+        <h3>借鉴价值</h3>
+        <p>其「自然语言 → 工具路由 → 自动执行」的交互模式是 Agent 与外部系统集成的标杆设计。该模式的核心洞察是：用户不应需要了解底层工具的细节，只需表达意图，系统负责翻译和执行。</p>
+
+        <h3>搬运建议</h3>
+        <p><strong>高价值</strong>。若 ys-powers 的使用者需要频繁与外部 SaaS 交互，可搬运或参考实现类似的「通用连接层」skill，使本地 Claude 工作流也能享受到「一句话操作千款应用」的能力。</p>
+      </section>
+
+      <section class="body-section" id="meta">
+        <h2>元信息</h2>
+
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>属性</th>
+              <th>值</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>来源</td>
+              <td><code>refer/awesome-claude-skills/connect/SKILL.md</code></td>
+            </tr>
+            <tr>
+              <td>维护者</td>
+              <td>Composio</td>
+            </tr>
+            <tr>
+              <td>许可证</td>
+              <td>Apache 2.0</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- Source Spread -->
+    <footer class="source-spread">
+      <h3>文档来源</h3>
+      <div class="source-meta">
+        <div class="source-meta-item">
+          <div class="meta-label">原始文件</div>
+          <div class="meta-value">connect.md</div>
+        </div>
+        <div class="source-meta-item">
+          <div class="meta-label">项目</div>
+          <div class="meta-value">ys-powers</div>
+        </div>
+        <div class="source-meta-item">
+          <div class="meta-label">生成时间</div>
+          <div class="meta-value">2026-05-16</div>
+        </div>
+        <div class="source-meta-item">
+          <div class="meta-label">样式系统</div>
+          <div class="meta-value">Document Review</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Active nav tracking
+    const sections = document.querySelectorAll('.body-section[id]');
+    const navLinks = document.querySelectorAll('.rail-nav a');
+
+    function updateActiveNav() {
+      const scrollPos = window.scrollY + 100;
+
+      sections.forEach((section, index) => {
+        const top = section.offsetTop;
+        const bottom = top + section.offsetHeight;
+
+        if (scrollPos >= top && scrollPos < bottom) {
+          navLinks.forEach(link => link.classList.remove('active'));
+          const activeLink = document.querySelector(`.rail-nav a[href="#${section.id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    updateActiveNav();
+
+    // Smooth scroll for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
