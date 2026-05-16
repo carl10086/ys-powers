@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>awesome-claude-skills 分析笔记</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      background: var(--gradient-hero);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-5xl) var(--space-4xl);
+      margin-bottom: var(--space-4xl);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-lg);
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover .subtitle {
+      font-size: 1.15rem;
+      opacity: 0.9;
+      max-width: 600px;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover .meta {
+      margin-top: var(--space-2xl);
+      display: flex;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover .meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    .cover .meta-item .num {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-xl);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-3xl);
+      border: 1px solid var(--border);
+    }
+
+    .reader-rail h3 {
+      font-family: var(--font-headline);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .reader-rail ul {
+      list-style: none;
+    }
+
+    .reader-rail li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .reader-rail a {
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: block;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .reader-rail a:hover {
+      background: var(--surface-container);
+      color: var(--primary);
+    }
+
+    /* Body Section */
+    .body-section {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4xl);
+      margin-bottom: var(--space-3xl);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin: var(--space-2xl) 0 var(--space-md);
+    }
+
+    .body-section p {
+      color: var(--fg-2);
+      margin-bottom: var(--space-md);
+      line-height: 1.7;
+    }
+
+    .body-section ul, .body-section ol {
+      margin-left: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-sm);
+      line-height: 1.6;
+    }
+
+    .body-section code {
+      font-family: var(--font-mono);
+      background: var(--surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85em;
+      color: var(--primary);
+    }
+
+    .body-section pre {
+      background: var(--surface-container-high);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      margin: var(--space-md) 0 var(--space-xl);
+      border: 1px solid var(--border);
+    }
+
+    .body-section pre code {
+      background: none;
+      padding: 0;
+      color: var(--fg-1);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* Pull Quote */
+    .pull-quote {
+      border-left: 4px solid var(--primary);
+      padding-left: var(--space-xl);
+      margin: var(--space-2xl) 0;
+      font-style: italic;
+      color: var(--fg-muted);
+      font-size: 1.05rem;
+    }
+
+    /* File Tree */
+    .file-tree {
+      background: var(--surface-container);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+
+    .file-tree .dir {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .file-tree .file {
+      color: var(--fg-2);
+    }
+
+    .file-tree .comment {
+      color: var(--fg-muted);
+    }
+
+    /* Category Grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .category-card {
+      background: var(--surface-container);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .category-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--outline-variant);
+    }
+
+    .category-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .category-card p {
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+      margin: 0;
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-left: 4px solid var(--secondary-container);
+    }
+
+    .evidence-margin h4 {
+      font-family: var(--font-headline);
+      font-size: 0.9rem;
+      color: var(--secondary-container);
+      margin-bottom: var(--space-md);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Stats Table */
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+    }
+
+    .stats-table th,
+    .stats-table td {
+      padding: var(--space-md) var(--space-lg);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-table th {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      color: var(--fg-1);
+      background: var(--surface-container);
+      font-size: 0.9rem;
+    }
+
+    .stats-table td {
+      color: var(--fg-2);
+    }
+
+    .stats-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--gradient-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      margin-top: var(--space-4xl);
+      color: white;
+    }
+
+    .question-panel h3 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      margin-bottom: var(--space-xl);
+      color: white;
+    }
+
+    .question-panel ol {
+      margin-left: var(--space-xl);
+    }
+
+    .question-panel li {
+      margin-bottom: var(--space-md);
+      opacity: 0.95;
+    }
+
+    .question-panel a {
+      color: var(--primary-fixed);
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-lg) var(--space-md);
+      }
+
+      .cover {
+        padding: var(--space-3xl) var(--space-xl);
+      }
+
+      .body-section {
+        padding: var(--space-xl);
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .reader-rail {
+        position: relative;
+        top: 0;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+
+    /* Print styles */
+    @media print {
+      .reader-rail { display: none; }
+      .cover { background: #a03b00 !important; -webkit-print-color-adjust: exact; }
+      .question-panel { background: #a03b00 !important; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover / Masthead -->
+    <header class="cover">
+      <h1>awesome-claude-skills 分析笔记</h1>
+      <p class="subtitle">
+        本目录是 <code>refer/awesome-claude-skills/</code> 的对照笔记，
+        按 <a href="../ys-powers/specs/2026-05-16-awesome-claude-skills-docs-design.md" style="color: var(--primary-fixed);">ys-powers 文档化设计 Spec</a> 的规范建立。
+      </p>
+      <div class="meta">
+        <div class="meta-item">
+          <span class="num">~30</span>
+          <span>本地 skill 目录</span>
+        </div>
+        <div class="meta-item">
+          <span class="num">800+</span>
+          <span>Composio 子 skill</span>
+        </div>
+        <div class="meta-item">
+          <span class="num">10</span>
+          <span>覆盖分类</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <h3>快速导航</h3>
+      <ul>
+        <li><a href="#what">这是什么</a></li>
+        <li><a href="#conventions">文档约定</a></li>
+        <li><a href="#structure">文件结构</a></li>
+        <li><a href="#usage">如何使用</a></li>
+        <li><a href="#categories">分类体系</a></li>
+      </ul>
+    </nav>
+
+    <!-- Body Section: What -->
+    <section class="body-section" id="what">
+      <h2>这是什么</h2>
+      <p>
+        <a href="https://github.com/ComposioHQ/awesome-claude-skills">awesome-claude-skills</a>
+        是由 Composio 维护的社区 Claude Skills 合集，收录了 1000+ 生产级、跨平台兼容的 Skills。
+        本地 <code>refer/</code> 目录中保留了其中约 30 个可直接分析的 skill 目录（含 <code>SKILL.md</code>），
+        外加 <code>composio-skills/</code> 下 800+ 个 SaaS App 自动化 skill。
+      </p>
+
+      <div class="pull-quote">
+        每个 skill 对应一个独立的 .md 分析文件，结构化摘要其 SKILL.md
+      </div>
+    </section>
+
+    <!-- Body Section: Conventions -->
+    <section class="body-section" id="conventions">
+      <h2>文档约定</h2>
+      <ul>
+        <li><strong>总览索引</strong>：<code>overview.md</code> 按分类列出所有本地 skill 的一览信息</li>
+        <li><strong>逐个深入</strong>：每个 skill 对应一个独立的 <code>.md</code> 分析文件，结构化摘要其 <code>SKILL.md</code></li>
+        <li><strong>HTML 预览</strong>：每个 <code>.md</code> 都有对应的 <code>.html</code>，通过 <code>/html</code> skill 生成</li>
+        <li><strong>只读原则</strong>：不修改 <code>refer/awesome-claude-skills/</code> 下的任何源文件</li>
+      </ul>
+    </section>
+
+    <!-- Body Section: Structure -->
+    <section class="body-section" id="structure">
+      <h2>文件结构</h2>
+      <div class="file-tree">
+<span class="dir">docs/awesome-claude-skills/</span>
+├── <span class="file">README.md</span>                          <span class="comment"># 本文件</span>
+├── <span class="file">overview.md</span>                        <span class="comment"># 总览索引</span>
+├── <span class="file">batch-log.md</span>                       <span class="comment"># 批次执行进度</span>
+├── <span class="file">composio-skills.md</span>                 <span class="comment"># composio-skills 聚合分析</span>
+├── <span class="file">artifacts-builder.md</span>               <span class="comment"># 单个 skill 深入分析</span>
+├── <span class="file">brand-guidelines.md</span>
+├── <span class="file">canvas-design.md</span>
+├── <span class="file">changelog-generator.md</span>
+├── <span class="file">competitive-ads-extractor.md</span>
+├── <span class="file">connect.md</span>
+├── <span class="file">connect-apps.md</span>
+├── <span class="file">connect-apps-plugin.md</span>
+├── <span class="file">content-research-writer.md</span>
+├── <span class="file">developer-growth-analysis.md</span>
+├── <span class="file">document-skills.md</span>
+├── <span class="file">domain-name-brainstormer.md</span>
+├── <span class="file">file-organizer.md</span>
+├── <span class="file">image-enhancer.md</span>
+├── <span class="file">internal-comms.md</span>
+├── <span class="file">invoice-organizer.md</span>
+├── <span class="file">langsmith-fetch.md</span>
+├── <span class="file">lead-research-assistant.md</span>
+├── <span class="file">mcp-builder.md</span>
+├── <span class="file">meeting-insights-analyzer.md</span>
+├── <span class="file">raffle-winner-picker.md</span>
+├── <span class="file">skill-creator.md</span>
+├── <span class="file">skill-share.md</span>
+├── <span class="file">slack-gif-creator.md</span>
+├── <span class="file">tailored-resume-generator.md</span>
+├── <span class="file">template-skill.md</span>
+├── <span class="file">theme-factory.md</span>
+├── <span class="file">twitter-algorithm-optimizer.md</span>
+├── <span class="file">video-downloader.md</span>
+└── <span class="file">webapp-testing.md</span>
+      </div>
+    </section>
+
+    <!-- Body Section: Usage -->
+    <section class="body-section" id="usage">
+      <h2>如何使用</h2>
+      <ul>
+        <li><strong>快速了解全貌</strong> &rarr; 阅读 <code>overview.md</code></li>
+        <li><strong>深入了解某个 skill</strong> &rarr; 打开对应名称的 <code>.md</code> 文件</li>
+        <li><strong>浏览器阅读</strong> &rarr; 打开对应名称的 <code>.html</code> 文件</li>
+      </ul>
+    </section>
+
+    <!-- Body Section: Categories -->
+    <section class="body-section" id="categories">
+      <h2>分类体系</h2>
+      <p>沿用 awesome-claude-skills 官方 README 中的分类：</p>
+
+      <div class="category-grid">
+        <div class="category-card">
+          <h4>Document Processing</h4>
+          <p>文档处理</p>
+        </div>
+        <div class="category-card">
+          <h4>Development & Code Tools</h4>
+          <p>开发与代码工具</p>
+        </div>
+        <div class="category-card">
+          <h4>Data & Analysis</h4>
+          <p>数据分析</p>
+        </div>
+        <div class="category-card">
+          <h4>Business & Marketing</h4>
+          <p>商业与营销</p>
+        </div>
+        <div class="category-card">
+          <h4>Communication & Writing</h4>
+          <p>沟通与写作</p>
+        </div>
+        <div class="category-card">
+          <h4>Creative & Media</h4>
+          <p>创意与媒体</p>
+        </div>
+        <div class="category-card">
+          <h4>Productivity & Organization</h4>
+          <p>生产力与组织</p>
+        </div>
+        <div class="category-card">
+          <h4>Collaboration & Project Management</h4>
+          <p>协作与项目管理</p>
+        </div>
+        <div class="category-card">
+          <h4>Security & Systems</h4>
+          <p>安全与系统</p>
+        </div>
+        <div class="category-card">
+          <h4>App Automation via Composio</h4>
+          <p>Composio 应用自动化</p>
+        </div>
+      </div>
+
+      <div class="evidence-margin">
+        <h4>分类说明</h4>
+        <p>部分分类在本地暂无纯类型 skill（如 Data & Analysis、Collaboration & Project Management、Security & Systems），
+        相关能力分散在其他 skill 中。完整 1000+ skills 列表见 <code>refer/awesome-claude-skills/README.md</code>。</p>
+      </div>
+    </section>
+
+    <!-- Question Panel -->
+    <section class="question-panel">
+      <h3>使用建议</h3>
+      <ol>
+        <li><strong>不知道用哪个</strong> &rarr; 先按分类浏览 <a href="overview.md">overview.md</a>，定位到相关领域后再点击深入分析</li>
+        <li><strong>想搬运到 ys-powers</strong> &rarr; 查看每个 skill 分析文件中的「与 ys-powers 的关联」章节</li>
+        <li><strong>发现缺失</strong> &rarr; 本索引仅覆盖本地目录，完整 1000+ skills 列表见 <code>refer/awesome-claude-skills/README.md</code></li>
+      </ol>
+    </section>
+  </div>
+</body>
+</html>

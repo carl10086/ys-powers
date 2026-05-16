@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>image-enhancer — Skill Specification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 48px;
+  --space-5xl: 64px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+  --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+  --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { min-height: 100%; margin: 0; }
+
+body {
+  color: var(--fg-1);
+  background: var(--bg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Document Shell */
+.document-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Cover / Masthead */
+.cover {
+  grid-column: 1 / -1;
+  padding: var(--space-4xl) var(--space-3xl);
+  background: linear-gradient(135deg, var(--surface-container-low) 0%, var(--surface-container) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+}
+
+.cover-eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cover h1 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.gradient-text {
+  color: transparent;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+.deck-item {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.deck-item strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+
+.deck-item p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Reader Rail */
+.reader-rail {
+  position: sticky;
+  top: var(--space-lg);
+  height: fit-content;
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.rail-title {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-headline);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.rail-nav {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.rail-nav a {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--fg-2);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: background 0.15s, color 0.15s;
+}
+
+.rail-nav a:hover {
+  background: var(--surface-container);
+  color: var(--fg-1);
+}
+
+.rail-nav a.active {
+  background: var(--primary-fixed);
+  color: var(--primary);
+}
+
+.rail-meta {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.rail-meta-item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  font-size: 12px;
+}
+
+.rail-meta-item span:first-child {
+  color: var(--fg-muted);
+}
+
+.rail-meta-item span:last-child {
+  color: var(--fg-2);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* Body Sheet */
+.body-sheet {
+  padding: var(--space-3xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.body-section {
+  margin-bottom: var(--space-4xl);
+}
+
+.body-section:last-child {
+  margin-bottom: 0;
+}
+
+.body-section h2 {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-headline);
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.body-section h3 {
+  margin: var(--space-2xl) 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.body-section p {
+  margin: 0 0 var(--space-md);
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.body-section ul,
+.body-section ol {
+  margin: 0 0 var(--space-lg);
+  padding-left: 20px;
+  color: var(--fg-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.body-section li {
+  margin-bottom: var(--space-sm);
+}
+
+/* Pull Quote */
+.pull-quote {
+  margin: var(--space-2xl) 0;
+  padding: var(--space-xl) var(--space-2xl);
+  background: var(--surface-container-low);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+
+/* Fact Table */
+.fact-table {
+  width: 100%;
+  margin: var(--space-lg) 0;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.fact-table th,
+.fact-table td {
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.fact-table th {
+  font-weight: 700;
+  color: var(--fg-muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--surface-container-low);
+}
+
+.fact-table td {
+  color: var(--fg-2);
+}
+
+.fact-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Claim Card */
+.claim-card {
+  padding: var(--space-lg);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-md);
+}
+
+.claim-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 15px;
+}
+
+.claim-card p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Evidence Margin */
+.evidence-margin {
+  margin: var(--space-2xl) 0;
+  padding: var(--space-lg);
+  background: var(--surface-container);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.evidence-margin .evidence-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.evidence-margin pre {
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  color: var(--fg-2);
+}
+
+/* Caveat Box */
+.caveat-box {
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: var(--radius-lg);
+}
+
+.caveat-box strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--red);
+  font-size: 13px;
+}
+
+.caveat-box p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Source Spread */
+.source-spread {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border);
+}
+
+.source-spread h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.source-item {
+  padding: var(--space-md);
+  background: var(--surface-container-low);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+}
+
+.source-item strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--fg-1);
+}
+
+.source-item span {
+  color: var(--fg-muted);
+}
+
+/* Question Panel */
+.question-panel {
+  margin-top: var(--space-3xl);
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, var(--surface-container-low) 0%, var(--surface-container) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.question-panel h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.question-panel ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--fg-2);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.question-panel li {
+  margin-bottom: var(--space-sm);
+}
+
+/* Search */
+.search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255, 248, 246, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  margin: calc(-1 * var(--space-3xl)) calc(-1 * var(--space-3xl)) var(--space-xl);
+  width: calc(100% + var(--space-3xl) * 2);
+}
+
+.search-bar input {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-container-lowest);
+  color: var(--fg-1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-bar input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(160, 59, 0, 0.1);
+}
+
+.search-bar input::placeholder {
+  color: var(--fg-muted);
+}
+
+/* Highlight */
+.highlight {
+  background: rgba(160, 59, 0, 0.15);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+/* Print */
+@media print {
+  .reader-rail,
+  .search-bar {
+    display: none;
+  }
+  .document-shell {
+    display: block;
+    padding: 0;
+  }
+  .body-sheet {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .document-shell {
+    grid-template-columns: 1fr;
+  }
+  .reader-rail {
+    position: static;
+    order: -1;
+  }
+  .rail-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+  .rail-nav a {
+    white-space: nowrap;
+  }
+  .body-sheet {
+    padding: var(--space-xl);
+  }
+  .cover {
+    padding: var(--space-2xl) var(--space-xl);
+  }
+  .search-bar {
+    margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-xl)) var(--space-lg);
+    width: calc(100% + var(--space-xl) * 2);
+  }
+}
+
+@media (max-width: 560px) {
+  .document-shell {
+    padding: var(--space-sm);
+  }
+  .deck {
+    grid-template-columns: 1fr;
+  }
+  .body-sheet {
+    padding: var(--space-lg);
+  }
+  .cover {
+    padding: var(--space-xl) var(--space-lg);
+  }
+  .cover h1 {
+    font-size: 30px;
+  }
+  .search-bar {
+    margin: calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg)) var(--space-lg);
+    width: calc(100% + var(--space-lg) * 2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+  <!-- Cover / Masthead -->
+  <header class="cover">
+    <p class="cover-eyebrow">Claude Skill Specification</p>
+    <h1>image-enhancer <span class="gradient-text">图像增强</span></h1>
+    <p style="margin: 0; color: var(--fg-2); font-size: 15px; line-height: 1.6; max-width: 640px;">
+      提升图像和截图的质量，包括分辨率放大、锐度增强和清晰度优化，使图片更适合用于演示、文档和社交媒体。
+    </p>
+    <div class="deck">
+      <div class="deck-item">
+        <strong>核心能力</strong>
+        <p>质量分析、智能放大、锐化增强、降噪修复、场景优化</p>
+      </div>
+      <div class="deck-item">
+        <strong>触发时机</strong>
+        <p>博客截图优化、社交媒体分享、低分辨率放大、压缩损伤修复</p>
+      </div>
+      <div class="deck-item">
+        <strong>输出产物</strong>
+        <p>增强后的图像文件，保留原始文件作为备份</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Reader Rail -->
+  <nav class="reader-rail" aria-label="Section navigation">
+    <p class="rail-title">目录</p>
+    <div class="rail-nav" id="railNav">
+      <a href="#positioning" class="active">定位</a>
+      <a href="#triggers">触发时机</a>
+      <a href="#capabilities">核心能力</a>
+      <a href="#workflow">指令流程</a>
+      <a href="#output-example">输出示例</a>
+      <a href="#scenarios">常见场景</a>
+      <a href="#relations">与 ys-powers 关联</a>
+      <a href="#meta">元信息</a>
+    </div>
+    <div class="rail-meta">
+      <div class="rail-meta-item">
+        <span>来源</span>
+        <span>awesome-claude-skills</span>
+      </div>
+      <div class="rail-meta-item">
+        <span>维护者</span>
+        <span>Composio / 社区</span>
+      </div>
+      <div class="rail-meta-item">
+        <span>许可证</span>
+        <span>Apache 2.0</span>
+      </div>
+      <div class="rail-meta-item">
+        <span>字数</span>
+        <span>~800</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Body Sheet -->
+  <article class="body-sheet">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="搜索文档内容..." aria-label="搜索">
+    </div>
+
+    <section class="body-section" id="positioning">
+      <h2>定位</h2>
+      <p>提升图像和截图的质量，包括分辨率放大、锐度增强和清晰度优化，使图片更适合用于演示、文档和社交媒体。</p>
+    </section>
+
+    <section class="body-section" id="triggers">
+      <h2>触发时机</h2>
+      <ul>
+        <li>需要为博客或文档优化截图质量时</li>
+        <li>分享图片到社交媒体前需要提升视觉效果时</li>
+        <li>低分辨率图片需要放大使用（如投影展示）时</li>
+        <li>压缩导致的马赛克或模糊需要修复时</li>
+      </ul>
+      <div class="caveat-box">
+        <strong>不适用场景</strong>
+        <p>原始图片质量极差（超出算法修复范围）或需要专业级照片后期处理时。</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="capabilities">
+      <h2>核心能力</h2>
+      <div class="claim-card">
+        <strong>1. 质量分析</strong>
+        <p>检查分辨率、锐度和压缩损伤程度</p>
+      </div>
+      <div class="claim-card">
+        <strong>2. 智能放大</strong>
+        <p>将图片 upscale 到更高分辨率（如 Retina 级别）</p>
+      </div>
+      <div class="claim-card">
+        <strong>3. 锐化增强</strong>
+        <p>强化边缘和细节，提升文字可读性</p>
+      </div>
+      <div class="claim-card">
+        <strong>4. 降噪修复</strong>
+        <p>清理压缩伪影和噪点</p>
+      </div>
+      <div class="claim-card">
+        <strong>5. 场景优化</strong>
+        <p>根据用途（Web、印刷、社交媒体）调整输出参数</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="workflow">
+      <h2>指令流程概览</h2>
+      <ol>
+        <li>分析输入图片的当前规格（分辨率、格式、质量缺陷）</li>
+        <li>根据用户需求确定增强方向（放大、锐化、降噪、综合优化）</li>
+        <li>应用对应的图像处理算法</li>
+        <li>输出优化后的图片，同时保留原始文件作为备份</li>
+      </ol>
+    </section>
+
+    <section class="body-section" id="output-example">
+      <h2>输出示例</h2>
+      <div class="evidence-margin">
+        <div class="evidence-label">
+          <span>终端输出样例</span>
+        </div>
+        <pre>Analyzing screenshot-2024.png...
+
+Current specs:
+- Resolution: 1920x1080
+- Format: PNG
+- Quality: Good, slight blur
+
+Enhancements applied:
+✓ Upscaled to 2560x1440 (retina)
+✓ Sharpened edges
+✓ Enhanced text clarity
+✓ Optimized file size
+
+Saved as: screenshot-2024-enhanced.png
+Original preserved as: screenshot-2024-original.png</pre>
+      </div>
+    </section>
+
+    <section class="body-section" id="scenarios">
+      <h2>常见场景</h2>
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>场景</th>
+            <th>描述</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>博客写作</strong></td>
+            <td>提升截图清晰度后再发布</td>
+          </tr>
+          <tr>
+            <td><strong>技术文档</strong></td>
+            <td>让 UI 截图更易于阅读</td>
+          </tr>
+          <tr>
+            <td><strong>社交媒体</strong></td>
+            <td>按平台尺寸优化图片</td>
+          </tr>
+          <tr>
+            <td><strong>演示文稿</strong></td>
+            <td>放大图片适应大屏幕</td>
+          </tr>
+          <tr>
+            <td><strong>印刷材料</strong></td>
+            <td>提升分辨率用于实体输出</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="body-section" id="relations">
+      <h2>与 ys-powers 的关联</h2>
+      <ul>
+        <li><strong>与 canvas-design 的关系</strong>：<code>canvas-design</code> 负责「创建视觉艺术」，<code>image-enhancer</code> 负责「优化现有图像」。两者互补。</li>
+        <li><strong>借鉴价值</strong>：其「分析 → 增强 → 保留原图」的安全处理流程可作为任何媒体处理 skill 的模板。</li>
+        <li><strong>搬运建议</strong>：中等价值。截图优化是常见需求，但图像处理依赖底层算法库，搬运时需确保环境中有对应的图像处理工具。</li>
+      </ul>
+    </section>
+
+    <section class="body-section" id="meta">
+      <h2>元信息</h2>
+      <div class="source-spread">
+        <div class="source-grid">
+          <div class="source-item">
+            <strong>来源</strong>
+            <span>refer/awesome-claude-skills/image-enhancer/SKILL.md</span>
+          </div>
+          <div class="source-item">
+            <strong>维护者</strong>
+            <span>Composio / 社区</span>
+          </div>
+          <div class="source-item">
+            <strong>许可证</strong>
+            <span>Apache 2.0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="question-panel">
+      <h3>使用建议</h3>
+      <ul>
+        <li>在需要批量处理截图时，优先考虑此 skill 的自动化能力</li>
+        <li>对于专业级图像处理需求，建议结合专业设计软件使用</li>
+        <li>搬运到 ys-powers 时，需检查目标环境的图像处理库可用性</li>
+      </ul>
+    </div>
+  </article>
+</div>
+
+<script>
+// Reading mode: active section tracking
+const sections = document.querySelectorAll('.body-section[id]');
+const navLinks = document.querySelectorAll('.rail-nav a');
+
+function onScroll() {
+  const scrollPos = window.scrollY + 120;
+  let activeId = sections[0]?.id;
+
+  sections.forEach(section => {
+    if (section.offsetTop <= scrollPos) {
+      activeId = section.id;
+    }
+  });
+
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + activeId);
+  });
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+// Smooth scroll for nav links
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const bodyContent = document.querySelector('.body-sheet');
+
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.trim().toLowerCase();
+
+  // Remove existing highlights
+  bodyContent.querySelectorAll('.highlight').forEach(el => {
+    const parent = el.parentNode;
+    parent.replaceChild(document.createTextNode(el.textContent), el);
+    parent.normalize();
+  });
+
+  if (!query) return;
+
+  // Walk text nodes and highlight matches
+  const walker = document.createTreeWalker(
+    bodyContent,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+
+  const nodesToReplace = [];
+  let node;
+  while (node = walker.nextNode()) {
+    if (node.nodeValue.toLowerCase().includes(query)) {
+      nodesToReplace.push(node);
+    }
+  }
+
+  nodesToReplace.forEach(node => {
+    const parent = node.parentNode;
+    if (parent.tagName === 'SCRIPT' || parent.closest('.search-bar')) return;
+
+    const text = node.nodeValue;
+    const parts = text.split(new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'));
+
+    const fragment = document.createDocumentFragment();
+    parts.forEach((part, i) => {
+      if (i % 2 === 1) {
+        const mark = document.createElement('mark');
+        mark.className = 'highlight';
+        mark.textContent = part;
+        fragment.appendChild(mark);
+      } else {
+        fragment.appendChild(document.createTextNode(part));
+      }
+    });
+
+    parent.replaceChild(fragment, node);
+  });
+});
+</script>
+</body>
+</html>

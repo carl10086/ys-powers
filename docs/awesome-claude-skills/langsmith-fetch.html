@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>langsmith-fetch — Agent 可观测性调试技能</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #a03b00;
+    --primary-container: #c94c00;
+    --primary-fixed: #ffdbcd;
+    --primary-fixed-dim: #ffb597;
+    --on-primary: #ffffff;
+    --accent-glow: #E8400D;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #fff8f6;
+    --surface: #fff8f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fbf2ef;
+    --surface-container: #f5ece9;
+    --surface-container-high: #efe6e3;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #e1bfb2;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+    --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #060B18;
+      --surface: #0B1426;
+      --surface-container-lowest: #101D35;
+      --surface-container-low: #101D35;
+      --surface-container: #162544;
+      --surface-container-high: #1c2d52;
+      --fg-1: #F8FAFC;
+      --fg-2: #CBD5E1;
+      --fg-muted: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #FF6B35;
+      --accent-glow: #00D4FF;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--fg-1);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* Document Shell */
+  .document-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  /* Cover / Masthead */
+  .cover {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4xl) var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+
+  .cover-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: var(--gradient-primary);
+    color: var(--on-primary);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-lg);
+  }
+
+  .cover h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-md);
+    color: var(--fg-1);
+  }
+
+  .cover .deck {
+    font-size: 1.15rem;
+    color: var(--fg-2);
+    max-width: 640px;
+    line-height: 1.6;
+    margin-bottom: var(--space-xl);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  .meta-row span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  /* Reader Rail */
+  .reader-rail {
+    position: sticky;
+    top: var(--space-lg);
+    background: var(--surface-container);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+    border: 1px solid var(--border);
+    z-index: 10;
+  }
+
+  .rail-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    justify-content: space-between;
+  }
+
+  .rail-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .rail-nav a {
+    text-decoration: none;
+    color: var(--fg-2);
+    font-size: 13px;
+    font-weight: 500;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .rail-nav a:hover,
+  .rail-nav a:focus {
+    background: var(--surface-container-high);
+    color: var(--fg-1);
+    border-color: var(--border-strong);
+    outline: none;
+  }
+
+  .rail-nav a.active {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+
+  .reading-modes {
+    display: flex;
+    gap: var(--space-xs);
+  }
+
+  .mode-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--fg-2);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+  }
+
+  .mode-btn:hover,
+  .mode-btn:focus {
+    background: var(--surface-container-high);
+    color: var(--fg-1);
+    outline: none;
+  }
+
+  .mode-btn.active {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+  }
+
+  /* Body Sections */
+  .body-section {
+    margin-bottom: var(--space-4xl);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-header h2 {
+    font-family: var(--font-headline);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--fg-1);
+    letter-spacing: -0.01em;
+  }
+
+  .section-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--gradient-primary);
+    color: var(--on-primary);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .section-body {
+    color: var(--fg-2);
+    line-height: 1.7;
+  }
+
+  .section-body p {
+    margin-bottom: var(--space-md);
+  }
+
+  /* Claim Cards */
+  .claim-card {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .claim-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .claim-card h3 {
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .claim-card p {
+    color: var(--fg-2);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Capability Grid */
+  .capability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .capability-item {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+  }
+
+  .capability-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .capability-item .cap-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-primary);
+    font-size: 18px;
+    margin-bottom: var(--space-md);
+  }
+
+  .capability-item h4 {
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-xs);
+  }
+
+  .capability-item p {
+    font-size: 13px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+  }
+
+  /* Code Blocks */
+  .code-block {
+    background: #1e1b19;
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-lg) 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block::before {
+    content: 'bash';
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-md);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .code-block code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: #f5f5f5;
+    display: block;
+  }
+
+  .code-block .comment {
+    color: #6b7280;
+  }
+
+  .code-block .command {
+    color: #60a5fa;
+  }
+
+  .code-block .flag {
+    color: #fbbf24;
+  }
+
+  .code-block .arg {
+    color: #a78bfa;
+  }
+
+  /* Flow Steps */
+  .flow-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .flow-step {
+    display: flex;
+    gap: var(--space-lg);
+    align-items: flex-start;
+  }
+
+  .flow-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--gradient-primary);
+    color: var(--on-primary);
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .flow-content {
+    flex: 1;
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 1px solid var(--border);
+  }
+
+  .flow-content h4 {
+    font-family: var(--font-headline);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-sm);
+  }
+
+  .flow-content p {
+    color: var(--fg-2);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+  }
+
+  .analysis-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .analysis-list li {
+    padding: var(--space-xs) 0;
+    padding-left: var(--space-lg);
+    position: relative;
+    font-size: 14px;
+    color: var(--fg-2);
+  }
+
+  .analysis-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+  }
+
+  /* Evidence Margin */
+  .evidence-margin {
+    background: var(--surface-container);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    border-left: 4px solid var(--primary);
+  }
+
+  .evidence-margin h4 {
+    font-family: var(--font-headline);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .evidence-margin p {
+    font-size: 14px;
+    color: var(--fg-2);
+    line-height: 1.6;
+  }
+
+  /* Relation Cards */
+  .relation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+
+  .relation-card {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .relation-card h4 {
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-sm);
+  }
+
+  .relation-card p {
+    font-size: 14px;
+    color: var(--fg-2);
+    line-height: 1.6;
+  }
+
+  .relation-tag {
+    display: inline-block;
+    background: var(--primary-fixed);
+    color: var(--primary-container);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: var(--space-sm);
+  }
+
+  /* Caveat Box */
+  .caveat-box {
+    background: var(--surface-container-high);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    border: 1px solid var(--border-strong);
+  }
+
+  .caveat-box h4 {
+    font-family: var(--font-headline);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .caveat-box p {
+    font-size: 14px;
+    color: var(--fg-muted);
+    line-height: 1.6;
+  }
+
+  /* Question Panel */
+  .question-panel {
+    background: var(--surface-container);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-top: var(--space-xl);
+    border: 1px solid var(--border);
+  }
+
+  .question-panel h4 {
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-md);
+  }
+
+  .question-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .question-list li {
+    padding: var(--space-sm) 0;
+    padding-left: var(--space-lg);
+    position: relative;
+    font-size: 14px;
+    color: var(--fg-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .question-list li:last-child {
+    border-bottom: none;
+  }
+
+  .question-list li::before {
+    content: '?';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 18px;
+    height: 18px;
+    background: var(--secondary-container);
+    color: var(--on-primary);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Source Spread */
+  .source-spread {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-top: var(--space-3xl);
+    border: 1px solid var(--border);
+  }
+
+  .source-spread h3 {
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-md);
+  }
+
+  .source-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .source-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .source-meta-item .label {
+    font-size: 12px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .source-meta-item .value {
+    font-size: 14px;
+    color: var(--fg-1);
+    font-weight: 500;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .document-shell {
+      padding: var(--space-xl) var(--space-md);
+    }
+
+    .cover {
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    .rail-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .rail-nav {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: var(--space-sm);
+    }
+
+    .capability-grid,
+    .relation-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .flow-step {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .reader-rail { display: none; }
+    .cover { box-shadow: none; border: 1px solid #ccc; }
+    .claim-card, .capability-item, .flow-content, .relation-card {
+      box-shadow: none;
+      border: 1px solid #ccc;
+      break-inside: avoid;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  /* Focus states */
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="document-shell">
+
+  <!-- Cover / Masthead -->
+  <header class="cover">
+    <div class="cover-badge">Claude Skill</div>
+    <h1>langsmith-fetch</h1>
+    <p class="deck">通过从 LangSmith Studio 获取 LangChain / LangGraph Agent 的执行轨迹（trace），帮助开发者调试 Agent 行为、分析工具调用、检查记忆操作和审查性能指标。</p>
+    <div class="meta-row">
+      <span>来源: refer/awesome-claude-skills</span>
+      <span>维护者: Composio / 社区 (@OthmanAdi)</span>
+      <span>许可证: Apache 2.0</span>
+    </div>
+  </header>
+
+  <!-- Reader Rail -->
+  <nav class="reader-rail">
+    <div class="rail-inner">
+      <div class="rail-nav">
+        <a href="#positioning" class="active">定位</a>
+        <a href="#triggers">触发时机</a>
+        <a href="#capabilities">核心能力</a>
+        <a href="#workflow">指令流程</a>
+        <a href="#install">安装要求</a>
+        <a href="#relations">关联分析</a>
+      </div>
+      <div class="reading-modes">
+        <button class="mode-btn active" data-mode="full">完整</button>
+        <button class="mode-btn" data-mode="summary">摘要</button>
+        <button class="mode-btn" data-mode="evidence">证据</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Positioning -->
+  <section class="body-section" id="positioning">
+    <div class="section-header">
+      <span class="section-number">1</span>
+      <h2>定位</h2>
+    </div>
+    <div class="section-body">
+      <p>langsmith-fetch 是一个面向 LangChain / LangGraph Agent 开发者的可观测性调试技能。它通过调用 LangSmith Studio API，获取 Agent 的执行轨迹数据，将原本分散在云端监控平台的 trace 信息拉取到本地开发环境，使开发者能够在调试会话中直接分析 Agent 的行为模式。</p>
+
+      <div class="evidence-margin">
+        <h4>核心价值主张</h4>
+        <p>将「云端 trace 数据」转化为「可操作的调试情报」，缩短从发现问题到定位根因的时间路径。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Triggers -->
+  <section class="body-section" id="triggers">
+    <div class="section-header">
+      <span class="section-number">2</span>
+      <h2>触发时机</h2>
+    </div>
+    <div class="section-body">
+      <div class="claim-card">
+        <h3>适用场景</h3>
+        <p>Agent 行为异常，需要查看最近执行记录时；调查工具调用失败或返回错误时；分析 Agent 的记忆（LTM）操作是否正常时；检查 Token 使用情况和执行性能时；需要向 LangSmith 获取特定 Trace ID 的详细信息时。</p>
+      </div>
+
+      <div class="caveat-box">
+        <h4>不适用场景</h4>
+        <p>未使用 LangChain / LangGraph 构建 Agent，或未配置 LangSmith 监控时。此技能依赖于 LangSmith 平台的 trace 数据，如果项目未接入 LangSmith，则无法使用。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capabilities -->
+  <section class="body-section" id="capabilities">
+    <div class="section-header">
+      <span class="section-number">3</span>
+      <h2>核心能力</h2>
+    </div>
+    <div class="section-body">
+      <div class="capability-grid">
+        <div class="capability-item">
+          <div class="cap-icon">1</div>
+          <h4>快速调试</h4>
+          <p>获取最近 N 分钟内的 traces，快速定位失败点和异常模式</p>
+        </div>
+        <div class="capability-item">
+          <div class="cap-icon">2</div>
+          <h4>深度分析</h4>
+          <p>针对特定 trace ID 获取完整执行流程和 JSON 详情</p>
+        </div>
+        <div class="capability-item">
+          <div class="cap-icon">3</div>
+          <h4>错误定位</h4>
+          <p>识别工具调用失败、连接超时、节点执行异常等问题</p>
+        </div>
+        <div class="capability-item">
+          <div class="cap-icon">4</div>
+          <h4>性能监控</h4>
+          <p>查看执行时长、Token 消耗等关键指标</p>
+        </div>
+        <div class="capability-item">
+          <div class="cap-icon">5</div>
+          <h4>工具调用审计</h4>
+          <p>追踪 Agent 调用了哪些工具、调用顺序和返回结果</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflow -->
+  <section class="body-section" id="workflow">
+    <div class="section-header">
+      <span class="section-number">4</span>
+      <h2>指令流程概览</h2>
+    </div>
+    <div class="section-body">
+      <div class="flow-container">
+        <div class="flow-step">
+          <span class="flow-marker">A</span>
+          <div class="flow-content">
+            <h4>快速调试（最近活动）</h4>
+            <p>扫描最近时间窗口内的 trace 活动，获取高频概览信息。</p>
+            <div class="code-block">
+              <code><span class="command">langsmith-fetch</span> <span class="arg">traces</span> <span class="flag">--last-n-minutes</span> <span class="arg">5</span> <span class="flag">--limit</span> <span class="arg">5</span> <span class="flag">--format</span> <span class="arg">pretty</span></code>
+            </div>
+            <ul class="analysis-list">
+              <li>发现 traces 数量</li>
+              <li>错误/失败项</li>
+              <li>调用的工具列表</li>
+              <li>执行时长</li>
+              <li>Token 使用量</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <span class="flow-marker">B</span>
+          <div class="flow-content">
+            <h4>深度调查（特定 Trace）</h4>
+            <p>基于快速扫描中发现的异常 trace ID，进行单点深度钻取。</p>
+            <div class="code-block">
+              <code><span class="command">langsmith-fetch</span> <span class="arg">trace</span> <span class="arg">&lt;trace-id&gt;</span> <span class="flag">--format</span> <span class="arg">json</span></code>
+            </div>
+            <ul class="analysis-list">
+              <li>Agent 目标</li>
+              <li>工具调用顺序和结果</li>
+              <li>失败点和错误信息</li>
+              <li>根因分析</li>
+              <li>修复建议</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="evidence-margin">
+        <h4>两级调试模式</h4>
+        <p>「最近活动快速扫描 → 特定 Trace 深度钻取」的两级调试模式是可观测性（observability）最佳实践，可复用到任何需要排查复杂执行流程的场景。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section class="body-section" id="install">
+    <div class="section-header">
+      <span class="section-number">5</span>
+      <h2>安装要求</h2>
+    </div>
+    <div class="section-body">
+      <div class="code-block">
+        <code><span class="comment"># 安装 CLI 工具</span>
+<span class="command">pip</span> <span class="arg">install</span> <span class="arg">langsmith-fetch</span>
+
+<span class="comment"># 配置环境变量</span>
+<span class="command">export</span> <span class="arg">LANGSMITH_API_KEY</span>=<span class="arg">"your_key"</span>
+<span class="command">export</span> <span class="arg">LANGSMITH_PROJECT</span>=<span class="arg">"your_project"</span></code>
+      </div>
+
+      <div class="caveat-box">
+        <h4>前置条件</h4>
+        <p>需要有效的 LangSmith API Key 和已配置的项目名称。确保目标 Agent 已接入 LangSmith 监控，否则无法获取 trace 数据。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Relations -->
+  <section class="body-section" id="relations">
+    <div class="section-header">
+      <span class="section-number">6</span>
+      <h2>与 ys-powers 的关联</h2>
+    </div>
+    <div class="section-body">
+      <div class="relation-grid">
+        <div class="relation-card">
+          <h4>developer-growth-analysis</h4>
+          <p>两者都分析「历史行为」，但 langsmith-fetch 聚焦 Agent 执行层，developer-growth-analysis 聚焦开发者个人成长。</p>
+          <span class="relation-tag">对比关系</span>
+        </div>
+        <div class="relation-card">
+          <h4>可观测性最佳实践</h4>
+          <p>其「最近活动快速扫描 → 特定 Trace 深度钻取」的两级调试模式是通用的可观测性最佳实践，可复用到任何需要排查复杂执行流程的场景。</p>
+          <span class="relation-tag">借鉴价值</span>
+        </div>
+        <div class="relation-card">
+          <h4>搬运建议</h4>
+          <p>高价值。若 ys-powers 的使用者使用 LangChain / LangGraph 构建 Agent，这是必备的调试工具。可作为「Agent 可观测性」skill 的一部分搬运。</p>
+          <span class="relation-tag">实施建议</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Question Panel -->
+  <section class="body-section" id="questions">
+    <div class="question-panel">
+      <h4>审查清单</h4>
+      <ul class="question-list">
+        <li>项目是否使用 LangChain / LangGraph 构建 Agent？</li>
+        <li>是否已配置 LangSmith 监控并获取 API Key？</li>
+        <li>调试目标是快速扫描还是深度调查特定 trace？</li>
+        <li>是否需要将两级调试模式抽象为通用可观测性 skill？</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Source Spread -->
+  <footer class="source-spread">
+    <h3>元信息</h3>
+    <div class="source-meta">
+      <div class="source-meta-item">
+        <span class="label">来源</span>
+        <span class="value">refer/awesome-claude-skills/langsmith-fetch/SKILL.md</span>
+      </div>
+      <div class="source-meta-item">
+        <span class="label">维护者</span>
+        <span class="value">Composio / 社区 (@OthmanAdi)</span>
+      </div>
+      <div class="source-meta-item">
+        <span class="label">许可证</span>
+        <span class="value">Apache 2.0</span>
+      </div>
+      <div class="source-meta-item">
+        <span class="label">文档版本</span>
+        <span class="value">v1.0</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // Reading mode switching
+  const modeBtns = document.querySelectorAll('.mode-btn');
+  const sections = document.querySelectorAll('.body-section');
+
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const mode = btn.dataset.mode;
+
+      sections.forEach(section => {
+        if (mode === 'summary') {
+          // Show only first paragraph of each section
+          const paragraphs = section.querySelectorAll('.section-body > p');
+          paragraphs.forEach((p, i) => {
+            p.style.display = i === 0 ? 'block' : 'none';
+          });
+          // Hide complex components
+          const complex = section.querySelectorAll('.capability-grid, .flow-container, .relation-grid, .code-block');
+          complex.forEach(el => el.style.display = 'none');
+        } else if (mode === 'evidence') {
+          // Show only evidence boxes and code
+          const all = section.querySelectorAll('.section-body > *');
+          all.forEach(el => {
+            if (el.classList.contains('evidence-margin') || el.classList.contains('code-block') || el.classList.contains('caveat-box')) {
+              el.style.display = 'block';
+            } else {
+              el.style.display = 'none';
+            }
+          });
+        } else {
+          // Full mode - show everything
+          const all = section.querySelectorAll('.section-body > *');
+          all.forEach(el => el.style.display = '');
+        }
+      });
+    });
+  });
+
+  // Active nav highlighting on scroll
+  const navLinks = document.querySelectorAll('.rail-nav a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (scrollY >= sectionTop - 200) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  });
+
+  // Smooth scroll for nav links
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

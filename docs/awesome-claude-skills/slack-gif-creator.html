@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slack GIF Creator — Skill Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #a03b00;
+    --primary-container: #c94c00;
+    --primary-fixed: #ffdbcd;
+    --primary-fixed-dim: #ffb597;
+    --on-primary: #ffffff;
+    --accent-glow: #E8400D;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #fff8f6;
+    --surface: #fff8f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fbf2ef;
+    --surface-container: #f5ece9;
+    --surface-container-high: #efe6e3;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #e1bfb2;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+    --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #060B18;
+      --surface: #0B1426;
+      --surface-container-lowest: #101D35;
+      --surface-container-low: #101D35;
+      --surface-container: #162544;
+      --surface-container-high: #1c2d52;
+      --fg-1: #F8FAFC;
+      --fg-2: #CBD5E1;
+      --fg-muted: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #FF6B35;
+      --accent-glow: #00D4FF;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--fg-1);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  .document-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  /* Cover */
+  .cover {
+    margin-bottom: var(--space-4xl);
+    padding-bottom: var(--space-3xl);
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  .cover-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .cover h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-lg);
+    color: var(--fg-1);
+  }
+
+  .cover .deck {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--fg-2);
+    max-width: 720px;
+    margin-bottom: var(--space-xl);
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  .cover-meta span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  /* Reader rail */
+  .reader-rail {
+    position: sticky;
+    top: var(--space-xl);
+    float: left;
+    width: 200px;
+    padding-right: var(--space-3xl);
+    margin-bottom: var(--space-4xl);
+  }
+
+  .reader-rail nav ul {
+    list-style: none;
+  }
+
+  .reader-rail nav li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .reader-rail nav a {
+    display: block;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+
+  .reader-rail nav a:hover,
+  .reader-rail nav a.active {
+    background: var(--surface-container);
+    color: var(--fg-1);
+  }
+
+  .reader-rail .rail-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+    margin-bottom: var(--space-md);
+    padding-left: var(--space-md);
+  }
+
+  /* Body */
+  .body-sheet {
+    margin-left: 220px;
+    max-width: 760px;
+  }
+
+  .body-section {
+    margin-bottom: var(--space-5xl);
+  }
+
+  .body-section h2 {
+    font-family: var(--font-headline);
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+    color: var(--fg-1);
+    letter-spacing: -0.01em;
+  }
+
+  .body-section h3 {
+    font-family: var(--font-headline);
+    font-size: 18px;
+    font-weight: 600;
+    margin: var(--space-2xl) 0 var(--space-md);
+    color: var(--fg-1);
+  }
+
+  .body-section p {
+    margin-bottom: var(--space-md);
+    color: var(--fg-2);
+  }
+
+  .body-section ul,
+  .body-section ol {
+    margin: var(--space-md) 0 var(--space-lg) var(--space-xl);
+    color: var(--fg-2);
+  }
+
+  .body-section li {
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Fact table */
+  .fact-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-xl) 0;
+    font-size: 14px;
+  }
+
+  .fact-table th,
+  .fact-table td {
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fact-table th {
+    font-family: var(--font-headline);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--fg-muted);
+    background: var(--surface-container-low);
+  }
+
+  .fact-table td {
+    color: var(--fg-2);
+  }
+
+  .fact-table tr:hover td {
+    background: var(--surface-container-low);
+  }
+
+  /* Claim card */
+  .claim-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+  }
+
+  .claim-card h4 {
+    font-family: var(--font-headline);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--fg-1);
+  }
+
+  .claim-card p {
+    font-size: 14px;
+    color: var(--fg-2);
+    margin: 0;
+  }
+
+  /* Code block */
+  pre {
+    background: var(--surface-container-high);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--fg-1);
+    margin: var(--space-lg) 0;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--surface-container);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Evidence margin */
+  .evidence-margin {
+    border-left: 3px solid var(--primary);
+    padding-left: var(--space-lg);
+    margin: var(--space-xl) 0;
+    color: var(--fg-muted);
+    font-size: 14px;
+  }
+
+  .evidence-margin strong {
+    color: var(--fg-1);
+  }
+
+  /* Caveat box */
+  .caveat-box {
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+  }
+
+  .caveat-box-title {
+    font-family: var(--font-headline);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: var(--space-sm);
+    color: var(--fg-1);
+  }
+
+  .caveat-box p {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* Question panel */
+  .question-panel {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    margin-top: var(--space-4xl);
+  }
+
+  .question-panel h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  .question-panel ul {
+    margin: var(--space-md) 0 0;
+    padding-left: var(--space-xl);
+  }
+
+  .question-panel li {
+    margin-bottom: var(--space-sm);
+    color: var(--fg-2);
+  }
+
+  /* Responsive */
+  @media (max-width: 860px) {
+    .reader-rail {
+      position: relative;
+      float: none;
+      width: 100%;
+      padding-right: 0;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .reader-rail nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .reader-rail nav li {
+      margin: 0;
+    }
+
+    .body-sheet {
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .document-shell {
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    .cover h1 {
+      font-size: 28px;
+    }
+
+    .cover .deck {
+      font-size: 16px;
+    }
+
+    .fact-table {
+      font-size: 13px;
+    }
+
+    .fact-table th,
+    .fact-table td {
+      padding: var(--space-sm);
+    }
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Focus */
+  a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <div class="cover-eyebrow">Claude Skill / 工具技能</div>
+    <h1>slack-gif-creator</h1>
+    <p class="deck">创建针对 Slack 优化的动画 GIF，提供符合 Slack 尺寸约束的验证器和可组合的动画原语（shake、bounce、move 等）。覆盖「静→动→优化」视觉生产链路的动画环节。</p>
+    <div class="cover-meta">
+      <span>来源: awesome-claude-skills</span>
+      <span>维护者: Composio / 社区</span>
+      <span>许可证: Apache 2.0</span>
+    </div>
+  </header>
+
+  <!-- Reader Rail -->
+  <aside class="reader-rail">
+    <div class="rail-label">目录</div>
+    <nav>
+      <ul>
+        <li><a href="#positioning" class="active">定位与触发</a></li>
+        <li><a href="#capabilities">核心能力</a></li>
+        <li><a href="#specs">Slack GIF 规格</a></li>
+        <li><a href="#optimization">优化策略</a></li>
+        <li><a href="#validator">验证器使用</a></li>
+        <li><a href="#relations">与 ys-powers 关联</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Body Sheet -->
+  <main class="body-sheet">
+
+    <section class="body-section" id="positioning">
+      <h2>定位与触发时机</h2>
+      <p>slack-gif-creator 是一个面向 Slack 生态的专用动画 GIF 创作技能。它在以下场景触发：</p>
+      <ul>
+        <li>需要为 Slack 制作表情包（emoji）或消息动图时</li>
+        <li>用户描述类似 "make me a GIF for Slack of X doing Y" 的需求时</li>
+        <li>需要确保 GIF 符合 Slack 的严格大小限制时</li>
+      </ul>
+      <div class="caveat-box">
+        <div class="caveat-box-title">不适用场景</div>
+        <p>非 Slack 场景的通用 GIF 制作。虽然工具可用，但优化方向不同，可能无法达到最佳文件大小与画质平衡。</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="capabilities">
+      <h2>核心能力</h2>
+
+      <div class="claim-card">
+        <h4>1. Slack 约束验证</h4>
+        <p>自动检查 GIF 是否符合 Slack 的消息或 emoji 尺寸限制，避免上传失败。</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>2. 动画原语</h4>
+        <p>提供可组合的动画基础模块：Shake（抖动）、Bounce（弹跳）、Move（移动）、Kaleidoscope（万花筒）。</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>3. 尺寸优化策略</h4>
+        <p>针对 Slack 的严格限制提供自动优化建议，包括帧率、颜色数、分辨率调整。</p>
+      </div>
+
+      <div class="claim-card">
+        <h4>4. 辅助工具</h4>
+        <p>文本渲染、颜色处理、特效叠加等可选工具，支持更丰富的视觉表达。</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="specs">
+      <h2>Slack GIF 规格</h2>
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>类型</th>
+            <th>最大尺寸</th>
+            <th>推荐尺寸</th>
+            <th>FPS</th>
+            <th>颜色</th>
+            <th>时长</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>消息 GIF</strong></td>
+            <td>~2 MB</td>
+            <td>480×480</td>
+            <td>15-20</td>
+            <td>128-256</td>
+            <td>2-5s</td>
+          </tr>
+          <tr>
+            <td><strong>Emoji GIF</strong></td>
+            <td>64 KB</td>
+            <td>128×128</td>
+            <td>10-12</td>
+            <td>32-48</td>
+            <td>1-2s</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="body-section" id="optimization">
+      <h2>Emoji GIF 优化策略</h2>
+      <p>Emoji GIF 面临最严苛的 64 KB 限制，需要采用激进的优化策略：</p>
+      <ul>
+        <li>限制总帧数 10-15 帧，减少冗余画面</li>
+        <li>使用 32-48 色，降低调色板大小</li>
+        <li>设计简洁，避免渐变和复杂纹理</li>
+        <li>频繁验证文件大小，迭代调整</li>
+      </ul>
+      <div class="evidence-margin">
+        <strong>关键洞察：</strong>Emoji GIF 的优化核心在于「减少信息熵」—— 通过简化视觉元素和缩短时长，在极小的体积内保留动画的辨识度。
+      </div>
+    </section>
+
+    <section class="body-section" id="validator">
+      <h2>验证器使用</h2>
+      <p>技能内置 Python 验证器，支持完整验证和快速检查两种模式：</p>
+      <pre><code># 完整验证
+from core.validators import validate_gif, is_slack_ready
+
+all_pass, results = validate_gif('emoji.gif', is_emoji=True)
+
+# 快速检查
+if is_slack_ready('emoji.gif', is_emoji=True):
+    print("Ready to upload!")</code></pre>
+      <p><code>validate_gif</code> 返回详细的检查结果列表，<code>is_slack_ready</code> 返回布尔值，适合在流水线中做快速门控。</p>
+    </section>
+
+    <section class="body-section" id="relations">
+      <h2>与 ys-powers 的关联</h2>
+
+      <h3>技能链路关系</h3>
+      <p>slack-gif-creator 与 ys-powers 中其他视觉技能形成完整生产链路：</p>
+      <ul>
+        <li><strong>canvas-design</strong>：创作静态视觉艺术</li>
+        <li><strong>image-enhancer</strong>：优化现有图片</li>
+        <li><strong>slack-gif-creator</strong>：创作 Slack 专用动画</li>
+      </ul>
+      <p>三者覆盖「静→动→优化」的完整视觉生产链路。</p>
+
+      <h3>设计模式借鉴</h3>
+      <p>其「约束验证器 + 可组合原语」的设计模式可复用到任何需要「在严格约束下创作」的场景，例如：</p>
+      <ul>
+        <li>社交媒体内容（Twitter/X 图片尺寸限制）</li>
+        <li>邮件签名（HTML 邮件客户端兼容性）</li>
+        <li>小程序素材（微信小程序包大小限制）</li>
+      </ul>
+
+      <h3>搬运建议</h3>
+      <div class="caveat-box">
+        <div class="caveat-box-title">低价值</div>
+        <p>功能高度聚焦 Slack 生态，适用面较窄。除非项目明确需要 Slack 表情包/动图制作能力，否则不建议搬运。</p>
+      </div>
+    </section>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h3>进一步探索</h3>
+      <ul>
+        <li>如何将「约束验证器 + 可组合原语」模式迁移到其他平台（如 Discord、微信）？</li>
+        <li>canvas-design 与 slack-gif-creator 的协作流程如何设计？</li>
+        <li>是否需要为 ys-powers 增加通用 GIF 优化技能，覆盖非 Slack 场景？</li>
+      </ul>
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  // Active nav highlighting on scroll
+  const sections = document.querySelectorAll('.body-section[id]');
+  const navLinks = document.querySelectorAll('.reader-rail nav a');
+
+  function updateActiveNav() {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.getBoundingClientRect().top;
+      if (sectionTop <= 120) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+</script>
+
+</body>
+</html>

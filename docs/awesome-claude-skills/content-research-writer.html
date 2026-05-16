@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Research Writer — Skill Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 48px;
+  --space-5xl: 64px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { min-height: 100%; margin: 0; }
+
+body {
+  color: var(--fg-1);
+  background: var(--bg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Document shell */
+.document-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+}
+
+/* Cover / masthead */
+.cover {
+  padding: var(--space-4xl) var(--space-3xl);
+  background: linear-gradient(135deg, var(--surface-container-low) 0%, var(--surface-container) 100%);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-3xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+}
+
+.cover-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-lg);
+}
+
+.cover h1 {
+  font-family: var(--font-headline);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 var(--space-md);
+  letter-spacing: -0.01em;
+  color: var(--fg-1);
+}
+
+.cover .subtitle {
+  font-size: 17px;
+  color: var(--fg-2);
+  margin: 0 0 var(--space-xl);
+  line-height: 1.5;
+}
+
+.deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+.deck-item {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.deck-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.deck-value {
+  font-family: var(--font-headline);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg-1);
+}
+
+/* Reader rail */
+.reader-rail {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-sm);
+  background: var(--surface-container-low);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rail-tab {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.rail-tab:hover {
+  color: var(--fg-1);
+  background: var(--surface-container);
+}
+
+.rail-tab.active {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+/* Body sections */
+.body-section {
+  margin-bottom: var(--space-4xl);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-header h2 {
+  font-family: var(--font-headline);
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--fg-1);
+}
+
+.section-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  background: var(--surface-container);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+/* Claim cards */
+.claim-card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  transition: box-shadow 0.2s ease;
+}
+
+.claim-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.claim-card h3 {
+  font-family: var(--font-headline);
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 var(--space-sm);
+  color: var(--fg-1);
+}
+
+.claim-card p {
+  margin: 0;
+  color: var(--fg-2);
+  line-height: 1.6;
+}
+
+/* Capability list */
+.capability-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.capability-list li {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.capability-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.capability-text {
+  flex: 1;
+}
+
+.capability-text strong {
+  color: var(--fg-1);
+  font-weight: 600;
+}
+
+.capability-text span {
+  color: var(--fg-2);
+}
+
+/* Trigger tags */
+.trigger-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.trigger-tag {
+  font-size: 13px;
+  color: var(--fg-2);
+  background: var(--surface-container);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+}
+
+.trigger-tag.exclude {
+  color: var(--red);
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+/* Workflow steps */
+.workflow-track {
+  display: grid;
+  gap: var(--space-md);
+  counter-reset: step;
+}
+
+.workflow-step {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+
+.workflow-step::before {
+  counter-increment: step;
+  content: counter(step);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-primary);
+  background: var(--gradient-primary);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.step-content h4 {
+  font-family: var(--font-headline);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 var(--space-xs);
+  color: var(--fg-1);
+}
+
+.step-content p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 14px;
+}
+
+/* Code block */
+.code-block {
+  background: #1e1b19;
+  color: #f5ece9;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  margin: var(--space-lg) 0;
+}
+
+.code-block .comment {
+  color: var(--fg-muted);
+}
+
+.code-block .command {
+  color: var(--accent-cyan);
+}
+
+/* Evidence margin */
+.evidence-margin {
+  margin-top: var(--space-3xl);
+  padding: var(--space-xl);
+  background: var(--surface-container-low);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.evidence-margin h3 {
+  font-family: var(--font-headline);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 var(--space-md);
+  color: var(--fg-1);
+}
+
+.meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.meta-table td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.meta-table td:first-child {
+  font-weight: 500;
+  color: var(--fg-muted);
+  width: 120px;
+}
+
+.meta-table td:last-child {
+  color: var(--fg-1);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.meta-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Question panel */
+.question-panel {
+  margin-top: var(--space-3xl);
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, var(--surface-container-low) 0%, var(--surface-container) 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.question-panel h3 {
+  font-family: var(--font-headline);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 var(--space-md);
+  color: var(--fg-1);
+}
+
+.question-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.question-list li {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--fg-2);
+}
+
+/* Pull quote */
+.pull-quote {
+  margin: var(--space-2xl) 0;
+  padding: var(--space-xl) var(--space-2xl);
+  border-left: 3px solid var(--primary);
+  background: var(--surface-container-low);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  color: var(--fg-2);
+}
+
+.pull-quote cite {
+  display: block;
+  margin-top: var(--space-sm);
+  font-style: normal;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+/* Caveat box */
+.caveat-box {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg) var(--space-xl);
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+.caveat-box strong {
+  color: var(--yellow);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .document-shell {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .cover {
+    padding: var(--space-2xl) var(--space-xl);
+  }
+
+  .cover h1 {
+    font-size: 26px;
+  }
+
+  .deck {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-rail {
+    padding: var(--space-xs);
+  }
+
+  .rail-tab {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 12px;
+  }
+
+  .workflow-step {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .claim-card, .rail-tab {
+    transition: none;
+  }
+}
+
+/* Print */
+@media print {
+  .reader-rail { display: none; }
+  .cover { background: #fff; border: 1px solid #ddd; }
+  .claim-card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <!-- Cover / Masthead -->
+  <header class="cover">
+    <div class="cover-badge">Claude Skill</div>
+    <h1>Content Research Writer</h1>
+    <p class="subtitle">作为写作搭档，协助完成从选题、调研、大纲、草稿到润色的全流程内容创作，同时保持作者的独特语调和风格。</p>
+
+    <div class="deck">
+      <div class="deck-item">
+        <div class="deck-label">Type</div>
+        <div class="deck-value">写作协作 Skill</div>
+      </div>
+      <div class="deck-item">
+        <div class="deck-label">Source</div>
+        <div class="deck-value">awesome-claude-skills</div>
+      </div>
+      <div class="deck-item">
+        <div class="deck-label">License</div>
+        <div class="deck-value">Apache 2.0</div>
+      </div>
+      <div class="deck-item">
+        <div class="deck-label">Maintainer</div>
+        <div class="deck-value">Composio / 社区</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Reader Rail -->
+  <nav class="reader-rail" role="tablist" aria-label="阅读模式">
+    <button class="rail-tab active" role="tab" aria-selected="true" onclick="setMode(this, 'all')">完整文档</button>
+    <button class="rail-tab" role="tab" aria-selected="false" onclick="setMode(this, 'overview')">快速概览</button>
+    <button class="rail-tab" role="tab" aria-selected="false" onclick="setMode(this, 'workflow')">工作流程</button>
+    <button class="rail-tab" role="tab" aria-selected="false" onclick="setMode(this, 'meta')">元信息</button>
+  </nav>
+
+  <!-- Body Sheet -->
+  <main>
+
+    <!-- Section: Positioning -->
+    <section class="body-section" data-section="overview">
+      <div class="section-header">
+        <h2>定位</h2>
+      </div>
+      <div class="claim-card">
+        <p>Content Research Writer 是一个全流程写作协作 Skill，覆盖从选题构思、资料调研、结构大纲、分段撰写到最终润色的完整内容创作链路。它不同于一次性生成全文的模板，而是通过问答式引导与作者保持同步，确保输出内容既符合事实依据，又保留作者个人语调。</p>
+      </div>
+
+      <div class="pull-quote">
+        其「澄清问题 → 大纲 → 逐段反馈」的协作流程可复用到任何需要结构化输出的写作场景（如技术文档、设计文档、会议纪要）。
+        <cite>—— 与 ys-powers 的关联</cite>
+      </div>
+    </section>
+
+    <!-- Section: Triggers -->
+    <section class="body-section" data-section="overview">
+      <div class="section-header">
+        <h2>触发时机</h2>
+        <span class="section-count">5 适用 / 2 排除</span>
+      </div>
+
+      <div class="claim-card">
+        <h3>适用场景</h3>
+        <div class="trigger-grid">
+          <span class="trigger-tag">撰写博客、文章、新闻稿或教程</span>
+          <span class="trigger-tag">需要为内容添加引用和参考文献</span>
+          <span class="trigger-tag">改进开头（hook）以抓住读者注意力</span>
+          <span class="trigger-tag">希望获得逐段反馈而非一次性全文评价</span>
+          <span class="trigger-tag">撰写需要数据来源支撑的技术文档或案例研究</span>
+        </div>
+      </div>
+
+      <div class="claim-card">
+        <h3>不适用场景</h3>
+        <div class="trigger-grid">
+          <span class="trigger-tag exclude">纯创意写作（诗歌、小说）</span>
+          <span class="trigger-tag exclude">高度个人化的私密内容</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Core Capabilities -->
+    <section class="body-section" data-section="overview">
+      <div class="section-header">
+        <h2>核心能力</h2>
+        <span class="section-count">7 项</span>
+      </div>
+
+      <ol class="capability-list">
+        <li>
+          <span class="capability-num">1</span>
+          <div class="capability-text">
+            <strong>协作式大纲</strong> — <span>帮助将零散想法组织为结构化的内容大纲</span>
+          </div>
+        </li>
+        <li>
+          <span class="capability-num">2</span>
+          <div class="capability-text">
+            <strong>调研辅助</strong> — <span>查找相关信息并添加规范引用</span>
+          </div>
+        </li>
+        <li>
+          <span class="capability-num">3</span>
+          <div class="capability-text">
+            <strong>Hook 优化</strong> — <span>强化文章开头，提升吸引力</span>
+          </div>
+        </li>
+        <li>
+          <span class="capability-num">4</span>
+          <div class="capability-text">
+            <strong>逐段反馈</strong> — <span>在写作过程中实时评审每个章节</span>
+          </div>
+        </li>
+        <li>
+          <span class="capability-num">5</span>
+          <div class="capability-text">
+            <strong>语调保持</strong> — <span>维持作者原有的写作风格和语气</span>
+          </div>
+        </li>
+        <li>
+          <span class="capability-num">6</span>
+          <div class="capability-text">
+            <strong>引用管理</strong> — <span>自动添加和格式化参考文献</span>
+          </div>
+        </li>
+        <li>
+          <span class="capability-num">7</span>
+          <div class="capability-text">
+            <strong>迭代打磨</strong> — <span>支持多轮修改，逐步提升内容质量</span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Section: Workflow -->
+    <section class="body-section" data-section="workflow">
+      <div class="section-header">
+        <h2>指令流程概览</h2>
+        <span class="section-count">5 阶段</span>
+      </div>
+
+      <div class="workflow-track">
+        <div class="workflow-step">
+          <div class="step-content">
+            <h4>明确写作项目</h4>
+            <p>通过 5-6 个澄清问题了解主题、受众、长度、目标和风格</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-content">
+            <h4>协作式大纲</h4>
+            <p>用结构化 Markdown 构建文章骨架（Hook → 引言 → 主体 → 结论）</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-content">
+            <h4>调研与引用</h4>
+            <p>针对大纲中的关键点搜索资料并添加引用</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-content">
+            <h4>逐段撰写与反馈</h4>
+            <p>每完成一段即获得评审意见，边写边改</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-content">
+            <h4>全文润色</h4>
+            <p>最终检查流畅度、清晰度和一致性</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Workspace -->
+    <section class="body-section" data-section="workflow">
+      <div class="section-header">
+        <h2>工作空间设置</h2>
+      </div>
+
+      <div class="claim-card">
+        <p>建议为每个写作项目创建独立目录，保持草稿与参考资料的隔离：</p>
+        <div class="code-block">
+<span class="comment"># 创建项目目录</span>
+<span class="command">mkdir</span> ~/writing/my-article-title
+<span class="command">cd</span> ~/writing/my-article-title
+<span class="command">touch</span> article-draft.md
+<span class="command">claude</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: ys-powers Context -->
+    <section class="body-section" data-section="meta">
+      <div class="section-header">
+        <h2>与 ys-powers 的关联</h2>
+      </div>
+
+      <div class="claim-card">
+        <h3>能力补位</h3>
+        <p>ys-powers 中无专门的内容创作 skill。<strong>content-research-writer</strong> 填补了「知识型内容生产」的空白。</p>
+      </div>
+
+      <div class="claim-card">
+        <h3>借鉴价值</h3>
+        <p>其「澄清问题 → 大纲 → 逐段反馈」的协作流程可复用到任何需要结构化输出的写作场景（如技术文档、设计文档、会议纪要）。</p>
+      </div>
+
+      <div class="claim-card">
+        <h3>搬运建议</h3>
+        <p><strong>高价值</strong>。内容创作是通用需求，且该 skill 的交互模式（问答式引导）与 ys-powers 的 <code>brainstorming</code> skill 互补。</p>
+      </div>
+    </section>
+
+    <!-- Evidence Margin: Meta Info -->
+    <aside class="evidence-margin" data-section="meta">
+      <h3>元信息</h3>
+      <table class="meta-table">
+        <tr>
+          <td>来源</td>
+          <td>refer/awesome-claude-skills/content-research-writer/SKILL.md</td>
+        </tr>
+        <tr>
+          <td>维护者</td>
+          <td>Composio / 社区</td>
+        </tr>
+        <tr>
+          <td>许可证</td>
+          <td>Apache 2.0</td>
+        </tr>
+        <tr>
+          <td>文档版本</td>
+          <td>v1.0 (as of 2026-05-16)</td>
+        </tr>
+      </table>
+    </aside>
+
+    <!-- Question Panel -->
+    <aside class="question-panel" data-section="meta">
+      <h3>评估清单</h3>
+      <ul class="question-list">
+        <li>该 Skill 是否适用于你当前的内容创作场景？</li>
+        <li>是否需要将其整合到 ys-powers 的 skill 体系中？</li>
+        <li>与现有 <code>brainstorming</code> skill 的协作边界如何划分？</li>
+        <li>是否需要针对中文写作环境进行本地化调整？</li>
+      </ul>
+
+      <div class="caveat-box">
+        <strong>注意：</strong> 本 Skill 定位为写作搭档而非替代作者。对于需要深度领域专业知识或高度创意表达的内容，仍需人工主导。
+      </div>
+    </aside>
+
+  </main>
+
+</div>
+
+<script>
+function setMode(btn, mode) {
+  // Update tab states
+  document.querySelectorAll('.rail-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+
+  // Show/hide sections
+  const sections = document.querySelectorAll('.body-section, .evidence-margin, .question-panel');
+
+  if (mode === 'all') {
+    sections.forEach(s => s.style.display = '');
+  } else {
+    sections.forEach(s => {
+      if (s.dataset.section === mode) {
+        s.style.display = '';
+      } else {
+        s.style.display = 'none';
+      }
+    });
+  }
+}
+</script>
+
+</body>
+</html>

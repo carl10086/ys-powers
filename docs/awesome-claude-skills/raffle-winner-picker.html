@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raffle Winner Picker — Skill Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      margin-bottom: var(--space-4xl);
+      padding-bottom: var(--space-3xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-eyebrow {
+      font-family: var(--font-headline);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover .deck {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-width: 640px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: var(--space-xl);
+      margin-top: var(--space-2xl);
+      flex-wrap: wrap;
+    }
+
+    .cover-meta-item {
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    .cover-meta-item strong {
+      color: var(--fg-2);
+      font-weight: 600;
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-xl);
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
+      margin-bottom: var(--space-3xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .reader-rail-label {
+      font-family: var(--font-headline);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .reader-rail ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .reader-rail a {
+      display: block;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      background: var(--surface-container);
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .reader-rail a:hover {
+      background: var(--primary-fixed);
+      color: var(--primary);
+      border-color: var(--primary-fixed-dim);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-sm);
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin: var(--space-2xl) 0 var(--space-md);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-md);
+      color: var(--fg-2);
+    }
+
+    .body-section ul,
+    .body-section ol {
+      margin-left: var(--space-xl);
+      margin-bottom: var(--space-md);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-lg) 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .claim-card-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--fg-1);
+      margin-bottom: var(--space-sm);
+    }
+
+    .claim-card-body {
+      color: var(--fg-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-lg) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th,
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fact-table th {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      background: var(--surface-container);
+    }
+
+    .fact-table td {
+      color: var(--fg-2);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .evidence-margin-label {
+      font-family: var(--font-headline);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .evidence-margin pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--fg-2);
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: linear-gradient(135deg, var(--surface-container-low) 0%, var(--surface-container) 100%);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .caveat-box-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--fg-1);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .caveat-box-body {
+      color: var(--fg-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin-top: var(--space-4xl);
+      box-shadow: var(--shadow-md);
+    }
+
+    .question-panel h3 {
+      font-family: var(--font-headline);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .question-panel ul {
+      list-style: none;
+      margin-left: 0;
+    }
+
+    .question-panel li {
+      padding: var(--space-sm) 0;
+      padding-left: var(--space-lg);
+      position: relative;
+      color: var(--fg-2);
+    }
+
+    .question-panel li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Source Spread */
+    .source-spread {
+      margin-top: var(--space-4xl);
+      padding-top: var(--space-3xl);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .source-spread h2 {
+      font-family: var(--font-headline);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+    }
+
+    .source-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .source-meta-item {
+      background: var(--surface-container);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .source-meta-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .source-meta-value {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--fg-2);
+    }
+
+    /* Search */
+    .search-box {
+      width: 100%;
+      padding: var(--space-md) var(--space-lg);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-pill);
+      background: var(--surface-container-lowest);
+      color: var(--fg-1);
+      font-family: var(--font-body);
+      font-size: 14px;
+      margin-bottom: var(--space-2xl);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-fixed);
+    }
+
+    .search-box::placeholder {
+      color: var(--fg-muted);
+    }
+
+    /* Reading Modes */
+    .reading-modes {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .reading-mode-btn {
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      background: var(--surface-container);
+      color: var(--fg-muted);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .reading-mode-btn:hover {
+      background: var(--surface-container-high);
+      color: var(--fg-2);
+    }
+
+    .reading-mode-btn.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .cover h1 {
+        font-size: 1.75rem;
+      }
+
+      .reader-rail {
+        position: relative;
+        top: 0;
+      }
+
+      .reader-rail ul {
+        flex-direction: column;
+      }
+
+      .cover-meta {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .fact-table {
+        font-size: 13px;
+      }
+
+      .fact-table th,
+      .fact-table td {
+        padding: var(--space-sm);
+      }
+    }
+
+    /* Print */
+    @media print {
+      .reader-rail,
+      .reading-modes,
+      .search-box {
+        display: none;
+      }
+
+      body {
+        background: white;
+        color: black;
+      }
+
+      .document-shell {
+        max-width: 100%;
+      }
+    }
+
+    /* Utility */
+    .highlight {
+      background: var(--primary-fixed);
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-eyebrow">Claude Skill Documentation</div>
+      <h1>raffle-winner-picker</h1>
+      <p class="deck">
+        从列表、CSV、Excel 或 Google Sheets 中随机抽取获奖者，使用加密安全的随机算法，确保公平、无偏、透明。
+      </p>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <strong>来源</strong> Composio / 社区
+        </div>
+        <div class="cover-meta-item">
+          <strong>许可证</strong> Apache 2.0
+        </div>
+        <div class="cover-meta-item">
+          <strong>维护者</strong> 社区贡献
+        </div>
+      </div>
+    </header>
+
+    <!-- Search -->
+    <input type="text" class="search-box" id="searchBox" placeholder="搜索文档内容..." aria-label="搜索文档">
+
+    <!-- Reading Modes -->
+    <div class="reading-modes" role="tablist" aria-label="阅读模式">
+      <button class="reading-mode-btn active" data-mode="full" role="tab" aria-selected="true">完整文档</button>
+      <button class="reading-mode-btn" data-mode="summary" role="tab" aria-selected="false">快速概览</button>
+      <button class="reading-mode-btn" data-mode="outline" role="tab" aria-selected="false">大纲</button>
+    </div>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail" aria-label="文档导航">
+      <div class="reader-rail-label">目录</div>
+      <ul>
+        <li><a href="#positioning">定位</a></li>
+        <li><a href="#triggers">触发时机</a></li>
+        <li><a href="#capabilities">核心能力</a></li>
+        <li><a href="#workflow">指令流程</a></li>
+        <li><a href="#example">输出示例</a></li>
+        <li><a href="#relation">与 ys-powers 的关联</a></li>
+        <li><a href="#meta">元信息</a></li>
+      </ul>
+    </nav>
+
+    <!-- Body Sheet -->
+    <main id="content">
+      <section class="body-section" id="positioning">
+        <h2>定位</h2>
+        <p>从列表、CSV、Excel 或 Google Sheets 中随机抽取获奖者，使用加密安全的随机算法，确保公平、无偏、透明。</p>
+      </section>
+
+      <section class="body-section" id="triggers">
+        <h2>触发时机</h2>
+        <p>以下场景适合使用 raffle-winner-picker：</p>
+        <ul>
+          <li>举办社交媒体抽奖活动需要选出获奖者时</li>
+          <li>活动现场抽取 raffle 获奖者时</li>
+          <li>随机选择调查参与者或测试用户时</li>
+          <li>从投稿作品中选出获奖作品时</li>
+          <li>公平分配有限名额或资源时</li>
+        </ul>
+        <div class="caveat-box">
+          <div class="caveat-box-title">
+            <span>不适用场景</span>
+          </div>
+          <div class="caveat-box-body">
+            需要按特定条件（如成绩、活跃度）加权评选时，不应使用本 skill。raffle-winner-picker 仅提供纯随机选择，不支持加权或评分机制。
+          </div>
+        </div>
+      </section>
+
+      <section class="body-section" id="capabilities">
+        <h2>核心能力</h2>
+        <div class="claim-card">
+          <div class="claim-card-title">1. 加密安全随机</div>
+          <div class="claim-card-body">使用密码学安全的随机数生成，无偏见、无模式，确保每个参与者都有同等的中奖概率。</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">2. 多数据源支持</div>
+          <div class="claim-card-body">支持 CSV、Excel、Google Sheets、纯文本列表等多种数据源格式，灵活适应不同工作流。</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">3. 多获奖者抽取</div>
+          <div class="claim-card-body">可一次性抽取 1 个或多个获奖者，满足一等奖、二等奖、三等奖等多层级需求。</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">4. 防重复机制</div>
+          <div class="claim-card-body">确保同一人不会中奖两次，自动排除已中奖者。</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">5. 透明过程</div>
+          <div class="claim-card-body">清晰展示选择过程和时间戳，提供可审计的抽奖记录。</div>
+        </div>
+        <div class="claim-card">
+          <div class="claim-card-title">6. 排除机制</div>
+          <div class="claim-card-body">可排除已中奖者或不符合条件的条目，灵活控制参与范围。</div>
+        </div>
+      </section>
+
+      <section class="body-section" id="workflow">
+        <h2>指令流程概览</h2>
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>步骤</th>
+              <th>操作</th>
+              <th>输出</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>加载数据</td>
+              <td>从指定来源读取所有参与条目</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>统计报告</td>
+              <td>输出总条目数</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>随机抽取</td>
+              <td>使用加密安全算法选择获奖者</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>展示结果</td>
+              <td>显示获奖者详情（行号、姓名、邮箱等）</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>后续操作</td>
+              <td>可选抽取 runner-up 或导出结果</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="body-section" id="example">
+        <h2>输出示例</h2>
+        <div class="evidence-margin">
+          <div class="evidence-margin-label">示例输出</div>
+          <pre>Accessing Google Sheet...
+Total entries found: 247
+
+Randomly selecting winner...
+
+🎉 WINNER SELECTED! 🎉
+
+Row #142
+Name: Sarah Johnson
+Email: sarah.j@email.com
+Entry Date: March 10, 2024
+
+Selection method: Cryptographically random
+Timestamp: 2024-03-15 14:32:18 UTC</pre>
+        </div>
+      </section>
+
+      <section class="body-section" id="relation">
+        <h2>与 ys-powers 的关联</h2>
+        <h3>与 ys-powers 现有能力的关系</h3>
+        <p>ys-powers 中无随机选择类 skill，<code>raffle-winner-picker</code> 填补了「公平随机选择」的工具空白。</p>
+
+        <h3>借鉴价值</h3>
+        <p>其「加密安全随机 + 透明审计日志」的设计是任何涉及随机选择的场景（如 A/B 测试分组、样本抽样）的安全基准。</p>
+
+        <h3>搬运建议</h3>
+        <p>低价值。功能简单，使用频率有限。但可作为通用工具 skill 的一部分保留。</p>
+      </section>
+
+      <section class="body-section" id="meta">
+        <h2>元信息</h2>
+        <div class="source-meta">
+          <div class="source-meta-item">
+            <div class="source-meta-label">来源</div>
+            <div class="source-meta-value">refer/awesome-claude-skills/raffle-winner-picker/SKILL.md</div>
+          </div>
+          <div class="source-meta-item">
+            <div class="source-meta-label">维护者</div>
+            <div class="source-meta-value">Composio / 社区</div>
+          </div>
+          <div class="source-meta-item">
+            <div class="source-meta-label">许可证</div>
+            <div class="source-meta-value">Apache 2.0</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Question Panel -->
+    <aside class="question-panel">
+      <h3>进一步探索</h3>
+      <ul>
+        <li>如何在 ys-powers 中集成类似的随机选择工具？</li>
+        <li>加密安全随机算法在 A/B 测试分组中的应用场景？</li>
+        <li>如何扩展支持更多数据源（如数据库、API）？</li>
+        <li>透明审计日志的设计模式是否可以复用到其他 skill？</li>
+      </ul>
+    </aside>
+
+    <!-- Source Spread -->
+    <footer class="source-spread">
+      <h2>文档信息</h2>
+      <div class="source-meta">
+        <div class="source-meta-item">
+          <div class="source-meta-label">生成时间</div>
+          <div class="source-meta-value">2026-05-17</div>
+        </div>
+        <div class="source-meta-item">
+          <div class="source-meta-label">文档版本</div>
+          <div class="source-meta-value">v1.0</div>
+        </div>
+        <div class="source-meta-item">
+          <div class="source-meta-label">原始文件</div>
+          <div class="source-meta-value">raffle-winner-picker.md</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Search functionality
+    const searchBox = document.getElementById('searchBox');
+    const content = document.getElementById('content');
+    const sections = content.querySelectorAll('.body-section');
+
+    searchBox.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+
+      if (!query) {
+        sections.forEach(section => {
+          section.style.display = '';
+          section.innerHTML = section.innerHTML.replace(/<mark class="highlight">|<\/mark>/g, '');
+        });
+        return;
+      }
+
+      sections.forEach(section => {
+        const text = section.textContent.toLowerCase();
+        const hasMatch = text.includes(query);
+        section.style.display = hasMatch ? '' : 'none';
+
+        if (hasMatch) {
+          // Simple highlight (avoid complex regex for this use case)
+          const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          while (walker.nextNode()) nodes.push(walker.currentNode);
+
+          nodes.forEach(node => {
+            const parent = node.parentNode;
+            if (parent.tagName === 'SCRIPT' || parent.closest('script')) return;
+
+            const textContent = node.textContent;
+            const index = textContent.toLowerCase().indexOf(query);
+
+            if (index !== -1 && !parent.closest('mark')) {
+              const before = textContent.slice(0, index);
+              const match = textContent.slice(index, index + query.length);
+              const after = textContent.slice(index + query.length);
+
+              const span = document.createElement('span');
+              span.innerHTML = `${before}<mark class="highlight">${match}</mark>${after}`;
+              parent.replaceChild(span, node);
+            }
+          });
+        }
+      });
+    });
+
+    // Reading modes
+    const modeButtons = document.querySelectorAll('.reading-mode-btn');
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modeButtons.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+
+        const mode = btn.dataset.mode;
+        applyReadingMode(mode);
+      });
+    });
+
+    function applyReadingMode(mode) {
+      sections.forEach(section => {
+        section.style.display = '';
+
+        if (mode === 'summary') {
+          // Show only key sections
+          const keyIds = ['positioning', 'capabilities', 'relation'];
+          if (!keyIds.includes(section.id)) {
+            section.style.display = 'none';
+          }
+        } else if (mode === 'outline') {
+          // Show headings only
+          const details = section.querySelectorAll('p, ul, ol, .claim-card, .evidence-margin, .caveat-box, table');
+          details.forEach(el => {
+            el.style.display = el.style.display === 'none' ? '' : 'none';
+          });
+        } else {
+          // Full mode - show everything
+          const details = section.querySelectorAll('p, ul, ol, .claim-card, .evidence-margin, .caveat-box, table');
+          details.forEach(el => el.style.display = '');
+        }
+      });
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('.reader-rail a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

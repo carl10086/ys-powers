@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>internal-comms — 内部沟通文档技能</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document shell */
+    .document-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-2xl);
+    }
+
+    /* Cover */
+    .cover {
+      background: var(--gradient-hero);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-5xl) var(--space-4xl);
+      margin-bottom: var(--space-4xl);
+      color: var(--on-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cover-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: var(--space-xl);
+    }
+
+    .cover .deck {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      opacity: 0.95;
+      max-width: 640px;
+    }
+
+    /* Reader rail */
+    .reader-rail {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-4xl);
+      flex-wrap: wrap;
+    }
+
+    .rail-btn {
+      padding: var(--space-sm) var(--space-lg);
+      border: 1px solid var(--border-strong);
+      background: var(--surface-container-low);
+      color: var(--fg-2);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .rail-btn:hover, .rail-btn.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    /* Body sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .section-header h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .section-body {
+      padding-left: var(--space-lg);
+    }
+
+    /* Claim cards */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .claim-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .claim-card h3 {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--fg-1);
+    }
+
+    .claim-card p {
+      color: var(--fg-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Fact table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--surface-container);
+      font-weight: 600;
+      color: var(--fg-1);
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Evidence margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-left: 4px solid var(--primary);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .evidence-margin .source-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-xs);
+    }
+
+    .evidence-margin p {
+      color: var(--fg-2);
+      font-style: italic;
+      font-size: 14px;
+    }
+
+    /* Caveat box */
+    .caveat-box {
+      background: var(--surface-container-high);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .caveat-box .caveat-title {
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .caveat-box p {
+      font-size: 13px;
+      color: var(--fg-muted);
+      line-height: 1.6;
+    }
+
+    /* Question panel */
+    .question-panel {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin-top: var(--space-4xl);
+    }
+
+    .question-panel h3 {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+    }
+
+    .question-list {
+      list-style: none;
+    }
+
+    .question-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .question-list li::before {
+      content: '→';
+      color: var(--primary);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* Source spread */
+    .source-spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .source-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: all 0.2s ease;
+    }
+
+    .source-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--outline-variant);
+    }
+
+    .source-card .source-type {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .source-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    .source-card p {
+      font-size: 13px;
+      color: var(--fg-muted);
+      line-height: 1.5;
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      font-family: var(--font-headline);
+      font-size: 1.35rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--fg-1);
+      padding: var(--space-2xl) var(--space-3xl);
+      margin: var(--space-2xl) 0;
+      position: relative;
+      text-align: center;
+    }
+
+    .pull-quote::before {
+      content: '"';
+      font-size: 4rem;
+      color: var(--primary);
+      opacity: 0.3;
+      position: absolute;
+      top: 0;
+      left: var(--space-lg);
+      line-height: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-lg);
+      }
+
+      .cover {
+        padding: var(--space-3xl) var(--space-xl);
+      }
+
+      .section-body {
+        padding-left: 0;
+      }
+
+      .reader-rail {
+        gap: var(--space-xs);
+      }
+
+      .rail-btn {
+        padding: var(--space-xs) var(--space-md);
+        font-size: 12px;
+      }
+
+      .source-spread {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reading mode: summary */
+    .mode-summary .body-section:not(:first-of-type),
+    .mode-summary .evidence-margin,
+    .mode-summary .question-panel,
+    .mode-summary .source-spread {
+      display: none;
+    }
+
+    .mode-summary .body-section:first-of-type .section-body {
+      display: block;
+    }
+
+    /* Reading mode: evidence */
+    .mode-evidence .claim-card,
+    .mode-evidence .fact-table {
+      display: none;
+    }
+
+    /* Utility */
+    .text-muted {
+      color: var(--fg-muted);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--primary-fixed);
+      color: var(--primary);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+
+    @media (max-width: 768px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-label">Claude Skill / 内部沟通</div>
+      <h1>internal-comms</h1>
+      <p class="deck">一套公司内部沟通文档的写作资源库，覆盖 3P 更新、公司简报、FAQ、状态报告、项目更新等常见内部沟通场景，确保格式和语调符合公司规范。</p>
+    </header>
+
+    <!-- Reader rail -->
+    <nav class="reader-rail" role="tablist" aria-label="阅读模式">
+      <button class="rail-btn active" onclick="setMode('full')" role="tab" aria-selected="true">完整文档</button>
+      <button class="rail-btn" onclick="setMode('summary')" role="tab" aria-selected="false">5分钟速览</button>
+      <button class="rail-btn" onclick="setMode('evidence')" role="tab" aria-selected="false">证据与来源</button>
+    </nav>
+
+    <!-- Section 1: Positioning -->
+    <section class="body-section" id="positioning">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2>定位</h2>
+      </div>
+      <div class="section-body">
+        <p style="margin-bottom: var(--space-lg); color: var(--fg-2);">internal-comms 是一套面向企业内部沟通的写作资源库，专注于以下核心场景：</p>
+        <div class="claim-card">
+          <h3>类型识别</h3>
+          <p>自动判断沟通文档的类型（3P 更新、简报、FAQ、事故报告等），根据内容特征匹配最合适的模板与语调。</p>
+        </div>
+        <div class="claim-card">
+          <h3>格式规范</h3>
+          <p>每种沟通类型都有独立的 guideline 文件，定义结构、语调和内容要求，确保输出的一致性。</p>
+        </div>
+        <div class="claim-card">
+          <h3>语调一致</h3>
+          <p>保持公司内部统一的沟通风格，无论是团队周会还是全员通知，都能体现专业性和品牌一致性。</p>
+        </div>
+        <div class="claim-card">
+          <h3>模板套用</h3>
+          <p>从 <code>examples/</code> 目录加载对应模板并按规范填充内容，降低写作门槛，提升效率。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Triggers -->
+    <section class="body-section" id="triggers">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2>触发时机</h2>
+      </div>
+      <div class="section-body">
+        <div class="two-col">
+          <div>
+            <h4 style="font-family: var(--font-headline); font-size: 14px; color: var(--primary); margin-bottom: var(--space-md); text-transform: uppercase; letter-spacing: 0.05em;">适用场景</h4>
+            <ul style="list-style: none; color: var(--fg-2); font-size: 14px;">
+              <li style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border);">撰写 3P 更新（Progress, Plans, Problems）</li>
+              <li style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border);">编写公司级或团队级 newsletter</li>
+              <li style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border);">回应内部常见问题（FAQ）</li>
+              <li style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border);">准备领导层汇报或项目状态报告</li>
+              <li style="padding: var(--space-sm) 0;">撰写事故报告（incident report）</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-family: var(--font-headline); font-size: 14px; color: var(--red); margin-bottom: var(--space-md); text-transform: uppercase; letter-spacing: 0.05em;">不适用场景</h4>
+            <div class="caveat-box">
+              <div class="caveat-title">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8 5v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="8" cy="11" r="0.75" fill="currentColor"/>
+                </svg>
+                注意边界
+              </div>
+              <p>对外公开的新闻稿、客户沟通或法律文件不在本 skill 的覆盖范围内。这些场景需要专门的对外沟通规范与法律审核流程。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Supported Types -->
+    <section class="body-section" id="types">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2>支持的沟通类型</h2>
+      </div>
+      <div class="section-body">
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>类型</th>
+              <th>Guideline 文件</th>
+              <th>适用场景</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge">3P 更新</span></td>
+              <td><code>examples/3p-updates.md</code></td>
+              <td>团队周会、进度同步</td>
+            </tr>
+            <tr>
+              <td><span class="badge">公司简报</span></td>
+              <td><code>examples/company-newsletter.md</code></td>
+              <td>全员通知、月度总结</td>
+            </tr>
+            <tr>
+              <td><span class="badge">FAQ 回复</span></td>
+              <td><code>examples/faq-answers.md</code></td>
+              <td>回应常见内部问题</td>
+            </tr>
+            <tr>
+              <td><span class="badge">通用沟通</span></td>
+              <td><code>examples/general-comms.md</code></td>
+              <td>不匹配以上类型的其他内部沟通</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: Workflow -->
+    <section class="body-section" id="workflow">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2>指令流程概览</h2>
+      </div>
+      <div class="section-body">
+        <div class="source-spread">
+          <div class="source-card">
+            <div class="source-type">Step 01</div>
+            <h4>识别沟通类型</h4>
+            <p>从用户请求中提取文档类型关键词，判断属于 3P 更新、简报、FAQ 还是通用沟通。</p>
+          </div>
+          <div class="source-card">
+            <div class="source-type">Step 02</div>
+            <h4>加载 Guideline</h4>
+            <p>从 <code>examples/</code> 目录读取对应类型的格式和语调规范，建立写作约束。</p>
+          </div>
+          <div class="source-card">
+            <div class="source-type">Step 03</div>
+            <h4>收集内容</h4>
+            <p>按 guideline 要求的结构收集信息（进度、计划、问题等），确保素材完整。</p>
+          </div>
+          <div class="source-card">
+            <div class="source-type">Step 04</div>
+            <h4>撰写文档</h4>
+            <p>遵循规范生成符合公司风格的内部沟通文稿，保持语调一致、结构清晰。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Relationship -->
+    <section class="body-section" id="relationship">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2>与 ys-powers 的关联</h2>
+      </div>
+      <div class="section-body">
+        <div class="evidence-margin">
+          <div class="source-label">互补关系</div>
+          <p>与 content-research-writer 的关系：content-research-writer 面向外部内容创作（博客、案例研究），internal-comms 面向内部沟通。两者互补，覆盖企业对内对外两大写作场景。</p>
+        </div>
+        <div class="evidence-margin">
+          <div class="source-label">借鉴价值</div>
+          <p>其「类型识别 → 模板加载 → 规范输出」的模式可复用到任何需要「按固定格式生成文档」的场景（如会议纪要、周报、Checklist）。</p>
+        </div>
+        <div class="evidence-margin">
+          <div class="source-label">搬运建议</div>
+          <p>中等价值。若 ys-powers 的使用者需要维护团队/公司内部的沟通规范，可搬运并替换 <code>examples/</code> 中的模板为自有规范。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Meta -->
+    <section class="body-section" id="meta">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2>元信息</h2>
+      </div>
+      <div class="section-body">
+        <table class="fact-table">
+          <tbody>
+            <tr>
+              <td style="font-weight: 600; width: 120px;">来源</td>
+              <td><code>refer/awesome-claude-skills/internal-comms/SKILL.md</code></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 600;">维护者</td>
+              <td>Composio / 社区</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 600;">许可证</td>
+              <td>Apache 2.0（详见 <code>LICENSE.txt</code>）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Question panel -->
+    <aside class="question-panel">
+      <h3>延伸阅读与问题</h3>
+      <ul class="question-list">
+        <li>如何将 internal-comms 的模板替换为公司自有规范？</li>
+        <li>类型识别机制能否扩展支持更多沟通场景（如会议纪要、周报）？</li>
+        <li>与 content-research-writer 的边界如何界定以避免功能重叠？</li>
+        <li>examples/ 目录的模板结构如何与现有文档系统对接？</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+    function setMode(mode) {
+      const shell = document.querySelector('.document-shell');
+      const buttons = document.querySelectorAll('.rail-btn');
+
+      // Update button states
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      event.target.classList.add('active');
+      event.target.setAttribute('aria-selected', 'true');
+
+      // Update body class
+      shell.classList.remove('mode-summary', 'mode-evidence');
+      if (mode === 'summary') {
+        shell.classList.add('mode-summary');
+      } else if (mode === 'evidence') {
+        shell.classList.add('mode-evidence');
+      }
+    }
+
+    // Keyboard navigation for rail
+    document.querySelectorAll('.rail-btn').forEach((btn, index, buttons) => {
+      btn.addEventListener('keydown', (e) => {
+        let nextIndex;
+        if (e.key === 'ArrowRight') {
+          nextIndex = (index + 1) % buttons.length;
+          buttons[nextIndex].focus();
+          buttons[nextIndex].click();
+        } else if (e.key === 'ArrowLeft') {
+          nextIndex = (index - 1 + buttons.length) % buttons.length;
+          buttons[nextIndex].focus();
+          buttons[nextIndex].click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

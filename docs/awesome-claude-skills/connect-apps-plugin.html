@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>connect-apps-plugin — Claude Code 插件文档</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #a03b00;
+    --primary-container: #c94c00;
+    --primary-fixed: #ffdbcd;
+    --primary-fixed-dim: #ffb597;
+    --on-primary: #ffffff;
+    --accent-glow: #E8400D;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #fff8f6;
+    --surface: #fff8f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fbf2ef;
+    --surface-container: #f5ece9;
+    --surface-container-high: #efe6e3;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #e1bfb2;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+    --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #060B18;
+      --surface: #0B1426;
+      --surface-container-lowest: #101D35;
+      --surface-container-low: #101D35;
+      --surface-container: #162544;
+      --surface-container-high: #1c2d52;
+      --fg-1: #F8FAFC;
+      --fg-2: #CBD5E1;
+      --fg-muted: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #FF6B35;
+      --accent-glow: #00D4FF;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg-1);
+    background: var(--bg);
+  }
+
+  .document-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  .cover {
+    background: var(--gradient-hero);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-4xl) var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+    color: var(--on-primary);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-lg);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .cover .meta {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: var(--space-xl);
+  }
+  .cover .deck {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    max-width: 700px;
+    opacity: 0.95;
+  }
+
+  .reader-rail {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-3xl);
+    flex-wrap: wrap;
+    position: sticky;
+    top: var(--space-lg);
+    z-index: 10;
+    background: var(--bg);
+    padding: var(--space-md) 0;
+  }
+  .reader-rail a {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    background: var(--surface-container);
+    color: var(--fg-2);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+  .reader-rail a:hover,
+  .reader-rail a:focus {
+    background: var(--primary);
+    color: var(--on-primary);
+    outline: none;
+    box-shadow: var(--shadow-accent);
+  }
+
+  .body-section {
+    margin-bottom: var(--space-4xl);
+  }
+  .body-section h2 {
+    font-family: var(--font-headline);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    margin: 0 0 var(--space-xl);
+    letter-spacing: -0.01em;
+    color: var(--fg-1);
+  }
+  .body-section h3 {
+    font-family: var(--font-headline);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: var(--space-2xl) 0 var(--space-md);
+    color: var(--fg-2);
+  }
+  .body-section p {
+    margin: 0 0 var(--space-lg);
+    color: var(--fg-2);
+  }
+
+  .claim-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    transition: box-shadow 0.2s ease;
+  }
+  .claim-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+  .claim-card strong {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .fact-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-xl) 0;
+    font-size: 0.95rem;
+  }
+  .fact-table th,
+  .fact-table td {
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .fact-table th {
+    font-weight: 600;
+    color: var(--fg-1);
+    background: var(--surface-container);
+    font-family: var(--font-headline);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .fact-table td {
+    color: var(--fg-2);
+  }
+  .fact-table tr:hover td {
+    background: var(--surface-container-low);
+  }
+
+  .evidence-margin {
+    border-left: 3px solid var(--primary);
+    padding-left: var(--space-lg);
+    margin: var(--space-xl) 0;
+    color: var(--fg-muted);
+    font-size: 0.95rem;
+  }
+
+  .pull-quote {
+    font-family: var(--font-headline);
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--primary);
+    margin: var(--space-2xl) 0;
+    padding: var(--space-xl) var(--space-2xl);
+    background: var(--surface-container);
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+  .pull-quote::before {
+    content: '"';
+    font-size: 3rem;
+    position: absolute;
+    top: -0.2em;
+    left: var(--space-md);
+    opacity: 0.2;
+    font-family: Georgia, serif;
+  }
+
+  .caveat-box {
+    background: var(--surface-container-high);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg) var(--space-xl);
+    margin: var(--space-xl) 0;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+  }
+  .caveat-box strong {
+    color: var(--fg-2);
+  }
+
+  .question-panel {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    margin-top: var(--space-2xl);
+  }
+  .question-panel h3 {
+    margin-top: 0;
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    color: var(--fg-1);
+  }
+  .question-panel ul {
+    margin: 0;
+    padding-left: var(--space-xl);
+    color: var(--fg-2);
+  }
+  .question-panel li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .source-spread {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+  }
+  .source-spread .claim-card {
+    margin-bottom: 0;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--surface-container);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+  }
+  pre {
+    background: var(--surface-container-high);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--fg-2);
+    border: 1px solid var(--border);
+  }
+
+  .install-steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: var(--space-xl) 0;
+  }
+  .install-steps li {
+    position: relative;
+    padding-left: var(--space-4xl);
+    margin-bottom: var(--space-xl);
+    min-height: 40px;
+  }
+  .install-steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--gradient-primary);
+    color: var(--on-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    font-family: var(--font-headline);
+  }
+  .install-steps li strong {
+    color: var(--fg-1);
+    display: block;
+    margin-bottom: var(--space-xs);
+  }
+  .install-steps li code {
+    display: inline-block;
+    margin-top: var(--space-sm);
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+  }
+  .meta-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+  }
+  .meta-card .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--fg-muted);
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-headline);
+  }
+  .meta-card .value {
+    font-size: 1rem;
+    color: var(--fg-1);
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .document-shell {
+      padding: var(--space-xl) var(--space-lg);
+    }
+    .cover {
+      padding: var(--space-2xl) var(--space-xl);
+    }
+    .reader-rail {
+      position: relative;
+      top: auto;
+    }
+    .source-spread {
+      grid-template-columns: 1fr;
+    }
+    .install-steps li {
+      padding-left: var(--space-3xl);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .claim-card { transition: none; }
+    .reader-rail a { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <header class="cover">
+    <h1>connect-apps-plugin</h1>
+    <div class="meta">Claude Code 插件 &nbsp;&middot;&nbsp; Composio 生态</div>
+    <div class="deck">
+      通过 <code>claude --plugin-dir</code> 安装到 Claude Code 中的物理插件载体，为 Claude 提供 500+ 应用的自动化执行能力。内置 OAuth 流程处理，用户只需粘贴 API Key 即可完成认证。
+    </div>
+  </header>
+
+  <nav class="reader-rail" role="navigation" aria-label="章节导航">
+    <a href="#positioning">定位</a>
+    <a href="#trigger">触发时机</a>
+    <a href="#capabilities">核心能力</a>
+    <a href="#install">安装流程</a>
+    <a href="#relation">与 ys-powers 关联</a>
+    <a href="#meta">元信息</a>
+  </nav>
+
+  <section class="body-section" id="positioning">
+    <h2>定位</h2>
+    <p><code>connect-apps</code> 的物理插件载体，通过 <code>claude --plugin-dir</code> 安装到 Claude Code 中，为 Claude 提供 500+ 应用的自动化执行能力。</p>
+
+    <div class="pull-quote">
+      插件化部署：将 Composio 能力打包为 Claude Code 可识别的插件格式，安装后 Claude 可发送邮件、创建 Issue、发布消息、更新文档等。
+    </div>
+  </section>
+
+  <section class="body-section" id="trigger">
+    <h2>触发时机</h2>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>安装阶段</strong><br>
+        需要通过 <code>claude --plugin-dir</code> 方式安装 Composio 插件时
+      </div>
+      <div class="claim-card">
+        <strong>配置阶段</strong><br>
+        已安装并运行 <code>/connect-apps:setup</code> 进行初始化配置时
+      </div>
+      <div class="claim-card">
+        <strong>不适用场景</strong><br>
+        使用 Python/TypeScript SDK 直接集成的场景（此时用 <code>connect</code>）
+      </div>
+    </div>
+  </section>
+
+  <section class="body-section" id="capabilities">
+    <h2>核心能力</h2>
+    <table class="fact-table">
+      <thead>
+        <tr><th>能力</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>插件化部署</strong></td><td>将 Composio 能力打包为 Claude Code 可识别的插件格式</td></tr>
+        <tr><td><strong>自动认证管理</strong></td><td>内置 OAuth 流程处理，用户只需粘贴 API Key</td></tr>
+        <tr><td><strong>500+ 应用覆盖</strong></td><td>安装后 Claude 可发送邮件、创建 Issue、发布消息、更新文档等</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="body-section" id="install">
+    <h2>安装流程</h2>
+    <ol class="install-steps">
+      <li>
+        <strong>安装插件</strong>
+        <pre><code>claude --plugin-dir ./connect-apps-plugin</code></pre>
+      </li>
+      <li>
+        <strong>在 Claude Code 中运行配置</strong>
+        <pre><code>/connect-apps:setup</code></pre>
+      </li>
+      <li>
+        <strong>粘贴 API Key</strong><br>
+        从 <code>platform.composio.dev</code> 获取的免费 API Key
+      </li>
+      <li>
+        <strong>重启 Claude Code</strong><br>
+        完成安装后重启以加载插件能力
+      </li>
+    </ol>
+  </section>
+
+  <section class="body-section" id="relation">
+    <h2>与 ys-powers 的关联</h2>
+
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>与 connect-apps 的关系</strong><br>
+        <code>connect-apps-plugin</code> 是「插件代码目录」，<code>connect-apps</code> 是「面向用户的使用说明」。两者配套使用。
+      </div>
+      <div class="claim-card">
+        <strong>借鉴价值</strong><br>
+        其插件结构（commands 目录 + README.md）可作为 ys-powers 开发 Claude Code 插件时的参考模板。
+      </div>
+      <div class="claim-card">
+        <strong>搬运建议</strong><br>
+        价值较低。这是 Composio 的专有插件实现，ys-powers 若需类似能力可直接使用 Composio SDK，无需搬运插件代码。
+      </div>
+    </div>
+
+    <div class="evidence-margin">
+      <strong>评估结论：</strong>该插件属于第三方专有实现，建议作为结构参考而非直接搬运。ys-powers 应优先考虑 SDK 集成方案。
+    </div>
+  </section>
+
+  <section class="body-section" id="meta">
+    <h2>元信息</h2>
+    <div class="meta-grid">
+      <div class="meta-card">
+        <div class="label">来源</div>
+        <div class="value"><code>refer/awesome-claude-skills/connect-apps-plugin/README.md</code></div>
+      </div>
+      <div class="meta-card">
+        <div class="label">维护者</div>
+        <div class="value">Composio</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">许可证</div>
+        <div class="value">Apache 2.0</div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="text-align:center; padding: var(--space-3xl) 0; color: var(--fg-muted); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: var(--space-4xl);">
+    connect-apps-plugin 文档 &nbsp;&middot;&nbsp; 由 html-anything 生成
+  </footer>
+
+</div>
+</body>
+</html>

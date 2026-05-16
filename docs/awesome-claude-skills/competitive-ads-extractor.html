@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="soft-saas">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competitive Ads Extractor — 技能概览</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #5b7cf6;
+    --primary-container: #4a6de5;
+    --accent-glow: #00D4FF;
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-container: #f8f9fc;
+    --fg-1: #172033;
+    --fg-2: #374151;
+    --fg-muted: #6b7288;
+    --border: rgba(106, 119, 150, 0.13);
+    --border-strong: rgba(106, 119, 150, 0.22);
+    --green: #10b981;
+    --blue: #5b7cf6;
+    --yellow: #f6c445;
+    --red: #ef4444;
+    --lavender: #aebcff;
+    --cyan: #65d6ce;
+    --pink: #e978ae;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(23, 32, 51, 0.04);
+    --shadow-md: 0 4px 12px rgba(23, 32, 51, 0.08);
+    --shadow-lg: 0 8px 24px rgba(23, 32, 51, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--fg-1);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .soft-saas-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  .soft-board {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    grid-template-rows: auto auto 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+
+  /* Profile Card */
+  .profile-card {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .profile-card .skill-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--blue) 0%, var(--lavender) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: var(--space-lg);
+  }
+
+  .profile-card h1 {
+    font-family: var(--font-headline);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-sm);
+    color: var(--fg-1);
+  }
+
+  .profile-card .subtitle {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-bottom: var(--space-xl);
+  }
+
+  .profile-card .meta-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+
+  .profile-card .meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .profile-card .meta-item .label {
+    color: var(--fg-muted);
+  }
+
+  .profile-card .meta-item .value {
+    font-weight: 600;
+    color: var(--fg-1);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .profile-card .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .tag-blue { background: rgba(91, 124, 246, 0.1); color: var(--blue); }
+  .tag-green { background: rgba(16, 185, 129, 0.1); color: var(--green); }
+  .tag-yellow { background: rgba(246, 196, 69, 0.12); color: #b48a1a; }
+  .tag-red { background: rgba(239, 68, 68, 0.08); color: var(--red); }
+
+  /* Metric Bloom */
+  .metric-bloom {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-bloom::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(91, 124, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .bloom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+  }
+
+  .bloom-header h2 {
+    font-family: var(--font-headline);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .bloom-header .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .workflow-cell {
+    background: var(--surface-container);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .workflow-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .workflow-cell .cell-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto var(--space-md);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .workflow-cell .cell-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: 4px;
+  }
+
+  .workflow-cell .cell-desc {
+    font-size: 11px;
+    color: var(--fg-muted);
+    line-height: 1.4;
+  }
+
+  .cell-icon.scrape { background: rgba(91, 124, 246, 0.1); }
+  .cell-icon.archive { background: rgba(16, 185, 129, 0.1); }
+  .cell-icon.analyze { background: rgba(246, 196, 69, 0.12); }
+  .cell-icon.classify { background: rgba(101, 214, 206, 0.12); }
+  .cell-icon.pattern { background: rgba(233, 120, 174, 0.1); }
+  .cell-icon.insight { background: rgba(174, 188, 255, 0.2); }
+
+  /* Campaign Panel */
+  .campaign-panel {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .campaign-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .campaign-card h3 {
+    font-family: var(--font-headline);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .metric-tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .metric-tile {
+    background: var(--surface-container);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+  }
+
+  .metric-tile .tile-value {
+    font-family: var(--font-headline);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+  }
+
+  .metric-tile .tile-label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+  }
+
+  .metric-tile .tile-trend {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .trend-up { color: var(--green); }
+  .trend-neutral { color: var(--fg-muted); }
+
+  /* Activity Strip */
+  .activity-strip {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .activity-strip h3 {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--space-xl);
+  }
+
+  .capability-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .capability-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    transition: background 0.15s ease;
+  }
+
+  .capability-item:hover {
+    background: var(--surface-container);
+  }
+
+  .capability-item .cap-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .capability-item .cap-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .capability-item .cap-content p {
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+  }
+
+  /* Usage Section */
+  .usage-section {
+    margin-top: var(--space-xl);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .usage-section h3 {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+  }
+
+  .code-block {
+    background: #0f172a;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg) var(--space-xl);
+    overflow-x: auto;
+    margin-bottom: var(--space-md);
+  }
+
+  .code-block code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #e2e8f0;
+    line-height: 1.6;
+    display: block;
+    white-space: pre-wrap;
+  }
+
+  .code-block .comment { color: #64748b; }
+  .code-block .prompt { color: #7dd3fc; }
+
+  /* Context Section */
+  .context-section {
+    margin-top: var(--space-xl);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .context-section h3 {
+    font-family: var(--font-headline);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+  }
+
+  .context-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .context-card {
+    background: var(--surface-container);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+  }
+
+  .context-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--fg-1);
+  }
+
+  .context-card p {
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .soft-board {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto auto;
+    }
+    .profile-card { grid-column: 1; grid-row: 1; }
+    .metric-bloom { grid-column: 2; grid-row: 1 / 3; }
+    .campaign-panel { grid-column: 1 / -1; grid-row: 3; flex-direction: row; }
+    .activity-strip { grid-row: 4; }
+    .workflow-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .soft-saas-shell {
+      padding: var(--space-lg) var(--space-md);
+    }
+    .soft-board {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    .profile-card,
+    .metric-bloom,
+    .campaign-panel,
+    .activity-strip {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .campaign-panel { flex-direction: column; }
+    .workflow-grid { grid-template-columns: 1fr; }
+    .capability-list { grid-template-columns: 1fr; }
+  }
+
+  /* Focus states */
+  .workflow-cell:focus,
+  .capability-item:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .workflow-cell { transition: none; }
+    .workflow-cell:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="soft-saas-shell">
+  <div class="soft-board">
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="skill-icon">&#128269;</div>
+      <h1>competitive-ads-extractor</h1>
+      <p class="subtitle">竞品广告抓取与分析技能</p>
+
+      <div class="meta-row">
+        <div class="meta-item">
+          <span class="label">来源</span>
+          <span class="value">awesome-claude-skills</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">维护者</span>
+          <span class="value">Composio / 社区</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">许可证</span>
+          <span class="value">Apache 2.0</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">搬运价值</span>
+          <span class="value">中等</span>
+        </div>
+      </div>
+
+      <div class="tag-row">
+        <span class="tag tag-blue">市场研究</span>
+        <span class="tag tag-green">竞品分析</span>
+        <span class="tag tag-yellow">广告情报</span>
+        <span class="tag tag-red">增长工具</span>
+      </div>
+    </div>
+
+    <!-- Metric Bloom -->
+    <div class="metric-bloom">
+      <div class="bloom-header">
+        <h2>核心工作流</h2>
+        <div class="status-dot" title="技能状态: 活跃"></div>
+      </div>
+
+      <div class="workflow-grid">
+        <div class="workflow-cell" tabindex="0">
+          <div class="cell-icon scrape">&#127760;</div>
+          <div class="cell-title">广告抓取</div>
+          <div class="cell-desc">从 Facebook Ad Library、LinkedIn 等平台抓取活跃广告</div>
+        </div>
+        <div class="workflow-cell" tabindex="0">
+          <div class="cell-icon archive">&#128193;</div>
+          <div class="cell-title">截图存档</div>
+          <div class="cell-desc">保存所有广告的可视化副本到本地目录</div>
+        </div>
+        <div class="workflow-cell" tabindex="0">
+          <div class="cell-icon analyze">&#128200;</div>
+          <div class="cell-title">Messaging 分析</div>
+          <div class="cell-desc">提取竞品强调的问题、使用场景和价值主张</div>
+        </div>
+        <div class="workflow-cell" tabindex="0">
+          <div class="cell-icon classify">&#128451;</div>
+          <div class="cell-title">主题分类</div>
+          <div class="cell-desc">按主题、受众或格式对广告进行分组</div>
+        </div>
+        <div class="workflow-cell" tabindex="0">
+          <div class="cell-icon pattern">&#128161;</div>
+          <div class="cell-title">模式识别</div>
+          <div class="cell-desc">发现共同的成功广告手法和创意模式</div>
+        </div>
+        <div class="workflow-cell" tabindex="0">
+          <div class="cell-icon insight">&#128161;</div>
+          <div class="cell-title">效果洞察</div>
+          <div class="cell-desc">解释为什么某些广告可能表现良好</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaign Panel -->
+    <div class="campaign-panel">
+      <div class="campaign-card">
+        <h3>&#128202; 能力指标</h3>
+        <div class="metric-tile-grid">
+          <div class="metric-tile">
+            <div class="tile-value">6</div>
+            <div class="tile-label">核心能力</div>
+            <div class="tile-trend trend-up">&#8593; 完整覆盖</div>
+          </div>
+          <div class="metric-tile">
+            <div class="tile-value">2</div>
+            <div class="tile-label">支持平台</div>
+            <div class="tile-trend trend-neutral">Facebook / LinkedIn</div>
+          </div>
+          <div class="metric-tile">
+            <div class="tile-value">3</div>
+            <div class="tile-label">分析维度</div>
+            <div class="tile-trend trend-up">结构 / 文案 / 视觉</div>
+          </div>
+          <div class="metric-tile">
+            <div class="tile-value">5</div>
+            <div class="tile-label">触发场景</div>
+            <div class="tile-trend trend-up">&#8593; 高频</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="campaign-card">
+        <h3>&#9888; 适用边界</h3>
+        <div style="font-size: 13px; color: var(--fg-2); line-height: 1.6;">
+          <p style="margin-bottom: var(--space-sm);"><strong>适用：</strong>研究竞品广告策略、寻找创意灵感、理解市场主流 messaging、分析行业趋势、规划广告活动</p>
+          <p><strong style="color: var(--red);">不适用：</strong>无明确竞品、广告平台不可访问的场景</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Strip -->
+    <div class="activity-strip">
+      <h3>&#128170; 核心能力详解</h3>
+      <div class="capability-list">
+        <div class="capability-item" tabindex="0">
+          <div class="cap-num">1</div>
+          <div class="cap-content">
+            <h4>广告抓取</h4>
+            <p>从 Facebook Ad Library、LinkedIn 等平台抓取活跃广告，支持批量竞品分析</p>
+          </div>
+        </div>
+        <div class="capability-item" tabindex="0">
+          <div class="cap-num">2</div>
+          <div class="cap-content">
+            <h4>截图存档</h4>
+            <p>保存所有广告的可视化副本到 competitor-ads/&lt;competitor-name&gt;/ 目录</p>
+          </div>
+        </div>
+        <div class="capability-item" tabindex="0">
+          <div class="cap-num">3</div>
+          <div class="cap-content">
+            <h4>Messaging 分析</h4>
+            <p>提取竞品强调的问题、使用场景和价值主张，结构化输出洞察</p>
+          </div>
+        </div>
+        <div class="capability-item" tabindex="0">
+          <div class="cap-num">4</div>
+          <div class="cap-content">
+            <h4>主题分类</h4>
+            <p>按主题、受众或格式对广告进行分组，便于对比分析</p>
+          </div>
+        </div>
+        <div class="capability-item" tabindex="0">
+          <div class="cap-num">5</div>
+          <div class="cap-content">
+            <h4>模式识别</h4>
+            <p>发现共同的成功广告手法和创意模式，提炼可复用策略</p>
+          </div>
+        </div>
+        <div class="capability-item" tabindex="0">
+          <div class="cap-num">6</div>
+          <div class="cap-content">
+            <h4>效果洞察</h4>
+            <p>基于结构、文案、视觉等维度解释广告表现优劣</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Usage Section -->
+  <div class="usage-section">
+    <h3>&#128483; 使用示例</h3>
+    <div class="code-block">
+      <code><span class="comment"># 抓取单个竞品广告</span>
+<span class="prompt">Extract all current ads from [Competitor Name] on Facebook Ad Library</span>
+
+<span class="comment"># 抓取并分析 messaging</span>
+<span class="prompt">Scrape ads from [Company] and analyze their messaging</span>
+
+<span class="comment"># 批量对比多个竞品</span>
+<span class="prompt">Extract ads from these 5 competitors: [list]. Compare their approaches.</span>
+
+<span class="comment"># LinkedIn B2B 定位分析</span>
+<span class="prompt">Get LinkedIn ads from [Competitor] and analyze their B2B positioning strategy</span></code>
+    </div>
+  </div>
+
+  <!-- Context Section -->
+  <div class="context-section">
+    <h3>&#128279; 与 ys-powers 的关联</h3>
+    <div class="context-grid">
+      <div class="context-card">
+        <h4>现有能力关系</h4>
+        <p>ys-powers 中无竞品分析类 skill，competitive-ads-extractor 填补了市场研究领域的空白</p>
+      </div>
+      <div class="context-card">
+        <h4>借鉴价值</h4>
+        <p>其「抓取 &rarr; 截图存档 &rarr; 结构化分析」的三段式流程可复用到任何竞品情报收集场景</p>
+      </div>
+      <div class="context-card">
+        <h4>搬运建议</h4>
+        <p>价值中等，适合有营销/增长团队的组织。若 ys-powers 使用者常涉及市场分析，建议搬运</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Simple interaction: clicking workflow cells highlights them
+  document.querySelectorAll('.workflow-cell').forEach(cell => {
+    cell.addEventListener('click', function() {
+      this.style.borderColor = 'var(--primary)';
+      setTimeout(() => {
+        this.style.borderColor = '';
+      }, 1000);
+    });
+  });
+
+  // Keyboard accessibility for capability items
+  document.querySelectorAll('.capability-item').forEach(item => {
+    item.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        this.style.background = 'var(--surface-container)';
+        setTimeout(() => {
+          this.style.background = '';
+        }, 300);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

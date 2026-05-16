@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awesome Claude Skills 文档化设计 Spec</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      padding: var(--space-5xl) 0 var(--space-4xl);
+      border-bottom: 1px solid var(--border-strong);
+      margin-bottom: var(--space-4xl);
+    }
+
+    .cover-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+    }
+
+    .deck {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-width: 640px;
+    }
+
+    .deck p + p {
+      margin-top: var(--space-md);
+    }
+
+    .caveat-box {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg) var(--space-xl);
+      margin-top: var(--space-2xl);
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+    }
+
+    .caveat-box strong {
+      color: var(--fg-2);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-xl);
+      float: right;
+      width: 200px;
+      margin-left: var(--space-3xl);
+      margin-bottom: var(--space-3xl);
+      padding: var(--space-lg);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .reader-rail h3 {
+      font-family: var(--font-headline);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .reader-rail ul {
+      list-style: none;
+    }
+
+    .reader-rail li {
+      margin-bottom: var(--space-sm);
+    }
+
+    .reader-rail a {
+      color: var(--fg-2);
+      text-decoration: none;
+      display: block;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .reader-rail a:hover {
+      background: var(--surface-container);
+      color: var(--primary);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-5xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin: var(--space-3xl) 0 var(--space-lg);
+    }
+
+    .body-section h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg-2);
+      margin: var(--space-2xl) 0 var(--space-md);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-lg);
+      color: var(--fg-2);
+    }
+
+    /* Lists */
+    .body-section ul,
+    .body-section ol {
+      margin: var(--space-lg) 0 var(--space-lg) var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Tables */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 0.9rem;
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .fact-table th {
+      background: var(--surface-container-high);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--fg-muted);
+      padding: var(--space-md) var(--space-lg);
+      text-align: left;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      vertical-align: top;
+    }
+
+    .fact-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Code blocks */
+    pre {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--fg-1);
+      margin: var(--space-lg) 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .claim-card h4 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      border-left: 3px solid var(--primary);
+      padding-left: var(--space-lg);
+      margin: var(--space-xl) 0;
+      color: var(--fg-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Pull Quote */
+    .pull-quote {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-style: italic;
+      color: var(--fg-1);
+      border-left: 4px solid var(--primary);
+      padding-left: var(--space-xl);
+      margin: var(--space-2xl) 0;
+      line-height: 1.5;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-2xl) 0;
+    }
+
+    .question-panel h4 {
+      margin-top: 0;
+      color: var(--fg-1);
+    }
+
+    .question-panel ul {
+      margin-left: var(--space-lg);
+    }
+
+    /* Source Spread */
+    .source-spread {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-lg) 0;
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+    }
+
+    .source-spread strong {
+      color: var(--fg-2);
+    }
+
+    /* File tree styling */
+    .file-tree {
+      background: var(--surface-container-high);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg) var(--space-xl);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--fg-2);
+      overflow-x: auto;
+    }
+
+    .file-tree .dir {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .file-tree .file {
+      color: var(--fg-muted);
+    }
+
+    .file-tree .comment {
+      color: var(--fg-muted);
+      font-style: italic;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .reader-rail {
+        position: static;
+        float: none;
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: var(--space-2xl);
+      }
+
+      .cover {
+        padding: var(--space-3xl) 0 var(--space-2xl);
+      }
+
+      .fact-table {
+        font-size: 0.8rem;
+      }
+
+      .fact-table th,
+      .fact-table td {
+        padding: var(--space-sm);
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .reader-rail {
+        display: none;
+      }
+
+      .document-shell {
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .cover {
+        padding-top: 0;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover / Masthead -->
+    <header class="cover">
+      <div class="cover-label">Design Specification</div>
+      <h1>Awesome Claude Skills 文档化设计 Spec</h1>
+      <div class="deck">
+        <p>为 <code>refer/awesome-claude-skills/</code> 建立一套完整的分析文档系统，实现总览索引与逐个深入两个目标，最终产出保留为 Markdown，并通过 <code>/html</code> skill 生成 HTML 预览版。</p>
+      </div>
+      <div class="caveat-box">
+        <strong>Scope:</strong> 本文档为设计规格书（Spec），非最终实现。涵盖目录结构、分类体系、写作规范、验证标准与分批执行计划。
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <h3>Contents</h3>
+      <ul>
+        <li><a href="#objective">Objective</a></li>
+        <li><a href="#commands">Commands</a></li>
+        <li><a href="#structure">Project Structure</a></li>
+        <li><a href="#code-style">Code Style</a></li>
+        <li><a href="#testing">Testing Strategy</a></li>
+        <li><a href="#boundaries">Boundaries</a></li>
+        <li><a href="#batch-plan">Batch Plan</a></li>
+      </ul>
+    </nav>
+
+    <!-- Body Sheet -->
+    <main>
+      <section class="body-section" id="objective">
+        <h2>1. Objective</h2>
+        <p>为 <code>refer/awesome-claude-skills/</code> 建立一套完整的分析文档系统，实现两个目标：</p>
+        <ol>
+          <li><strong>总览索引</strong>：创建一个 <code>overview.md</code>，按分类列出所有本地 skill 的名称、定位、触发时机，让人一眼看清 awesome-claude-skills 的全貌。</li>
+          <li><strong>逐个深入</strong>：为每个本地 skill 创建独立的分析文件，结构化摘要其 SKILL.md 的核心内容，提炼与 ys-powers 的关联或借鉴点。</li>
+        </ol>
+        <p>最终产出保留为 Markdown，并通过 <code>/html</code> skill 生成 HTML 预览版，方便在浏览器中阅读。</p>
+      </section>
+
+      <section class="body-section" id="commands">
+        <h2>2. Commands</h2>
+        <p>本工作流不涉及代码编译或测试运行，主要命令/操作如下：</p>
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>命令/操作</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>find refer/awesome-claude-skills -maxdepth 2 -name "SKILL.md"</code></td>
+              <td>定位所有本地 skill 目录</td>
+            </tr>
+            <tr>
+              <td><code>cat refer/awesome-claude-skills/&lt;skill&gt;/SKILL.md</code></td>
+              <td>读取单个 skill 的指令内容</td>
+            </tr>
+            <tr>
+              <td><code>/html &lt;file-path&gt;</code></td>
+              <td>生成 HTML 预览（通过 <code>html-anything</code> skill）</td>
+            </tr>
+            <tr>
+              <td><code>git add docs/awesome-claude-skills/</code></td>
+              <td>暂存新文档</td>
+            </tr>
+            <tr>
+              <td><code>git commit</code></td>
+              <td>分批提交（每批一个 commit）</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="body-section" id="structure">
+        <h2>3. Project Structure</h2>
+        <p>文档目录统一放在 <code>docs/awesome-claude-skills/</code>，与 <code>refer/awesome-claude-skills/</code> 形成对照关系（遵循 CLAUDE.md 中 "与 <code>refer/&lt;X&gt;/</code> 同名的 <code>docs/&lt;X&gt;/</code> 是该参考项目的对照笔记" 的约定）。</p>
+
+        <div class="file-tree">
+<span class="dir">docs/awesome-claude-skills/</span>
+├── <span class="file">README.md</span>              <span class="comment"># 目录说明：awesome-claude-skills 是什么、文档约定、使用方式</span>
+├── <span class="file">overview.md</span>            <span class="comment"># 总览索引：按分类列出所有 ~28 个 skill 的摘要</span>
+├── <span class="file">index.html</span>             <span class="comment"># overview.md 的 HTML 预览版</span>
+├── <span class="file">composio-skills.md</span>     <span class="comment"># 分类聚合分析（因 composio-skills 子目录极多，需特殊处理）</span>
+├── <span class="file">composio-skills.html</span>
+├── <span class="file">artifacts-builder.md</span>   <span class="comment"># 单个 skill 深入分析</span>
+├── <span class="file">artifacts-builder.html</span>
+├── <span class="file">brand-guidelines.md</span>
+├── <span class="file">brand-guidelines.html</span>
+├── <span class="file">...（其余每个 skill 一一对应）</span>
+└── <span class="file">batch-log.md</span>           <span class="comment"># 批次执行日志，记录每批完成的 skill 列表和进度</span>
+        </div>
+
+        <h3>3.1 composio-skills 的特殊处理</h3>
+        <p><code>composio-skills</code> 子目录下包含 78+ 个 SaaS App 的自动化 skill（如 salesforce-automation、slack-automation 等），数量庞大且结构雷同。不为其每个子 skill 创建独立文件，而是统一在 <code>composio-skills.md</code> 中按类别（CRM、项目管理、沟通、代码/DevOps 等）做聚合分析，每个类别提取通用模式和代表性示例。</p>
+
+        <h3>3.2 分类体系</h3>
+        <p><code>overview.md</code> 中的分类沿用 awesome-claude-skills README 中的分类：</p>
+        <ul>
+          <li>Document Processing</li>
+          <li>Development & Code Tools</li>
+          <li>Data & Analysis</li>
+          <li>Business & Marketing</li>
+          <li>Communication & Writing</li>
+          <li>Creative & Media</li>
+          <li>Productivity & Organization</li>
+          <li>Collaboration & Project Management</li>
+          <li>Security & Systems</li>
+          <li>App Automation via Composio</li>
+        </ul>
+      </section>
+
+      <section class="body-section" id="code-style">
+        <h2>4. Code Style（文档风格）</h2>
+
+        <h3>4.1 单个 Skill 分析文件模板</h3>
+        <p>每个独立分析文件遵循以下结构：</p>
+
+        <div class="claim-card">
+          <h4>模板结构</h4>
+          <pre><code># &lt;Skill 名称&gt;
+
+## 定位
+一句话描述这个 skill 解决什么问题。
+
+## 触发时机
+- 何时应该使用这个 skill（从 SKILL.md 的 When to Use 提取）
+- 何时不应该使用（如有明确的 NOT to use 提示）
+
+## 核心能力
+- 能力 1：简述
+- 能力 2：简述
+- ...
+
+## 指令流程概览
+将 SKILL.md 中的指令流程提炼为 3-5 个关键步骤，用结构化列表呈现。不复制全文，只提取骨架。
+
+## 与 ys-powers 的关联
+- 是否已有类似 skill？（如 agent-skills、superpowers 中的对应能力）
+- 是否值得借鉴搬运到 ys-powers 的 skills/ 目录？
+- 是否有互补价值？
+
+## 元信息
+- 来源：refer/awesome-claude-skills/&lt;skill-name&gt;/SKILL.md
+- 作者/维护者：（从 SKILL.md frontmatter 或 README 链接提取）
+- 许可证：（如有标注）</code></pre>
+        </div>
+
+        <h3>4.2 写作规范</h3>
+        <ul>
+          <li>用中文撰写，skill 名称、文件路径、命令名保持英文原文</li>
+          <li>不复制 SKILL.md 全文，只做结构化摘要</li>
+          <li>每个 skill 分析文件控制在 200-500 字（composio-skills 聚合文件可更长）</li>
+          <li>避免主观评价，保持客观描述</li>
+        </ul>
+      </section>
+
+      <section class="body-section" id="testing">
+        <h2>5. Testing Strategy</h2>
+        <p>文档工作的"验证"不同于代码测试，验证标准如下：</p>
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>验证项</th>
+              <th>方法</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>文件完整性</td>
+              <td><code>ls docs/awesome-claude-skills/*.md | wc -l</code> 应等于计划文件数</td>
+            </tr>
+            <tr>
+              <td>内容准确性</td>
+              <td>抽查 3-5 个分析文件，对照原始 SKILL.md 确认摘要无偏差</td>
+            </tr>
+            <tr>
+              <td>链接可达性</td>
+              <td><code>overview.md</code> 中的内部链接全部可点击跳转</td>
+            </tr>
+            <tr>
+              <td>HTML 生成</td>
+              <td>每个 <code>.md</code> 都有对应的 <code>.html</code>，浏览器打开无报错</td>
+            </tr>
+            <tr>
+              <td>分类一致性</td>
+              <td>所有 skill 在 <code>overview.md</code> 中都有归属分类，无遗漏</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="body-section" id="boundaries">
+        <h2>6. Boundaries</h2>
+
+        <h3>6.1 Always Do</h3>
+        <ul>
+          <li>每个本地 skill 目录至少有一个对应的分析条目（overview 中）或独立文件</li>
+          <li>保留原始 Markdown，HTML 仅作为预览副本</li>
+          <li>每完成一批后 <code>git commit</code>，commit message 注明批次号</li>
+        </ul>
+
+        <h3>6.2 Ask First</h3>
+        <ul>
+          <li>如果发现某个 skill 的 SKILL.md 内容极少（&lt; 50 字），是否仍按完整模板写，还是降级为 overview 中的简条目</li>
+          <li>是否需要在 <code>docs/awesome-claude-skills/</code> 下创建子目录按分类组织，还是全部平铺</li>
+        </ul>
+
+        <div class="question-panel">
+          <h4>6.3 Never Do</h4>
+          <ul>
+            <li>不修改 <code>refer/awesome-claude-skills/</code> 下的任何文件（只读）</li>
+            <li>不为 composio-skills 下的 78+ 个子 skill 创建独立文件（统一聚合）</li>
+            <li>不搬运 awesome-claude-skills 的代码到 ys-powers（仅做分析笔记）</li>
+            <li>不在分析文件中泄露 SKILL.md 中的 API key、token 等敏感信息</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="body-section" id="batch-plan">
+        <h2>7. Batch Plan（分批执行计划）</h2>
+        <p>共 ~28 个 skill 目录（含 composio-skills），分 4 批：</p>
+
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>批次</th>
+              <th>Skill 列表</th>
+              <th>预计文件数</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Batch 1</td>
+              <td>overview.md + README.md + artifacts-builder, brand-guidelines, canvas-design, changelog-generator, competitive-ads-extractor, composio-skills</td>
+              <td>1 总览 + 1 说明 + 5 单文件 + 1 聚合 = 8</td>
+            </tr>
+            <tr>
+              <td>Batch 2</td>
+              <td>connect, connect-apps, connect-apps-plugin, content-research-writer, developer-growth-analysis, document-skills, domain-name-brainstormer</td>
+              <td>7 单文件</td>
+            </tr>
+            <tr>
+              <td>Batch 3</td>
+              <td>file-organizer, image-enhancer, internal-comms, invoice-organizer, langsmith-fetch, lead-research-assistant, mcp-builder</td>
+              <td>7 单文件</td>
+            </tr>
+            <tr>
+              <td>Batch 4</td>
+              <td>meeting-insights-analyzer, raffle-winner-picker, skill-creator, skill-share, slack-gif-creator, tailored-resume-generator, template-skill, theme-factory, twitter-algorithm-optimizer, video-downloader, webapp-testing</td>
+              <td>11 单文件 + batch-log.md</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="evidence-margin">
+          <p>每批流程：读取 SKILL.md &rarr; 撰写/更新 Markdown &rarr; 生成 HTML &rarr; <code>git commit</code> &rarr; 进入下一批。</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="source-spread" style="margin-top: var(--space-5xl); padding: var(--space-xl) 0; border-top: 1px solid var(--border);">
+      <p><strong>Source:</strong> docs/ys-powers/specs/2026-05-16-awesome-claude-skills-docs-design.md</p>
+      <p><strong>Generated:</strong> 2026-05-16 via html-anything skill</p>
+    </footer>
+  </div>
+</body>
+</html>

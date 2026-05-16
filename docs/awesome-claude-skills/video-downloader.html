@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>video-downloader — Skill Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #a03b00;
+    --primary-container: #c94c00;
+    --primary-fixed: #ffdbcd;
+    --primary-fixed-dim: #ffb597;
+    --on-primary: #ffffff;
+    --accent-glow: #E8400D;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #fff8f6;
+    --surface: #fff8f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fbf2ef;
+    --surface-container: #f5ece9;
+    --surface-container-high: #efe6e3;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #e1bfb2;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+    --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #060B18;
+      --surface: #0B1426;
+      --surface-container-lowest: #101D35;
+      --surface-container-low: #101D35;
+      --surface-container: #162544;
+      --surface-container-high: #1c2d52;
+      --fg-1: #F8FAFC;
+      --fg-2: #CBD5E1;
+      --fg-muted: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #FF6B35;
+      --accent-glow: #00D4FF;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--fg-1);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* Document shell */
+  .document-shell {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  /* Cover */
+  .cover {
+    margin-bottom: var(--space-4xl);
+    padding-bottom: var(--space-3xl);
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  .cover h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
+    color: var(--fg-1);
+  }
+
+  .cover .tagline {
+    font-size: 1.125rem;
+    color: var(--fg-2);
+    margin-bottom: var(--space-xl);
+    max-width: 640px;
+    line-height: 1.55;
+  }
+
+  .cover .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+
+  .cover .meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .cover .meta .badge {
+    background: var(--surface-container);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--fg-2);
+  }
+
+  /* Reader rail */
+  .reader-rail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-3xl);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  .reader-rail a {
+    text-decoration: none;
+    color: var(--fg-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .reader-rail a:hover,
+  .reader-rail a:focus {
+    color: var(--primary);
+    background: var(--surface-container-low);
+    outline: none;
+  }
+
+  /* Body sections */
+  .body-section {
+    margin-bottom: var(--space-4xl);
+  }
+
+  .body-section h2 {
+    font-family: var(--font-headline);
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+    color: var(--fg-1);
+    letter-spacing: -0.01em;
+  }
+
+  .body-section h3 {
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: var(--space-2xl) 0 var(--space-md);
+    color: var(--fg-1);
+  }
+
+  .body-section p {
+    margin-bottom: var(--space-md);
+    color: var(--fg-2);
+    line-height: 1.65;
+  }
+
+  .body-section ul,
+  .body-section ol {
+    margin: var(--space-md) 0 var(--space-lg) var(--space-xl);
+    color: var(--fg-2);
+  }
+
+  .body-section li {
+    margin-bottom: var(--space-sm);
+    line-height: 1.6;
+  }
+
+  /* Claim cards */
+  .claim-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin: var(--space-md) 0;
+  }
+
+  .claim-card strong {
+    color: var(--fg-1);
+    font-weight: 600;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--surface-container-high);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--fg-1);
+    margin: var(--space-md) 0 var(--space-lg);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--surface-container);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Evidence margin */
+  .evidence-margin {
+    border-left: 3px solid var(--primary);
+    padding-left: var(--space-lg);
+    margin: var(--space-lg) 0;
+    color: var(--fg-muted);
+    font-size: 0.9rem;
+  }
+
+  .evidence-margin strong {
+    color: var(--fg-2);
+  }
+
+  /* Caveat box */
+  .caveat-box {
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+  }
+
+  .caveat-box .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Question panel */
+  .question-panel {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-top: var(--space-3xl);
+  }
+
+  .question-panel h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+  }
+
+  .question-panel ul {
+    margin-bottom: 0;
+  }
+
+  /* Source spread */
+  .source-spread {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-lg) 0;
+  }
+
+  .source-spread .card {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+  }
+
+  .source-spread .card .key {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-xs);
+  }
+
+  .source-spread .card .value {
+    font-weight: 600;
+    color: var(--fg-1);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .document-shell {
+      padding: var(--space-xl) var(--space-md);
+    }
+
+    .cover h1 {
+      font-size: 1.75rem;
+    }
+
+    .reader-rail {
+      gap: var(--space-xs);
+    }
+
+    .reader-rail a {
+      font-size: 0.8rem;
+      padding: var(--space-xs);
+    }
+
+    .source-spread {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reader-rail a { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <h1>video-downloader</h1>
+    <p class="tagline">从 YouTube 下载视频，支持自定义质量、格式和音频提取。基于 yt-dlp 实现，自动处理安装和流合并。</p>
+    <div class="meta">
+      <span class="badge">Python</span>
+      <span class="badge">CLI</span>
+      <span class="badge">yt-dlp</span>
+      <span>来源: refer/awesome-claude-skills</span>
+      <span>许可证: Apache 2.0</span>
+    </div>
+  </header>
+
+  <!-- Reader rail -->
+  <nav class="reader-rail" aria-label="文档导航">
+    <a href="#positioning">定位</a>
+    <a href="#triggers">触发时机</a>
+    <a href="#capabilities">核心能力</a>
+    <a href="#usage">使用方式</a>
+    <a href="#relations">关联</a>
+    <a href="#meta">元信息</a>
+  </nav>
+
+  <!-- Positioning -->
+  <section class="body-section" id="positioning">
+    <h2>定位</h2>
+    <p>video-downloader 是一个用于从 YouTube 下载视频的 Claude Code skill。它支持自定义质量（1080p、720p 等）、格式（MP4、WebM、MKV）和音频提取（MP3）。基于 yt-dlp 实现，自动处理依赖安装和音视频流合并。</p>
+  </section>
+
+  <!-- Triggers -->
+  <section class="body-section" id="triggers">
+    <h2>触发时机</h2>
+    <ul>
+      <li>需要离线观看 YouTube 视频时</li>
+      <li>需要下载视频用于编辑、存档或二次创作时</li>
+      <li>仅需提取视频音频（如播客、音乐）时</li>
+    </ul>
+    <div class="caveat-box">
+      <div class="label">不适用场景</div>
+      <p>版权受限内容、或平台明确禁止下载的视频。</p>
+    </div>
+  </section>
+
+  <!-- Core capabilities -->
+  <section class="body-section" id="capabilities">
+    <h2>核心能力</h2>
+    <div class="claim-card">
+      <ol>
+        <li><strong>多质量选择</strong>：best、1080p、720p、480p、360p、worst</li>
+        <li><strong>多格式支持</strong>：MP4（默认）、WebM、MKV</li>
+        <li><strong>音频提取</strong>：仅下载音频并转为 MP3</li>
+        <li><strong>自动依赖管理</strong>：自动安装 yt-dlp（如未安装）</li>
+        <li><strong>自定义输出目录</strong>：默认保存到 <code>/mnt/user-data/outputs/</code></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Usage -->
+  <section class="body-section" id="usage">
+    <h2>使用方式</h2>
+
+    <h3>默认下载（最佳质量 MP4）</h3>
+    <pre><code>python scripts/download_video.py "https://www.youtube.com/watch?v=VIDEO_ID"</code></pre>
+
+    <h3>指定质量</h3>
+    <pre><code>python scripts/download_video.py "URL" -q 720p</code></pre>
+
+    <h3>指定格式</h3>
+    <pre><code>python scripts/download_video.py "URL" -f webm</code></pre>
+
+    <h3>仅音频</h3>
+    <pre><code>python scripts/download_video.py "URL" -a</code></pre>
+
+    <h3>自定义输出目录</h3>
+    <pre><code>python scripts/download_video.py "URL" -o /path/to/directory</code></pre>
+  </section>
+
+  <!-- Relations -->
+  <section class="body-section" id="relations">
+    <h2>与 ys-powers 的关联</h2>
+
+    <div class="evidence-margin">
+      <strong>媒体工作流</strong>：video-downloader 获取媒体素材，image-enhancer 优化图片，canvas-design 创作视觉内容。三者构成「获取 → 优化 → 创作」的完整媒体处理工作流。
+    </div>
+
+    <div class="evidence-margin">
+      <strong>借鉴价值</strong>：其「自动依赖安装 + 简洁 CLI 封装」的模式可作为任何基于外部工具的技能的设计参考。
+    </div>
+
+    <div class="evidence-margin">
+      <strong>搬运建议</strong>：低价值。功能单一，yt-dlp 本身已是成熟工具。但可作为「媒体处理工具集」的一部分保留。
+    </div>
+  </section>
+
+  <!-- Meta -->
+  <section class="body-section" id="meta">
+    <h2>元信息</h2>
+    <div class="source-spread">
+      <div class="card">
+        <div class="key">来源</div>
+        <div class="value">refer/awesome-claude-skills/video-downloader/SKILL.md</div>
+      </div>
+      <div class="card">
+        <div class="key">维护者</div>
+        <div class="value">Composio / 社区</div>
+      </div>
+      <div class="card">
+        <div class="key">许可证</div>
+        <div class="value">Apache 2.0</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Question panel -->
+  <div class="question-panel">
+    <h3>使用建议</h3>
+    <ul>
+      <li>作为独立工具使用时，直接调用 yt-dlp 可能更简单</li>
+      <li>在媒体处理 pipeline 中，建议与 image-enhancer、canvas-design 组合使用</li>
+      <li>注意遵守 YouTube 服务条款和当地版权法规</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

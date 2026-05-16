@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>file-organizer — Claude Skill 文档</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-2xl);
+    }
+
+    /* Cover */
+    .cover {
+      background: var(--gradient-hero);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-5xl) var(--space-4xl);
+      margin-bottom: var(--space-4xl);
+      color: var(--on-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cover-label {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover-deck {
+      font-size: 1.15rem;
+      line-height: 1.5;
+      opacity: 0.95;
+      max-width: 600px;
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-4xl);
+      flex-wrap: wrap;
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rail-tab {
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid transparent;
+    }
+
+    .rail-tab:hover {
+      background: var(--surface-container);
+      color: var(--fg-2);
+    }
+
+    .rail-tab.active {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    /* Body Section */
+    .body-section {
+      margin-bottom: var(--space-5xl);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-md);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+    }
+
+    .section-body {
+      padding-left: calc(var(--space-md) + 28px);
+    }
+
+    /* Claim Card */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2xl);
+      margin-bottom: var(--space-xl);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .claim-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .claim-card h3 {
+      font-family: var(--font-headline);
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--fg-1);
+    }
+
+    .claim-card p {
+      color: var(--fg-2);
+      line-height: 1.6;
+    }
+
+    /* Capability Grid */
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-xl);
+      margin-top: var(--space-xl);
+    }
+
+    .capability-item {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2xl);
+      transition: all 0.2s ease;
+    }
+
+    .capability-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--outline-variant);
+    }
+
+    .capability-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: var(--space-md);
+    }
+
+    .capability-item h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+
+    .capability-item p {
+      font-size: 13px;
+      color: var(--fg-muted);
+      line-height: 1.5;
+    }
+
+    /* Trigger List */
+    .trigger-list {
+      list-style: none;
+    }
+
+    .trigger-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .trigger-list li:last-child {
+      border-bottom: none;
+    }
+
+    .trigger-bullet {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+
+    .trigger-text {
+      flex: 1;
+    }
+
+    .trigger-warning {
+      display: inline-block;
+      background: var(--primary-fixed);
+      color: var(--primary-container);
+      padding: 2px var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: var(--space-sm);
+    }
+
+    /* Workflow Steps */
+    .workflow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .step-item {
+      display: flex;
+      gap: var(--space-xl);
+      align-items: flex-start;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    .step-content p {
+      color: var(--fg-2);
+      font-size: 14px;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--fg-1);
+    }
+
+    .code-block .comment {
+      color: var(--fg-muted);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-left: 3px solid var(--primary);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .evidence-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Meta Table */
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--space-xl);
+    }
+
+    .meta-table th,
+    .meta-table td {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-table th {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--fg-muted);
+    }
+
+    .meta-table td {
+      color: var(--fg-2);
+    }
+
+    .meta-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      margin-top: var(--space-4xl);
+    }
+
+    .question-panel h3 {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--space-xl);
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .question-item {
+      padding: var(--space-lg);
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .question-item strong {
+      display: block;
+      margin-bottom: var(--space-xs);
+      color: var(--fg-1);
+    }
+
+    .question-item span {
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    /* Footer */
+    .document-footer {
+      margin-top: var(--space-5xl);
+      padding-top: var(--space-3xl);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--fg-muted);
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-lg);
+      }
+
+      .cover {
+        padding: var(--space-3xl) var(--space-xl);
+      }
+
+      .section-body {
+        padding-left: 0;
+      }
+
+      .step-item {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .capability-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .question-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-label">Claude Skill</div>
+      <h1>file-organizer</h1>
+      <p class="cover-deck">个人文件整理助手，通过分析文件类型、日期和内容上下文，自动建议并执行文件重组、去重和清理，保持数字工作空间整洁。</p>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <button class="rail-tab active" onclick="showSection('overview')">概览</button>
+      <button class="rail-tab" onclick="showSection('capabilities')">核心能力</button>
+      <button class="rail-tab" onclick="showSection('workflow')">指令流程</button>
+      <button class="rail-tab" onclick="showSection('commands')">常用命令</button>
+      <button class="rail-tab" onclick="showSection('meta')">元信息</button>
+    </nav>
+
+    <!-- Section 1: Overview -->
+    <section class="body-section" id="overview">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2 class="section-title">定位与触发时机</h2>
+      </div>
+      <div class="section-body">
+        <div class="claim-card">
+          <h3>Skill 定位</h3>
+          <p>作为个人文件整理助手，通过分析文件类型、日期和内容上下文，自动建议并执行文件重组、去重和清理，保持数字工作空间整洁。</p>
+        </div>
+
+        <h3 style="font-family: var(--font-headline); font-size: 1.15rem; margin: var(--space-2xl) 0 var(--space-lg);">适用场景</h3>
+        <ul class="trigger-list">
+          <li>
+            <span class="trigger-bullet"></span>
+            <span class="trigger-text">Downloads 文件夹混乱、找不到文件时</span>
+          </li>
+          <li>
+            <span class="trigger-bullet"></span>
+            <span class="trigger-text">怀疑有大量重复文件占用空间时</span>
+          </li>
+          <li>
+            <span class="trigger-bullet"></span>
+            <span class="trigger-text">项目目录结构不合理、需要重新规划时</span>
+          </li>
+          <li>
+            <span class="trigger-bullet"></span>
+            <span class="trigger-text">准备归档旧项目或清理过期文件时</span>
+          </li>
+          <li>
+            <span class="trigger-bullet"></span>
+            <span class="trigger-text">启动新项目需要建立规范的目录结构时</span>
+          </li>
+          <li>
+            <span class="trigger-bullet"></span>
+            <span class="trigger-text">
+              当前正在频繁修改的活跃项目目录
+              <span class="trigger-warning">不适用</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: Capabilities -->
+    <section class="body-section" id="capabilities">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2 class="section-title">核心能力</h2>
+      </div>
+      <div class="section-body">
+        <div class="capability-grid">
+          <div class="capability-item">
+            <div class="capability-icon">📊</div>
+            <h4>结构分析</h4>
+            <p>扫描目标目录，统计文件类型、大小分布、日期范围和现有组织问题</p>
+          </div>
+          <div class="capability-item">
+            <div class="capability-icon">🔍</div>
+            <h4>重复检测</h4>
+            <p>跨系统识别重复文件，辅助用户决定保留哪个版本</p>
+          </div>
+          <div class="capability-item">
+            <div class="capability-icon">💡</div>
+            <h4>智能建议</h4>
+            <p>基于文件类型（文档、图片、视频、代码等）或用途（工作、个人、归档）提出逻辑分组方案</p>
+          </div>
+          <div class="capability-item">
+            <div class="capability-icon">⚡</div>
+            <h4>自动整理</h4>
+            <p>在用户确认后执行移动、重命名和分类操作</p>
+          </div>
+          <div class="capability-item">
+            <div class="capability-icon">🧠</div>
+            <h4>上下文保持</h4>
+            <p>根据文件内容、修改时间和项目关联性做出智能决策</p>
+          </div>
+          <div class="capability-item">
+            <div class="capability-icon">🧹</div>
+            <h4>Clutter 清理</h4>
+            <p>识别长期未访问的旧文件，建议归档或删除</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Workflow -->
+    <section class="body-section" id="workflow">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2 class="section-title">指令流程概览</h2>
+      </div>
+      <div class="section-body">
+        <div class="workflow-steps">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>明确范围</h4>
+              <p>确认目标目录、主要问题、需避开的敏感区域、整理激进程度</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>现状分析</h4>
+              <p>使用 ls、find、du、file 等命令收集文件统计信息</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>模式识别</h4>
+              <p>按类型、用途、时间等维度确定逻辑分组</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>方案呈现</h4>
+              <p>向用户展示建议的目录结构和文件迁移计划</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>执行整理</h4>
+              <p>在用户批准后执行移动/重命名，保留原始备份</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Commands -->
+    <section class="body-section" id="commands">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2 class="section-title">常用分析命令</h2>
+      </div>
+      <div class="section-body">
+        <div class="evidence-margin">
+          <div class="evidence-label">目录概览</div>
+          <div class="code-block">
+            <pre>ls -la &lt;target_directory&gt;</pre>
+          </div>
+        </div>
+
+        <div class="evidence-margin">
+          <div class="evidence-label">文件类型统计</div>
+          <div class="code-block">
+            <pre>find &lt;target_directory&gt; -type f | sed 's/.*\.//' | sort | uniq -c | sort -rn</pre>
+          </div>
+        </div>
+
+        <div class="evidence-margin">
+          <div class="evidence-label">最大文件</div>
+          <div class="code-block">
+            <pre>find &lt;target_directory&gt; -type f -exec du -h {} + | sort -rh | head -20</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Meta -->
+    <section class="body-section" id="meta">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">元信息</h2>
+      </div>
+      <div class="section-body">
+        <table class="meta-table">
+          <tr>
+            <th>属性</th>
+            <th>值</th>
+          </tr>
+          <tr>
+            <td>来源</td>
+            <td>refer/awesome-claude-skills/file-organizer/SKILL.md</td>
+          </tr>
+          <tr>
+            <td>维护者</td>
+            <td>Composio / 社区</td>
+          </tr>
+          <tr>
+            <td>许可证</td>
+            <td>Apache 2.0</td>
+          </tr>
+          <tr>
+            <td>与 ys-powers 的关系</td>
+            <td>填补「本地环境维护」空白；四步安全流程可复用</td>
+          </tr>
+          <tr>
+            <td>搬运建议</td>
+            <td>中等价值；适合需要维护整洁开发环境的个人或团队</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h3>与 ys-powers 的关联</h3>
+      <div class="question-grid">
+        <div class="question-item">
+          <strong>现有能力</strong>
+          <span>ys-powers 中无文件管理类 skill，file-organizer 填补了「本地环境维护」的空白</span>
+        </div>
+        <div class="question-item">
+          <strong>借鉴价值</strong>
+          <span>「分析 → 建议 → 确认 → 执行」的四步安全流程可复用到任何涉及文件系统变更的操作中</span>
+        </div>
+        <div class="question-item">
+          <strong>搬运建议</strong>
+          <span>中等价值。适合需要维护整洁开发环境的个人或团队。注意文件操作有破坏性，skill 中已包含「用户确认」安全机制</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="document-footer">
+      <p>file-organizer skill 文档 · 生成于 ys-powers 项目</p>
+    </footer>
+  </div>
+
+  <script>
+    function showSection(sectionId) {
+      // Update active tab
+      document.querySelectorAll('.rail-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Smooth scroll to section
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Intersection Observer for auto-updating active tab on scroll
+    const sections = document.querySelectorAll('.body-section');
+    const tabs = document.querySelectorAll('.rail-tab');
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -80% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tabs.forEach((tab, index) => {
+            tab.classList.remove('active');
+            if (tab.getAttribute('onclick').includes(id)) {
+              tab.classList.add('active');
+            }
+          });
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>

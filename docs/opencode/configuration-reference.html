@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenCode 配置参考</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #8b3f1f;
+    --primary-container: #a84d28;
+    --primary-fixed: #f5e0d6;
+    --primary-fixed-dim: #e8c4b0;
+    --on-primary: #ffffff;
+    --accent-glow: #c44a47;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #faf7f5;
+    --surface: #faf7f5;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f5f0ed;
+    --surface-container: #efe9e5;
+    --surface-container-high: #e8e2dd;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #d4c4b8;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(139, 63, 31, 0.15);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0d0c;
+      --surface: #1a1715;
+      --surface-container-lowest: #1f1c19;
+      --surface-container-low: #25221e;
+      --surface-container: #2b2723;
+      --surface-container-high: #332e29;
+      --fg-1: #f5f0ed;
+      --fg-2: #c4bbb4;
+      --fg-muted: #8a7e76;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #c44a47;
+      --accent-glow: #e8400d;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 15px;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--fg-1);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Document Shell */
+  .document-shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  /* Cover */
+  .cover {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5xl) var(--space-4xl);
+    margin-bottom: var(--space-4xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .cover-label {
+    font-family: var(--font-headline);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    margin-bottom: var(--space-md);
+  }
+
+  .cover-title {
+    font-family: var(--font-headline);
+    font-size: 2.75rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--fg-1);
+    margin-bottom: var(--space-lg);
+    letter-spacing: -0.02em;
+  }
+
+  .cover-lede {
+    font-size: 1.15rem;
+    color: var(--fg-2);
+    line-height: 1.55;
+    max-width: 640px;
+    margin-bottom: var(--space-xl);
+  }
+
+  .cover-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-lg);
+  }
+
+  .cover-meta span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  /* Reader Rail */
+  .reader-rail {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-4xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .reader-rail-title {
+    font-family: var(--font-headline);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .reader-rail-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-xs) var(--space-lg);
+  }
+
+  .reader-rail-list a {
+    display: block;
+    padding: var(--space-xs) 0;
+    color: var(--fg-2);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s;
+  }
+
+  .reader-rail-list a:hover {
+    color: var(--primary);
+  }
+
+  .reader-rail-list a::before {
+    content: attr(data-num) ".";
+    display: inline-block;
+    width: 1.5em;
+    color: var(--fg-muted);
+    font-weight: 500;
+  }
+
+  /* Body Section */
+  .body-section {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+    margin-bottom: var(--space-2xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .body-section h2 {
+    font-family: var(--font-headline);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--primary);
+    display: inline-block;
+  }
+
+  .body-section h3 {
+    font-family: var(--font-headline);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--fg-1);
+    margin: var(--space-2xl) 0 var(--space-md);
+  }
+
+  .body-section h4 {
+    font-family: var(--font-headline);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--fg-2);
+    margin: var(--space-xl) 0 var(--space-sm);
+  }
+
+  .body-section p {
+    margin-bottom: var(--space-md);
+    color: var(--fg-2);
+  }
+
+  .body-section ul, .body-section ol {
+    margin: var(--space-md) 0 var(--space-md) var(--space-lg);
+    color: var(--fg-2);
+  }
+
+  .body-section li {
+    margin-bottom: var(--space-xs);
+  }
+
+  .body-section strong {
+    color: var(--fg-1);
+    font-weight: 600;
+  }
+
+  .body-section code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface-container);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+  }
+
+  .body-section pre {
+    background: var(--surface-container);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    margin: var(--space-md) 0 var(--space-lg);
+  }
+
+  .body-section pre code {
+    background: none;
+    padding: 0;
+    color: var(--fg-1);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* Fact Table */
+  .fact-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-md) 0 var(--space-lg);
+    font-size: 0.9rem;
+  }
+
+  .fact-table th {
+    background: var(--surface-container);
+    font-family: var(--font-headline);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--fg-muted);
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 2px solid var(--border-strong);
+  }
+
+  .fact-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border);
+    color: var(--fg-2);
+    vertical-align: top;
+  }
+
+  .fact-table tr:hover td {
+    background: var(--surface-container-low);
+  }
+
+  .fact-table code {
+    font-size: 0.8em;
+  }
+
+  /* Claim Card */
+  .claim-card {
+    background: var(--surface-container);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: var(--space-md) var(--space-lg);
+    margin: var(--space-md) 0 var(--space-lg);
+  }
+
+  .claim-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Evidence Margin */
+  .evidence-margin {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+  }
+
+  .evidence-margin-label {
+    font-family: var(--font-headline);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg-muted);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Caveat Box */
+  .caveat-box {
+    background: var(--primary-fixed);
+    border: 1px solid var(--primary-fixed-dim);
+    border-radius: var(--radius-md);
+    padding: var(--space-md) var(--space-lg);
+    margin: var(--space-md) 0 var(--space-lg);
+  }
+
+  .caveat-box strong {
+    color: var(--primary);
+  }
+
+  /* Question Panel */
+  .question-panel {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    margin-top: var(--space-4xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .question-panel h2 {
+    font-family: var(--font-headline);
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+    color: var(--fg-1);
+  }
+
+  .question-panel ul {
+    list-style: none;
+    margin: 0;
+  }
+
+  .question-panel li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .question-panel a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .question-panel a:hover {
+    text-decoration: underline;
+  }
+
+  /* Source Spread */
+  .source-spread {
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .document-shell {
+      padding: var(--space-lg) var(--space-md);
+    }
+
+    .cover {
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    .cover-title {
+      font-size: 2rem;
+    }
+
+    .body-section {
+      padding: var(--space-xl);
+    }
+
+    .reader-rail-list {
+      grid-template-columns: 1fr;
+    }
+
+    .fact-table {
+      font-size: 0.8rem;
+    }
+
+    .fact-table th, .fact-table td {
+      padding: var(--space-xs) var(--space-sm);
+    }
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    .document-shell { max-width: none; padding: 0; }
+    .cover, .body-section, .reader-rail, .question-panel {
+      box-shadow: none;
+      border: 1px solid #ddd;
+      break-inside: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <div class="cover-label">技术参考文档</div>
+    <h1 class="cover-title">OpenCode 配置参考</h1>
+    <p class="cover-lede">面向已熟悉 Claude Code 配置的开发者，系统介绍 OpenCode 的配置机制、扩展能力与迁移路径。涵盖 JSON 配置格式、Skills、Commands、Rules、Agents 四类扩展点，以及与 Claude Code 的兼容性对照。</p>
+    <div class="cover-meta">
+      <span>来源：opencode.ai/docs/zh-cn</span>
+      <span>版本：截至 2026/05/16</span>
+      <span>读者：Claude Code 迁移用户</span>
+    </div>
+  </header>
+
+  <!-- Reader Rail -->
+  <nav class="reader-rail">
+    <div class="reader-rail-title">目录</div>
+    <ul class="reader-rail-list">
+      <li><a href="#sec1" data-num="1">概述</a></li>
+      <li><a href="#sec2" data-num="2">配置系统</a></li>
+      <li><a href="#sec3" data-num="3">Skills（技能）</a></li>
+      <li><a href="#sec4" data-num="4">Commands（命令）</a></li>
+      <li><a href="#sec5" data-num="5">Rules（规则）</a></li>
+      <li><a href="#sec6" data-num="6">Agents（代理）</a></li>
+      <li><a href="#sec7" data-num="7">与 Claude Code 的兼容性对照</a></li>
+      <li><a href="#sec8" data-num="8">快速迁移检查清单</a></li>
+      <li><a href="#sec9" data-num="9">参考链接</a></li>
+    </ul>
+  </nav>
+
+  <!-- Section 1 -->
+  <section class="body-section" id="sec1">
+    <h2>1. 概述</h2>
+    <p>OpenCode 是一款 AI 编码助手，其配置机制与 Claude Code 有较高的相似度，同时提供了多层级合并和 Claude Code 兼容模式。</p>
+
+    <div class="claim-card">
+      <p><strong>核心特点：</strong></p>
+      <ul>
+        <li>使用 JSON 作为统一配置格式</li>
+        <li>支持多层级配置合并（远程 → 全局 → 项目 → 环境变量）</li>
+        <li>原生兼容 Claude Code 的 <code>.claude/</code> 目录结构</li>
+        <li>支持 skills、commands、rules、agents 四类扩展能力</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Section 2 -->
+  <section class="body-section" id="sec2">
+    <h2>2. 配置系统</h2>
+
+    <h3>2.1 配置文件格式</h3>
+    <p>OpenCode 使用 JSON 配置文件，Schema 地址为：</p>
+    <pre><code>{
+  "$schema": "https://opencode.ai/config.json"
+}</code></pre>
+
+    <h3>2.2 配置加载优先级（从低到高）</h3>
+    <p>后面的配置会覆盖前面配置的冲突键，非冲突键则会合并保留：</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr><th>优先级</th><th>配置源</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><code>.well-known/opencode</code></td><td>远程组织默认配置（通过身份验证提供商自动获取）</td></tr>
+        <tr><td>2</td><td><code>~/.config/opencode/opencode.json</code></td><td>全局用户配置</td></tr>
+        <tr><td>3</td><td><code>OPENCODE_CONFIG_CONTENT</code></td><td>环境变量，直接内联 JSON 内容</td></tr>
+        <tr><td>4</td><td>项目配置</td><td>当前目录或向上遍历到最近的 Git 工作树根目录</td></tr>
+        <tr><td>5</td><td>自定义配置</td><td>通过 <code>OPENCODE_CONFIG_DIR</code> 指定的额外目录</td></tr>
+      </tbody>
+    </table>
+
+    <div class="caveat-box">
+      <p><strong>关键行为：</strong>配置是<strong>合并</strong>而非替换。例如组织配置默认禁用了某个 MCP 服务器，用户仍可在全局配置中显式启用它。</p>
+    </div>
+
+    <h3>2.3 项目配置位置</h3>
+    <p>OpenCode 启动时会在以下位置查找项目级配置：</p>
+    <ul>
+      <li>当前工作目录</li>
+      <li>向上遍历目录树，直到到达 Git 工作树根目录</li>
+    </ul>
+    <p>项目配置文件可安全提交到 Git，与全局配置使用相同的 Schema。</p>
+
+    <h3>2.4 常用配置项示例</h3>
+    <div class="evidence-margin">
+      <div class="evidence-margin-label">配置示例</div>
+      <pre><code>{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "anthropic/claude-sonnet-4-5",
+  "title_model": "anthropic/claude-haiku-4-5",
+  "timeout": 300000,
+  "scroll_acceleration": {
+    "enabled": true
+  },
+  "agents": {
+    "build": {
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "temperature": 0
+    }
+  }
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 3 -->
+  <section class="body-section" id="sec3">
+    <h2>3. Skills（技能）</h2>
+
+    <h3>3.1 文件格式</h3>
+    <p>每个 skill 是一个目录，内含 <code>SKILL.md</code> 文件：</p>
+    <pre><code>&lt;skill-name&gt;/
+└── SKILL.md</code></pre>
+
+    <p><code>SKILL.md</code> 必须以 YAML frontmatter 开头，正文为 Markdown：</p>
+    <div class="evidence-margin">
+      <div class="evidence-margin-label">SKILL.md 示例</div>
+      <pre><code>---
+name: git-release
+description: Create consistent releases and changelogs
+---
+
+# Git Release
+
+Use this when you are preparing a tagged release.
+
+## Steps
+
+1. Draft release notes from merged PRs
+2. Propose a version bump
+3. Provide a copy-pasteable git tag command</code></pre>
+    </div>
+
+    <div class="caveat-box">
+      <p><strong>命名规则：</strong>仅包含小写字母和数字，可用单个连字符分隔。正则表达式为 <code>^[a-z0-9]+(-[a-z0-9]+)*$</code>。</p>
+    </div>
+
+    <h3>3.2 搜索路径</h3>
+    <p>OpenCode 按以下顺序查找 skills：</p>
+
+    <p><strong>项目本地路径：</strong></p>
+    <ol>
+      <li><code>.claude/skills/&lt;name&gt;/SKILL.md</code></li>
+      <li><code>.agents/skills/&lt;name&gt;/SKILL.md</code></li>
+      <li><code>.opencode/skills/&lt;name&gt;/SKILL.md</code></li>
+    </ol>
+
+    <p><strong>全局路径：</strong></p>
+    <ol start="4">
+      <li><code>~/.config/opencode/skills/&lt;name&gt;/SKILL.md</code></li>
+      <li><code>~/.claude/skills/&lt;name&gt;/SKILL.md</code></li>
+      <li><code>~/.agents/skills/&lt;name&gt;/SKILL.md</code></li>
+    </ol>
+
+    <p>项目本地优先于全局。OpenCode 会从当前工作目录向上遍历到 Git 工作树根目录。</p>
+
+    <h3>3.3 权限控制</h3>
+    <p>可在代理配置中通过 <code>available_skills</code> 限制可访问的 skills：</p>
+    <pre><code>{
+  "agents": {
+    "plan": {
+      "available_skills": ["explore", "debug"]
+    }
+  }
+}</code></pre>
+
+    <p>为不需要使用 skills 的代理完全禁用：</p>
+    <pre><code>{
+  "agents": {
+    "review": {
+      "available_skills": []
+    }
+  }
+}</code></pre>
+  </section>
+
+  <!-- Section 4 -->
+  <section class="body-section" id="sec4">
+    <h2>4. Commands（命令）</h2>
+
+    <h3>4.1 文件格式</h3>
+    <p>Commands 使用 Markdown 文件定义，文件名即为命令名：</p>
+    <pre><code>.opencode/commands/
+├── test.md
+├── create-component.md
+└── review-changes.md</code></pre>
+
+    <p><strong>文件结构：</strong></p>
+    <div class="evidence-margin">
+      <div class="evidence-margin-label">Command 文件示例</div>
+      <pre><code>---
+model: anthropic/claude-3-5-sonnet-20241022
+description: Run tests with coverage
+---
+
+Run the full test suite with coverage report and show any failures.
+Focus on the failing tests and suggest fixes.</code></pre>
+    </div>
+    <p>Frontmatter 定义命令属性，正文内容成为发送给 LLM 的提示词模板。</p>
+
+    <h3>4.2 搜索路径</h3>
+    <ul>
+      <li>项目本地：<code>.opencode/commands/&lt;name&gt;.md</code></li>
+      <li>全局：<code>~/.config/opencode/commands/&lt;name&gt;.md</code></li>
+    </ul>
+
+    <h3>4.3 占位符语法</h3>
+    <p>Commands 支持在提示词中使用占位符：</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr><th>占位符</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>$ARGUMENTS</code></td><td>用户输入的所有参数</td></tr>
+        <tr><td><code>$1</code>, <code>$2</code>, <code>$3</code></td><td>第 N 个参数</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>示例：</strong></p>
+    <pre><code>---
+description: Create a new component
+---
+
+Create a new React component named $ARGUMENTS with TypeScript support.
+Include proper typing and basic structure.</code></pre>
+
+    <pre><code>---
+description: Create a new file with content
+---
+
+Create a file named $1 in the directory $2 with the following content: $3</code></pre>
+
+    <h3>4.4 系统命令集成</h3>
+    <p>Command 内容中可嵌入 shell 命令，其输出会成为提示词的一部分：</p>
+    <div class="evidence-margin">
+      <div class="evidence-margin-label">系统命令集成示例</div>
+      <pre><code>---
+description: Review recent changes
+---
+
+Review these changes and suggest any improvements:
+
+`git log --oneline -10`</code></pre>
+    </div>
+    <p>命令在项目根目录运行，输出结果自动注入上下文。</p>
+
+    <h3>4.5 覆盖内置命令</h3>
+    <p>自定义命令与内置命令同名时会覆盖内置命令。例如定义 <code>.opencode/commands/test.md</code> 会覆盖默认的 <code>test</code> 命令。</p>
+  </section>
+
+  <!-- Section 5 -->
+  <section class="body-section" id="sec5">
+    <h2>5. Rules（规则）</h2>
+
+    <h3>5.1 核心文件</h3>
+    <p>OpenCode 使用 <code>AGENTS.md</code> 提供自定义指令，类似于 Cursor 的 Rules 功能。文件内容会被纳入 LLM 上下文，用于针对特定项目定制行为。</p>
+
+    <h3>5.2 搜索顺序</h3>
+    <p>OpenCode 按以下顺序查找规则文件，<strong>第一个匹配的文件生效</strong>：</p>
+
+    <p><strong>项目级（仅在项目目录及其子目录工作时生效）：</strong></p>
+    <ol>
+      <li><code>AGENTS.md</code></li>
+      <li><code>.opencode/AGENTS.md</code></li>
+      <li><code>.claude/CLAUDE.md</code></li>
+      <li><code>.claude/AGENTS.md</code></li>
+    </ol>
+
+    <p><strong>全局级（应用于所有会话）：</strong></p>
+    <ol start="5">
+      <li><code>~/.config/opencode/AGENTS.md</code></li>
+      <li><code>~/.claude/CLAUDE.md</code></li>
+      <li><code>~/.claude/AGENTS.md</code></li>
+    </ol>
+
+    <h3>5.3 Claude Code 兼容性</h3>
+    <p>OpenCode 原生支持 Claude Code 的 <code>CLAUDE.md</code> 和 <code>.claude/</code> 目录约定：</p>
+    <ul>
+      <li><code>.claude/AGENTS.md</code></li>
+      <li><code>.claude/CLAUDE.md</code></li>
+      <li><code>.claude/skills/*/SKILL.md</code></li>
+    </ul>
+
+    <p>可通过环境变量禁用兼容性：</p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>环境变量</th><th>作用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>OPENCODE_DISABLE_CLAUDE_CODE</code></td><td>完全禁用所有 <code>.claude</code> 支持</td></tr>
+        <tr><td><code>OPENCODE_DISABLE_CLAUDE_CODE_PROMPT</code></td><td>仅禁用 <code>~/.claude/CLAUDE.md</code></td></tr>
+        <tr><td><code>OPENCODE_DISABLE_CLAUDE_CODE_SKILLS</code></td><td>仅禁用 <code>.claude/skills</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.4 自动生成规则</h3>
+    <p>运行以下命令可自动扫描项目并生成 <code>AGENTS.md</code>：</p>
+    <pre><code>$ opencode rules</code></pre>
+    <p>该命令会分析项目结构和内容，生成初始规则文件。如果已存在规则文件，则会在其基础上补充。</p>
+
+    <h3>5.5 外部文件引用</h3>
+    <p>OpenCode 支持在 <code>AGENTS.md</code> 中引用外部文件，但<strong>不直接支持文件路径引用</strong>。可通过以下方式实现：</p>
+
+    <p><strong>方式一：配置中指定指令文件</strong></p>
+    <pre><code>{
+  "agents": {
+    "instructions": [
+      "docs/guidelines.md",
+      ".cursor/rules/*.md"
+    ]
+  }
+}</code></pre>
+    <p>支持 glob 模式和远程 URL：</p>
+    <pre><code>{
+  "agents": {
+    "instructions": [
+      "https://raw.githubusercontent.com/my-org/shared-rules/main/style.md"
+    ]
+  }
+}</code></pre>
+
+    <p><strong>方式二：在 AGENTS.md 中指示代理懒加载</strong></p>
+    <div class="evidence-margin">
+      <div class="evidence-margin-label">懒加载示例</div>
+      <pre><code># TypeScript Project Rules
+
+## External File Loading
+
+CRITICAL: When you encounter a file reference (e.g., @rules/general.md), use your Read tool to load it on a need-to-know basis.
+
+## Development Guidelines
+
+For TypeScript code style: @docs/typescript-guidelines.md
+For React patterns: @docs/react-patterns.md</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 6 -->
+  <section class="body-section" id="sec6">
+    <h2>6. Agents（代理）</h2>
+
+    <h3>6.1 内置代理</h3>
+    <p>OpenCode 内置两类代理：</p>
+
+    <p><strong>主代理（用户直接交互）：</strong></p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>代理</th><th>用途</th><th>工具权限</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Build</td><td>标准开发工作</td><td>完整工具访问</td></tr>
+        <tr><td>Plan</td><td>规划和分析，防止意外修改</td><td>受限权限</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>子代理（主代理调用或用户直接调用）：</strong></p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>代理</th><th>用途</th><th>特点</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>General</td><td>研究复杂问题、执行多步骤任务</td><td>完整工具访问（除 todo 外）</td></tr>
+        <tr><td>Explore</td><td>快速只读代码库探索</td><td>无法修改文件</td></tr>
+        <tr><td>External</td><td>外部文档和依赖研究</td><td>只读，可克隆依赖仓库</td></tr>
+        <tr><td>Context Compaction</td><td>长上下文压缩</td><td>自动运行，不可选择</td></tr>
+        <tr><td>Title Generation</td><td>生成会话标题</td><td>自动运行，不可选择</td></tr>
+        <tr><td>Summary</td><td>创建会话摘要</td><td>自动运行，不可选择</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>会话导航快捷键：</strong></p>
+    <ul>
+      <li><code>session_child_cycle_forward</code>：向前循环会话（父 → 子1 → 子2 → ... → 父）</li>
+      <li><code>session_child_cycle_reverse</code>：向后循环会话</li>
+    </ul>
+
+    <h3>6.2 自定义代理</h3>
+    <p>可通过两种方式自定义代理：JSON 配置或 Markdown 文件。</p>
+
+    <p><strong>JSON 配置方式：</strong></p>
+    <div class="evidence-margin">
+      <div class="evidence-margin-label">JSON 配置示例</div>
+      <pre><code>{
+  "agents": {
+    "review": {
+      "name": "Code Review",
+      "description": "Reviews code for best practices and potential issues",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "temperature": 0,
+      "system_prompt": "You are a code reviewer. Focus on security, performance, and maintainability.",
+      "max_iterations": 10,
+      "tools": {
+        "Read": false,
+        "Write": false
+      }
+    }
+  }
+}</code></pre>
+    </div>
+
+    <p><strong>Markdown 文件方式：</strong></p>
+    <p>在 <code>~/.config/opencode/agents/</code> 目录下创建 Markdown 文件：</p>
+    <pre><code>---
+name: Code Review
+description: Reviews code for quality and best practices
+model: anthropic/claude-sonnet-4-20250514
+temperature: 0
+max_iterations: 10
+---
+
+You are in code review mode. Focus on:
+
+- Code quality and best practices
+- Potential bugs and edge cases
+- Performance implications
+- Security considerations
+
+Provide constructive feedback without making direct changes.</code></pre>
+    <p>文件名即为代理名称，如 <code>review.md</code>。</p>
+
+    <h3>6.3 代理配置项说明</h3>
+    <table class="fact-table">
+      <thead>
+        <tr><th>配置项</th><th>类型</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>string</td><td>代理显示名称</td></tr>
+        <tr><td><code>description</code></td><td>string</td><td>功能描述，在 TUI 中展示</td></tr>
+        <tr><td><code>model</code></td><td>string</td><td>模型 ID，格式为 <code>provider/model-name</code></td></tr>
+        <tr><td><code>temperature</code></td><td>number</td><td>控制随机性，0 为确定性，1 为创造性</td></tr>
+        <tr><td><code>system_prompt</code></td><td>string</td><td>系统提示词，可使用 <code>{file:./prompts.txt}</code> 引用外部文件</td></tr>
+        <tr><td><code>max_iterations</code></td><td>number</td><td>最大代理迭代次数，达到限制后代理会返回摘要</td></tr>
+        <tr><td><code>tools</code></td><td>object</td><td>工具访问权限，可单独禁用特定工具</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>模型 ID 格式：</strong>使用 <code>provider/model-name</code>，例如：</p>
+    <ul>
+      <li><code>anthropic/claude-sonnet-4-5</code></li>
+      <li><code>anthropic/claude-haiku-4-5</code></li>
+      <li><code>opencode/gpt-5.1-codex</code></li>
+    </ul>
+
+    <p><strong>工具权限控制示例：</strong></p>
+    <pre><code>{
+  "agents": {
+    "plan": {
+      "tools": {
+        "Write": false,
+        "Bash": false
+      }
+    }
+  }
+}</code></pre>
+
+    <p>使用通配符控制 MCP 工具：</p>
+    <pre><code>{
+  "agents": {
+    "review": {
+      "tools": {
+        "mcp_*": false
+      }
+    }
+  }
+}</code></pre>
+  </section>
+
+  <!-- Section 7 -->
+  <section class="body-section" id="sec7">
+    <h2>7. 与 Claude Code 的兼容性对照</h2>
+
+    <table class="fact-table">
+      <thead>
+        <tr><th>能力</th><th>Claude Code</th><th>OpenCode</th><th>兼容性说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>配置文件</td><td><code>settings.json</code> / <code>settings.local.json</code></td><td><code>opencode.json</code></td><td>格式不同，需手动迁移</td></tr>
+        <tr><td>Skills 目录</td><td><code>.claude/skills/&lt;name&gt;/SKILL.md</code></td><td><code>.opencode/skills/&lt;name&gt;/SKILL.md</code></td><td>OpenCode 原生读取 <code>.claude/skills</code></td></tr>
+        <tr><td>Commands 目录</td><td><code>.claude/commands/&lt;name&gt;.md</code></td><td><code>.opencode/commands/&lt;name&gt;.md</code></td><td>格式相同，路径不同</td></tr>
+        <tr><td>Rules 文件</td><td><code>.claude/CLAUDE.md</code></td><td><code>.opencode/AGENTS.md</code></td><td>OpenCode 原生读取 <code>.claude/CLAUDE.md</code></td></tr>
+        <tr><td>Agents 目录</td><td>无内置 agents 配置</td><td><code>.opencode/agents/</code> / <code>~/.config/opencode/agents/</code></td><td>Claude Code 无对应机制</td></tr>
+        <tr><td>Hooks</td><td><code>settings.json</code> 中的 hooks 字段</td><td><code>hooks.json</code></td><td>机制不同</td></tr>
+        <tr><td>全局配置目录</td><td><code>~/.claude/</code></td><td><code>~/.config/opencode/</code></td><td>路径不同</td></tr>
+      </tbody>
+    </table>
+
+    <div class="claim-card">
+      <p><strong>关键结论：</strong></p>
+      <ul>
+        <li>Skills 和 Rules 可直接复用：OpenCode 会主动读取 <code>.claude/skills/</code> 和 <code>.claude/CLAUDE.md</code></li>
+        <li>Commands 需复制到新路径：<code>.claude/commands/</code> → <code>.opencode/commands/</code></li>
+        <li>Agents 是 OpenCode 特有：Claude Code 无对应概念，属于增量能力</li>
+        <li>Hooks 不兼容：需根据 OpenCode 的 hooks 机制重新配置</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Section 8 -->
+  <section class="body-section" id="sec8">
+    <h2>8. 快速迁移检查清单</h2>
+    <p>将 ys-powers 能力迁移到 OpenCode 项目：</p>
+    <ul>
+      <li><input type="checkbox" disabled> Skills：确认 <code>.claude/skills/</code> 下的 <code>SKILL.md</code> 符合命名规范（小写+数字+连字符）</li>
+      <li><input type="checkbox" disabled> Commands：复制 <code>.claude/commands/*.md</code> 到 <code>.opencode/commands/</code></li>
+      <li><input type="checkbox" disabled> Rules：<code>.claude/CLAUDE.md</code> 会自动生效，无需操作；或使用 <code>.opencode/AGENTS.md</code></li>
+      <li><input type="checkbox" disabled> Agents：如需自定义代理，在 <code>~/.config/opencode/agents/</code> 中创建 Markdown 文件</li>
+      <li><input type="checkbox" disabled> 配置：创建 <code>.opencode/opencode.json</code> 设置模型、超时等偏好</li>
+      <li><input type="checkbox" disabled> 权限：如需限制代理工具访问，在配置中设置 <code>tools</code> 字段</li>
+    </ul>
+  </section>
+
+  <!-- Section 9 -->
+  <section class="body-section" id="sec9">
+    <h2>9. 参考链接</h2>
+    <ul>
+      <li><a href="https://opencode.ai/docs/zh-cn" target="_blank" rel="noopener">OpenCode 官方文档</a></li>
+      <li><a href="https://opencode.ai/config.json" target="_blank" rel="noopener">配置 Schema</a></li>
+      <li><a href="https://opencode.ai/docs/zh-cn/skills" target="_blank" rel="noopener">Skills 文档</a></li>
+      <li><a href="https://opencode.ai/docs/zh-cn/commands" target="_blank" rel="noopener">Commands 文档</a></li>
+      <li><a href="https://opencode.ai/docs/zh-cn/rules" target="_blank" rel="noopener">Rules 文档</a></li>
+      <li><a href="https://opencode.ai/docs/zh-cn/agents" target="_blank" rel="noopener">Agents 文档</a></li>
+    </ul>
+  </section>
+
+  <!-- Question Panel -->
+  <div class="question-panel">
+    <h2>延伸阅读</h2>
+    <ul>
+      <li><a href="https://opencode.ai/docs/zh-cn" target="_blank" rel="noopener">OpenCode 官方文档中心</a></li>
+      <li><a href="https://opencode.ai/config.json" target="_blank" rel="noopener">官方配置 Schema</a></li>
+    </ul>
+  </div>
+
+  <!-- Source Spread -->
+  <div class="source-spread">
+    <p>本文档基于 opencode.ai/docs/zh-cn 截至 2026/05/16 的版本整理。如有更新，请以官方文档为准。</p>
+  </div>
+
+</div>
+</body>
+</html>

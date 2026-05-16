@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>invoice-organizer — 智能发票整理技能</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover */
+    .cover {
+      margin-bottom: var(--space-5xl);
+      padding-bottom: var(--space-4xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover-tag::before {
+      content: '';
+      width: 24px;
+      height: 2px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-pill);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover .deck {
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: var(--fg-2);
+      max-width: 680px;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .caveat-box {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
+      font-size: 13px;
+      color: var(--fg-muted);
+      max-width: 600px;
+    }
+
+    .caveat-box strong {
+      color: var(--fg-2);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-4xl);
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rail-tab {
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .rail-tab:hover {
+      background: var(--surface-container);
+      color: var(--fg-2);
+    }
+
+    .rail-tab.active {
+      background: var(--surface-container-high);
+      color: var(--fg-1);
+      border-color: var(--border-strong);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-5xl);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-md);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .section-header h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin-bottom: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .claim-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .claim-card h3 {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .claim-card .claim-meta {
+      font-size: 12px;
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      margin-bottom: var(--space-md);
+    }
+
+    .claim-card p {
+      color: var(--fg-2);
+      line-height: 1.7;
+    }
+
+    /* Fact Tables */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      font-weight: 600;
+      color: var(--fg-1);
+      border-bottom: 2px solid var(--border-strong);
+      font-family: var(--font-headline);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      vertical-align: top;
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      margin: var(--space-2xl) 0;
+      padding: var(--space-xl);
+      background: var(--surface-container);
+      border-radius: var(--radius-lg);
+      border-left: 3px solid var(--primary);
+    }
+
+    .evidence-margin .evidence-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .evidence-margin blockquote {
+      font-style: italic;
+      color: var(--fg-2);
+      line-height: 1.7;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Pull Quote */
+    .pull-quote {
+      margin: var(--space-3xl) 0;
+      padding: var(--space-2xl) var(--space-3xl);
+      background: var(--gradient-hero);
+      border-radius: var(--radius-xl);
+      color: var(--on-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pull-quote::before {
+      content: '"';
+      font-family: var(--font-headline);
+      font-size: 6rem;
+      line-height: 1;
+      opacity: 0.15;
+      position: absolute;
+      top: -10px;
+      left: var(--space-lg);
+    }
+
+    .pull-quote p {
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pull-quote .quote-source {
+      margin-top: var(--space-md);
+      font-size: 13px;
+      opacity: 0.8;
+      font-family: var(--font-mono);
+    }
+
+    /* Source Spread */
+    .source-spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-xl);
+      margin: var(--space-2xl) 0;
+    }
+
+    .source-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .source-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .source-card .source-tag {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--primary-fixed);
+      color: var(--primary-container);
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-md);
+    }
+
+    .source-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--fg-1);
+    }
+
+    .source-card p {
+      font-size: 13px;
+      color: var(--fg-muted);
+      line-height: 1.6;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin-top: var(--space-4xl);
+    }
+
+    .question-panel h3 {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .question-list {
+      list-style: none;
+    }
+
+    .question-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      font-size: 14px;
+      color: var(--fg-2);
+    }
+
+    .question-list li::before {
+      content: '?';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-fixed);
+      color: var(--primary-container);
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .question-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* Evidence Browser */
+    .evidence-browser {
+      margin-top: var(--space-4xl);
+      padding-top: var(--space-4xl);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .evidence-browser h3 {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+    }
+
+    .browser-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .browser-item {
+      padding: var(--space-lg);
+      background: var(--surface-container);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      transition: background 0.2s ease;
+    }
+
+    .browser-item:hover {
+      background: var(--surface-container-high);
+    }
+
+    .browser-item .item-id {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .browser-item .item-desc {
+      color: var(--fg-2);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .cover h1 {
+        font-size: 1.75rem;
+      }
+
+      .claim-card {
+        padding: var(--space-lg);
+      }
+
+      .pull-quote {
+        padding: var(--space-xl);
+      }
+
+      .pull-quote p {
+        font-size: 1.1rem;
+      }
+
+      .source-spread {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reading mode: summary */
+    body[data-reading="summary"] .body-section:not(:first-of-type),
+    body[data-reading="summary"] .evidence-browser,
+    body[data-reading="summary"] .question-panel {
+      display: none;
+    }
+
+    /* Reading mode: evidence */
+    body[data-reading="evidence"] .claim-card p,
+    body[data-reading="evidence"] .section-header {
+      display: none;
+    }
+
+    /* Utility */
+    .text-gradient {
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Print */
+    @media print {
+      .reader-rail {
+        display: none;
+      }
+      .claim-card {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-tag">Claude Skill</div>
+      <h1>invoice-organizer</h1>
+      <p class="deck">
+        自动读取发票和收据文件，提取关键信息（日期、金额、供应商等），按统一规则重命名并分类归档，将数小时的手动记账压缩为几分钟。
+      </p>
+      <div class="caveat-box">
+        <strong>适用范围：</strong>适合自由职业者、小企业和需要自行管理财务的开发者。注意 OCR 准确性受图片质量影响。不适用：无发票文件、或仅需处理少量（&lt; 5 张）且已有明确分类时。
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <button class="rail-tab active" onclick="setReadingMode('full')">完整文档</button>
+      <button class="rail-tab" onclick="setReadingMode('summary')">5 分钟概览</button>
+      <button class="rail-tab" onclick="setReadingMode('evidence')">证据与元信息</button>
+      <a href="#capabilities" class="rail-tab">核心能力</a>
+      <a href="#workflow" class="rail-tab">指令流程</a>
+      <a href="#relations" class="rail-tab">关联分析</a>
+    </nav>
+
+    <!-- Section 1: Positioning -->
+    <section class="body-section" id="positioning">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2>定位与触发时机</h2>
+      </div>
+
+      <div class="claim-card">
+        <h3>核心定位</h3>
+        <div class="claim-meta">SCOPE / PURPOSE</div>
+        <p>
+          invoice-organizer 是发票场景的专用整理技能，具备领域特定的信息提取能力。它从非结构化文件中提取结构化数据，将混乱的财务凭证转化为可检索、可汇总、可交接的标准化档案。
+        </p>
+      </div>
+
+      <div class="evidence-margin">
+        <div class="evidence-label">适用场景</div>
+        <blockquote>
+          准备税务申报需要整理财务凭证时；管理跨多个供应商的企业支出时；从混乱的下载文件夹或邮件附件中整理收据时；需要为会计提供结构化的发票清单时；建立自动化的 ongoing 记账归档流程时。
+        </blockquote>
+      </div>
+
+      <div class="claim-card">
+        <h3>不适用场景</h3>
+        <div class="claim-meta">CONTRAINDICATION</div>
+        <p>
+          无发票文件、或仅需处理少量（&lt; 5 张）且已有明确分类时，使用该技能反而会增加不必要的复杂度。此时手动整理更为高效。
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 2: Capabilities -->
+    <section class="body-section" id="capabilities">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2>核心能力</h2>
+      </div>
+
+      <div class="source-spread">
+        <div class="source-card">
+          <span class="source-tag">Extract</span>
+          <h4>信息提取</h4>
+          <p>从 PDF、图片、邮件附件中读取供应商名称、发票号、日期、金额、商品描述、支付方式</p>
+        </div>
+        <div class="source-card">
+          <span class="source-tag">Rename</span>
+          <h4>统一重命名</h4>
+          <p>按 <code>YYYY-MM-DD Vendor - Invoice - ProductOrService.pdf</code> 格式标准化文件名</p>
+        </div>
+        <div class="source-card">
+          <span class="source-tag">Classify</span>
+          <h4>智能分类</h4>
+          <p>按供应商、支出类别（软件、办公、差旅等）、时间段或税务类别归档</p>
+        </div>
+        <div class="source-card">
+          <span class="source-tag">Multi-format</span>
+          <h4>多格式支持</h4>
+          <p>PDF、扫描件（JPG/PNG）、邮件附件、截图、银行对账单</p>
+        </div>
+        <div class="source-card">
+          <span class="source-tag">Preserve</span>
+          <h4>原始保留</h4>
+          <p>整理过程中保留原始文件，创建副本或硬链接</p>
+        </div>
+        <div class="source-card">
+          <span class="source-tag">Report</span>
+          <h4>报表生成</h4>
+          <p>可选输出 CSV 汇总表，方便会计对账</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Workflow -->
+    <section class="body-section" id="workflow">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2>指令流程概览</h2>
+      </div>
+
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>步骤</th>
+            <th>操作</th>
+            <th>技术细节</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. 扫描目录</strong></td>
+            <td>定位目标文件夹中的所有发票相关文件</td>
+            <td>递归扫描，识别常见发票格式与命名模式</td>
+          </tr>
+          <tr>
+            <td><strong>2. 逐文件提取</strong></td>
+            <td>PDF：文本提取；图片：OCR 识别；模糊文件：使用文件名线索、文件创建日期作为 fallback</td>
+            <td>识别 "Invoice Date"、"Total"、"Invoice #" 等关键词</td>
+          </tr>
+          <tr>
+            <td><strong>3. 标准化命名</strong></td>
+            <td>按 <code>YYYY-MM-DD Vendor - Invoice - Product.pdf</code> 重命名</td>
+            <td>日期统一为 ISO 8601 格式，Vendor 名称规范化</td>
+          </tr>
+          <tr>
+            <td><strong>4. 分类归档</strong></td>
+            <td>移动到按供应商/类别/年份组织的目录结构</td>
+            <td>支持多级目录：Vendor/Year/ 或 Year/Category/</td>
+          </tr>
+          <tr>
+            <td><strong>5. 生成报表</strong></td>
+            <td>输出 CSV（可选），包含所有发票的明细信息</td>
+            <td>字段：日期、供应商、金额、类别、文件名、原始路径</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 4: Relations -->
+    <section class="body-section" id="relations">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2>与 ys-powers 的关联</h2>
+      </div>
+
+      <div class="pull-quote">
+        <p>「信息提取 → 标准化命名 → 分类归档 → 报表生成」的流水线可复用到任何「从非结构化文件中提取结构化数据」的场景。</p>
+        <div class="quote-source">SKILL ANALYSIS / PIPELINE PATTERN</div>
+      </div>
+
+      <div class="claim-card">
+        <h3>与 file-organizer 的关系</h3>
+        <div class="claim-meta">RELATIONSHIP</div>
+        <p>
+          <code>file-organizer</code> 是通用文件整理，<code>invoice-organizer</code> 是发票场景的专用版本，具备领域特定的信息提取能力。两者共享「扫描 → 识别 → 归类」的底层逻辑，但 invoice-organizer 增加了财务语义理解和税务分类规则。
+        </p>
+      </div>
+
+      <div class="claim-card">
+        <h3>借鉴价值评估</h3>
+        <div class="claim-meta">VALUE ASSESSMENT</div>
+        <p>
+          <strong>中等价值。</strong>适合自由职业者、小企业和需要自行管理财务的开发者。注意 OCR 准确性受图片质量影响。其流水线设计模式（信息提取 → 标准化命名 → 分类归档 → 报表生成）可复用到其他领域，如合同整理、病历归档、票据管理等。
+        </p>
+      </div>
+    </section>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h3>实施前需澄清的问题</h3>
+      <ul class="question-list">
+        <li>目标用户的主要发票来源是什么？（PDF 扫描件 / 手机拍照 / 邮件附件 / 银行对账单）</li>
+        <li>归档分类的优先级：按供应商、按支出类别、按税务年度，还是混合策略？</li>
+        <li>是否需要与现有会计软件（如 QuickBooks、Xero）集成，还是独立 CSV 导出即可？</li>
+        <li>对 OCR 错误的容忍度如何？是否需要人工复核环节？</li>
+        <li>原始文件的保留策略：硬链接、副本、还是移动归档？</li>
+      </ul>
+    </div>
+
+    <!-- Evidence Browser -->
+    <div class="evidence-browser">
+      <h3>元信息档案</h3>
+      <div class="browser-grid">
+        <div class="browser-item">
+          <div class="item-id">SOURCE</div>
+          <div class="item-desc">refer/awesome-claude-skills/invoice-organizer/SKILL.md</div>
+        </div>
+        <div class="browser-item">
+          <div class="item-id">MAINTAINER</div>
+          <div class="item-desc">Composio / 社区</div>
+        </div>
+        <div class="browser-item">
+          <div class="item-id">LICENSE</div>
+          <div class="item-desc">Apache 2.0</div>
+        </div>
+        <div class="browser-item">
+          <div class="item-id">CATEGORY</div>
+          <div class="item-desc">File & Work Data / Finance</div>
+        </div>
+        <div class="browser-item">
+          <div class="item-id">VALUE</div>
+          <div class="item-desc">Medium — 领域专用，模式可复用</div>
+        </div>
+        <div class="browser-item">
+          <div class="item-id">PORTING</div>
+          <div class="item-desc">建议重写而非直接搬运</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setReadingMode(mode) {
+      document.body.setAttribute('data-reading', mode);
+      document.querySelectorAll('.rail-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.textContent.includes('完整') && mode === 'full') tab.classList.add('active');
+        if (tab.textContent.includes('概览') && mode === 'summary') tab.classList.add('active');
+        if (tab.textContent.includes('证据') && mode === 'evidence') tab.classList.add('active');
+      });
+    }
+  </script>
+</body>
+</html>

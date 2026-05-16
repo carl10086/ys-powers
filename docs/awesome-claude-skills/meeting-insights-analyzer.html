@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting Insights Analyzer — 会议洞察分析器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover */
+    .cover {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-4xl) var(--space-3xl);
+      margin-bottom: var(--space-4xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .cover-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      background: var(--primary-fixed);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+      letter-spacing: -0.01em;
+    }
+
+    .cover .subtitle {
+      font-size: 1.15rem;
+      color: var(--fg-2);
+      max-width: 640px;
+      line-height: 1.6;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-lg);
+      margin-top: var(--space-2xl);
+    }
+
+    .deck-item {
+      background: var(--surface-container);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+
+    .deck-item .number {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+
+    .deck-item .label {
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      font-weight: 500;
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-lg);
+      background: var(--surface-container);
+      border-radius: var(--radius-xl);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-3xl);
+      border: 1px solid var(--border);
+      z-index: 10;
+    }
+
+    .rail-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rail-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .rail-links a {
+      text-decoration: none;
+      color: var(--fg-2);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .rail-links a:hover {
+      background: var(--surface-container-high);
+      color: var(--fg-1);
+    }
+
+    .rail-links a.active {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .reading-mode {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .mode-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--border-strong);
+      background: var(--surface-container-lowest);
+      color: var(--fg-2);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn:hover {
+      border-color: var(--outline-variant);
+      color: var(--fg-1);
+    }
+
+    .mode-btn.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .section-header {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .section-header h2 {
+      font-family: var(--font-headline);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-md);
+      letter-spacing: -0.01em;
+    }
+
+    .section-header p {
+      color: var(--fg-2);
+      max-width: 640px;
+      font-size: 1rem;
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2xl);
+      margin-bottom: var(--space-lg);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .claim-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .claim-card h3 {
+      font-family: var(--font-headline);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .claim-card .claim-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      background: var(--primary-fixed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .claim-card p {
+      color: var(--fg-2);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    .claim-card ul {
+      margin-top: var(--space-md);
+      padding-left: var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    .claim-card li {
+      margin-bottom: var(--space-sm);
+      line-height: 1.6;
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .evidence-margin .evidence-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .evidence-margin p {
+      color: var(--fg-2);
+      font-size: 0.9rem;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 0.9rem;
+    }
+
+    .fact-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      font-weight: 600;
+      color: var(--fg-1);
+      border-bottom: 2px solid var(--border-strong);
+      font-family: var(--font-headline);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      color: var(--fg-2);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container);
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      margin-top: var(--space-4xl);
+    }
+
+    .question-panel h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--space-xl);
+      color: var(--fg-1);
+    }
+
+    .question-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .question-item {
+      background: var(--surface-container-lowest);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+
+    .question-item .q-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .question-item p {
+      color: var(--fg-2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Source Spread */
+    .source-spread {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin-top: var(--space-3xl);
+    }
+
+    .source-spread h3 {
+      font-family: var(--font-headline);
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .source-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+    }
+
+    .source-meta span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+    }
+
+    .caveat-box .caveat-icon {
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .caveat-box p {
+      color: var(--fg-2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .caveat-box strong {
+      color: var(--fg-1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-md);
+      }
+
+      .cover {
+        padding: var(--space-3xl) var(--space-xl);
+      }
+
+      .deck {
+        grid-template-columns: 1fr;
+      }
+
+      .rail-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .rail-links {
+        justify-content: center;
+      }
+
+      .reading-mode {
+        justify-content: center;
+      }
+
+      .question-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <span class="cover-label">Skill Documentation</span>
+      <h1>Meeting Insights Analyzer</h1>
+      <p class="subtitle">通过分析会议转录文本，识别沟通模式、行为倾向和可改进点，帮助用户成为更高效沟通者和领导者。</p>
+      <div class="deck">
+        <div class="deck-item">
+          <span class="number">4</span>
+          <span class="label">核心能力维度</span>
+        </div>
+        <div class="deck-item">
+          <span class="number">4</span>
+          <span class="label">分析步骤流程</span>
+        </div>
+        <div class="deck-item">
+          <span class="number">4</span>
+          <span class="label">常用分析维度</span>
+        </div>
+        <div class="deck-item">
+          <span class="number">6</span>
+          <span class="label">支持文件格式</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <div class="rail-inner">
+        <div class="rail-links">
+          <a href="#positioning" class="active">定位</a>
+          <a href="#triggers">触发时机</a>
+          <a href="#capabilities">核心能力</a>
+          <a href="#workflow">指令流程</a>
+          <a href="#dimensions">分析维度</a>
+          <a href="#relations">关联</a>
+        </div>
+        <div class="reading-mode">
+          <button class="mode-btn active" data-mode="full">完整</button>
+          <button class="mode-btn" data-mode="summary">摘要</button>
+          <button class="mode-btn" data-mode="evidence">证据</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Positioning -->
+    <section class="body-section" id="positioning">
+      <div class="section-header">
+        <h2>定位</h2>
+        <p>Meeting Insights Analyzer 是一个专注于会议沟通效能提升的分析工具。它通过系统性地解析会议转录文本，提取可量化的沟通行为指标，并提供基于证据的改进建议。</p>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#127942;</span>核心价值主张</h3>
+        <p>将非结构化的会议对话转化为结构化的沟通洞察，帮助用户：</p>
+        <ul>
+          <li>识别自身沟通模式中的盲点和惯性</li>
+          <li>获取具体、可操作的改进建议（附带时间戳证据）</li>
+          <li>追踪沟通能力随时间的成长轨迹</li>
+          <li>在绩效评审和团队辅导中提供数据支撑</li>
+        </ul>
+      </div>
+      <div class="caveat-box">
+        <span class="caveat-icon">&#9888;</span>
+        <p><strong>前提条件：</strong>此 skill 需要高质量的会议转录文件（含说话人标签和时间戳）才能发挥最佳效果。无转录文件时无法使用。</p>
+      </div>
+    </section>
+
+    <!-- Triggers -->
+    <section class="body-section" id="triggers">
+      <div class="section-header">
+        <h2>触发时机</h2>
+        <p>明确何时应该激活此 skill，以及何时应该寻找替代方案。</p>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#9989;</span>适用场景</h3>
+        <ul>
+          <li>需要回顾自己的会议表现并获取具体反馈时</li>
+          <li>准备绩效评审，需要沟通能力的具体例证时</li>
+          <li>辅导团队成员改进沟通风格时</li>
+          <li>追踪一段时间内的沟通能力成长趋势时</li>
+          <li>识别自己在会议中是否回避冲突、主导对话或忽略倾听时</li>
+        </ul>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#10060;</span>不适用场景</h3>
+        <p>无会议转录文件可用时。此 skill 完全依赖文本数据，没有转录就无法进行分析。</p>
+      </div>
+    </section>
+
+    <!-- Core Capabilities -->
+    <section class="body-section" id="capabilities">
+      <div class="section-header">
+        <h2>核心能力</h2>
+        <p>Meeting Insights Analyzer 提供四个相互关联的分析能力，从模式识别到趋势追踪形成完整闭环。</p>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128269;</span>1. 模式识别</h3>
+        <p>跨多场会议识别重复行为模式，包括：</p>
+        <ul>
+          <li><strong>冲突回避或间接沟通</strong> — 检测模糊语言、委婉表达和回避策略</li>
+          <li><strong>发言比例和轮流发言模式</strong> — 量化个人在会议中的话语占比</li>
+          <li><strong>提问 vs 陈述的比例</strong> — 区分探究性沟通与宣告性沟通</li>
+          <li><strong>积极倾听指标</strong> — 识别复述、确认和跟进问题</li>
+          <li><strong>决策方式</strong> — 分析共识构建 vs 独断决策的倾向</li>
+        </ul>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128200;</span>2. 沟通效果分析</h3>
+        <p>评估沟通的多维效果：</p>
+        <ul>
+          <li><strong>清晰度和直接性</strong> — 信息传达的明确程度</li>
+          <li><strong>填充词和模糊语言</strong> — "um"、"like"、"kind of"、"maybe" 等使用频率</li>
+          <li><strong>语调和情绪模式</strong> — 情绪表达的一致性和适应性</li>
+          <li><strong>会议控制和引导能力</strong> — 话题管理和时间把控</li>
+        </ul>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128161;</span>3. 可操作建议</h3>
+        <p>提供带时间戳的具体示例，每个建议包含三个要素：</p>
+        <ul>
+          <li><strong>发生了什么</strong> — 具体的对话片段和行为描述</li>
+          <li><strong>为什么重要</strong> — 该行为对沟通效果的影响分析</li>
+          <li><strong>如何改进</strong> — 可执行的具体替代方案</li>
+        </ul>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128640;</span>4. 趋势追踪</h3>
+        <p>对比多场会议的数据，展示成长轨迹。通过纵向对比，用户可以看到自己在特定维度上的进步或退步。</p>
+      </div>
+    </section>
+
+    <!-- Workflow -->
+    <section class="body-section" id="workflow">
+      <div class="section-header">
+        <h2>指令流程概览</h2>
+        <p>四步标准化分析流程，确保每次分析都系统、全面、有针对性。</p>
+      </div>
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>步骤</th>
+            <th>动作</th>
+            <th>输出</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. 发现可用数据</strong></td>
+            <td>扫描文件夹中的转录文件（.txt、.md、.vtt、.srt、.docx）</td>
+            <td>可用文件清单及格式确认</td>
+          </tr>
+          <tr>
+            <td><strong>2. 明确分析目标</strong></td>
+            <td>确认用户关注的行为类型（冲突回避、打断、填充词等）</td>
+            <td>聚焦的分析维度列表</td>
+          </tr>
+          <tr>
+            <td><strong>3. 分析模式</strong></td>
+            <td>针对每个关注点提取具体证据和时间戳</td>
+            <td>带证据的行为模式报告</td>
+          </tr>
+          <tr>
+            <td><strong>4. 生成报告</strong></td>
+            <td>输出结构化洞察，包含正面案例和改进建议</td>
+            <td>完整分析报告</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Dimensions -->
+    <section class="body-section" id="dimensions">
+      <div class="section-header">
+        <h2>常用分析维度</h2>
+        <p>四个关键维度的识别信号和解读方式。</p>
+      </div>
+      <table class="fact-table">
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>识别信号</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>冲突回避</strong></td>
+            <td>模糊语言（"maybe"、"I think"）、间接请求代替直接表达</td>
+          </tr>
+          <tr>
+            <td><strong>发言比例</strong></td>
+            <td>计算用户发言时长占总时长的百分比</td>
+          </tr>
+          <tr>
+            <td><strong>积极倾听</strong></td>
+            <td>复述对方观点、提出跟进问题、适时确认</td>
+          </tr>
+          <tr>
+            <td><strong>会议控制</strong></td>
+            <td>引导话题转移、总结决议、分配行动项</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="evidence-margin">
+        <div class="evidence-label">分析提示</div>
+        <p>高质量的分析需要转录文件包含说话人标签和时间戳。纯文本转录仍可分析，但无法提供精确的时间定位和行为上下文。</p>
+      </div>
+    </section>
+
+    <!-- Relations -->
+    <section class="body-section" id="relations">
+      <div class="section-header">
+        <h2>与 ys-powers 的关联</h2>
+        <p>此 skill 在 ys-powers 体系中的定位和借鉴价值。</p>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128279;</span>与 internal-comms 的关系</h3>
+        <p><code>internal-comms</code> 帮助「撰写」沟通内容，<code>meeting-insights-analyzer</code> 帮助「评估」沟通效果。两者互补，形成沟通能力的完整闭环：从内容创作到效果复盘。</p>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128736;</span>借鉴价值</h3>
+        <p>其「转录 → 模式识别 → 时间戳证据 → 改进建议」的分析框架可复用到任何需要「基于文本数据提取行为洞察」的场景。</p>
+      </div>
+      <div class="claim-card">
+        <h3><span class="claim-icon">&#128230;</span>搬运建议</h3>
+        <p>中等价值。适合需要提升沟通效率的团队或个人。注意需要高质量的会议转录（含说话人标签和时间戳）。</p>
+      </div>
+    </section>
+
+    <!-- Source Spread -->
+    <div class="source-spread">
+      <h3>元信息</h3>
+      <div class="source-meta">
+        <span>&#128196; 来源：refer/awesome-claude-skills/meeting-insights-analyzer/SKILL.md</span>
+        <span>&#128100; 维护者：Composio / 社区</span>
+        <span>&#9878; 许可证：Apache 2.0</span>
+      </div>
+    </div>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <h2>使用前的关键问题</h2>
+      <div class="question-list">
+        <div class="question-item">
+          <div class="q-label">数据准备</div>
+          <p>你是否拥有带说话人标签和时间戳的会议转录文件？</p>
+        </div>
+        <div class="question-item">
+          <div class="q-label">分析聚焦</div>
+          <p>你最关注哪个沟通维度：冲突处理、发言习惯、倾听质量还是会议引导？</p>
+        </div>
+        <div class="question-item">
+          <div class="q-label">时间跨度</div>
+          <p>你希望分析单次会议还是追踪一段时间内的成长趋势？</p>
+        </div>
+        <div class="question-item">
+          <div class="q-label">应用场景</div>
+          <p>分析结果将用于个人改进、绩效评审还是团队辅导？</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Reading mode toggle
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const sections = document.querySelectorAll('.body-section');
+
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+
+        sections.forEach(section => {
+          if (mode === 'summary') {
+            // Show only first claim card or table in each section
+            const cards = section.querySelectorAll('.claim-card, .fact-table, .caveat-box');
+            cards.forEach((card, i) => {
+              card.style.display = i === 0 ? 'block' : 'none';
+            });
+            const evidence = section.querySelectorAll('.evidence-margin');
+            evidence.forEach(e => e.style.display = 'none');
+          } else if (mode === 'evidence') {
+            // Show only evidence elements
+            const cards = section.querySelectorAll('.claim-card, .fact-table');
+            cards.forEach(card => card.style.display = 'none');
+            const evidence = section.querySelectorAll('.evidence-margin, .caveat-box');
+            evidence.forEach(e => e.style.display = 'block');
+          } else {
+            // Full mode - show everything
+            const all = section.querySelectorAll('.claim-card, .fact-table, .evidence-margin, .caveat-box');
+            all.forEach(el => el.style.display = 'block');
+          }
+        });
+      });
+    });
+
+    // Active nav link on scroll
+    const navLinks = document.querySelectorAll('.rail-links a');
+    const observerOptions = { rootMargin: '-20% 0px -80% 0px' };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => link.classList.remove('active'));
+          const activeLink = document.querySelector(`.rail-links a[href="#${entry.target.id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>

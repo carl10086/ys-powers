@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skill-share — Claude Skill 分发工具</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4xl);
+      margin-bottom: var(--space-3xl);
+      border: 1px solid var(--border);
+    }
+
+    .cover-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .cover-title {
+      font-family: var(--font-headline);
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--fg-1);
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .cover-summary {
+      font-size: 1.1rem;
+      color: var(--fg-2);
+      line-height: 1.7;
+      max-width: 640px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: var(--space-xl);
+      margin-top: var(--space-xl);
+      padding-top: var(--space-xl);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .meta-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      font-weight: 600;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+      color: var(--fg-2);
+      font-weight: 500;
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-lg);
+      background: var(--surface-container);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-3xl);
+      border: 1px solid var(--border);
+    }
+
+    .rail-title {
+      font-family: var(--font-headline);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .rail-nav {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .rail-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .rail-link:hover {
+      background: var(--surface-container-high);
+      border-color: var(--border-strong);
+      color: var(--fg-1);
+    }
+
+    .rail-link .num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      background: var(--surface-container-lowest);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-fixed);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-sm);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      letter-spacing: -0.01em;
+    }
+
+    .section-body {
+      color: var(--fg-2);
+      line-height: 1.7;
+    }
+
+    .section-body p {
+      margin-bottom: var(--space-lg);
+    }
+
+    .section-body ul, .section-body ol {
+      margin-bottom: var(--space-lg);
+      padding-left: var(--space-xl);
+    }
+
+    .section-body li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+    }
+
+    .claim-card-title {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .claim-card-body {
+      color: var(--fg-2);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Pipeline Steps */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin: var(--space-xl) 0;
+    }
+
+    .pipeline-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .pipeline-step:hover {
+      border-color: var(--outline-variant);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-xs);
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--fg-muted);
+    }
+
+    .step-arrow {
+      text-align: center;
+      color: var(--fg-muted);
+      font-size: 1.2rem;
+      padding: var(--space-xs) 0;
+    }
+
+    /* Capability Grid */
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .capability-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: all 0.2s ease;
+    }
+
+    .capability-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--outline-variant);
+    }
+
+    .capability-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--surface-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      font-size: 1.2rem;
+    }
+
+    .capability-title {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-xs);
+    }
+
+    .capability-desc {
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      line-height: 1.5;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: #0f0f0f;
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+      overflow-x: auto;
+    }
+
+    .code-block code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e6e6e6;
+      line-height: 1.6;
+    }
+
+    .code-prompt {
+      color: #33ff00;
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-left: 3px solid var(--primary);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .evidence-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+
+    .evidence-text {
+      color: var(--fg-2);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 0.9rem;
+    }
+
+    .fact-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--surface-container);
+      color: var(--fg-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Slack Integration Block */
+    .slack-block {
+      background: linear-gradient(135deg, #4A154B 0%, #611f69 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .slack-block-title {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .slack-block-body {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .slack-tools {
+      display: flex;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .slack-tool {
+      background: rgba(255,255,255,0.15);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    /* Relationship Map */
+    .relation-map {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .relation-title {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+    }
+
+    .relation-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .relation-item:last-child {
+      border-bottom: none;
+    }
+
+    .relation-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .relation-text {
+      flex: 1;
+      color: var(--fg-2);
+    }
+
+    .relation-tag {
+      font-size: 0.75rem;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      background: var(--surface-container);
+      color: var(--fg-muted);
+      white-space: nowrap;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-top: var(--space-3xl);
+    }
+
+    .question-panel-title {
+      font-family: var(--font-headline);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--space-lg);
+    }
+
+    .question-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .question-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .question-list li:last-child {
+      border-bottom: none;
+    }
+
+    .question-list .q-marker {
+      color: var(--primary);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-md);
+      }
+
+      .cover {
+        padding: var(--space-xl);
+      }
+
+      .cover-title {
+        font-size: 1.8rem;
+      }
+
+      .cover-header {
+        flex-direction: column;
+      }
+
+      .capability-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .rail-nav {
+        flex-direction: column;
+      }
+    }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Focus states */
+    a:focus, button:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover / Masthead -->
+    <header class="cover">
+      <div class="cover-header">
+        <h1 class="cover-title">skill-share</h1>
+        <span class="cover-badge">Claude Skill</span>
+      </div>
+      <p class="cover-summary">
+        创建新的 Claude Skill 并自动通过 Slack 分享给团队，实现 Skill 开发 → 验证 → 打包 → 通知的一体化流程。
+      </p>
+      <div class="cover-meta">
+        <div class="meta-item">
+          <span class="meta-label">来源</span>
+          <span class="meta-value">Composio / 社区</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">许可证</span>
+          <span class="meta-value">Apache 2.0</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">维护者</span>
+          <span class="meta-value">社区贡献</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">价值评估</span>
+          <span class="meta-value">中等 — 适合团队协作维护 Skill 库</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail">
+      <div class="rail-title">目录</div>
+      <div class="rail-nav">
+        <a href="#positioning" class="rail-link"><span class="num">01</span> 定位</a>
+        <a href="#triggers" class="rail-link"><span class="num">02</span> 触发时机</a>
+        <a href="#capabilities" class="rail-link"><span class="num">03</span> 核心能力</a>
+        <a href="#workflow" class="rail-link"><span class="num">04</span> 指令流程</a>
+        <a href="#slack" class="rail-link"><span class="num">05</span> Slack 集成</a>
+        <a href="#example" class="rail-link"><span class="num">06</span> 使用示例</a>
+        <a href="#relation" class="rail-link"><span class="num">07</span> 与 ys-powers 关联</a>
+      </div>
+    </nav>
+
+    <!-- Section 1: Positioning -->
+    <section class="body-section" id="positioning">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2 class="section-title">定位</h2>
+      </div>
+      <div class="section-body">
+        <p>skill-share 是一个 Claude Skill 分发工具，它将 Skill 创建、结构验证、自动打包和团队通知整合为一条完整的流水线。它的核心目标是消除 Skill 开发完成后分发到团队的 friction，让 Skill 从"本地可用"变为"团队共享"的过程完全自动化。</p>
+
+        <div class="evidence-margin">
+          <div class="evidence-label">核心承诺</div>
+          <div class="evidence-text">"创建 Skill 后，一条命令完成验证、打包、通知 —— 团队成员即刻可用。"</div>
+        </div>
+
+        <p>与仅用于本地个人使用的 Skill 不同，skill-share 假设 Skill 是需要团队协作维护的资产。它通过标准化的目录结构、自动化的质量检查和即时通讯集成，确保分发的 Skill 符合团队规范且触达率最大化。</p>
+      </div>
+    </section>
+
+    <!-- Section 2: Triggers -->
+    <section class="body-section" id="triggers">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2 class="section-title">触发时机</h2>
+      </div>
+      <div class="section-body">
+        <p>以下场景适合使用 skill-share：</p>
+
+        <div class="claim-card">
+          <div class="claim-card-title">
+            <span style="color: var(--green);">&#10003;</span> 适用场景
+          </div>
+          <div class="claim-card-body">
+            <ul>
+              <li>创建新 Skill 后需要分发给团队成员时</li>
+              <li>需要验证 Skill 结构是否符合规范时</li>
+              <li>希望将 Skill 打包为可分发格式（zip）时</li>
+              <li>需要自动化 Skill 开发和团队通知流程时</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-card-title">
+            <span style="color: var(--red);">&#10007;</span> 不适用场景
+          </div>
+          <div class="claim-card-body">
+            <p>Skill 仅个人使用、无需团队协作时 —— 此时额外的验证和通知步骤是不必要的 overhead。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Capabilities -->
+    <section class="body-section" id="capabilities">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2 class="section-title">核心能力</h2>
+      </div>
+      <div class="section-body">
+        <p>skill-share 提供四项核心能力，覆盖 Skill 从创建到分发的全生命周期：</p>
+
+        <div class="capability-grid">
+          <div class="capability-card">
+            <div class="capability-icon">&#128196;</div>
+            <div class="capability-title">Skill 创建</div>
+            <div class="capability-desc">自动生成标准目录结构（SKILL.md、scripts/、references/、assets/）和 YAML frontmatter</div>
+          </div>
+          <div class="capability-card">
+            <div class="capability-icon">&#9989;</div>
+            <div class="capability-title">结构验证</div>
+            <div class="capability-desc">检查 SKILL.md 格式、必填字段和命名规范（hyphen-case）</div>
+          </div>
+          <div class="capability-card">
+            <div class="capability-icon">&#128230;</div>
+            <div class="capability-title">自动打包</div>
+            <div class="capability-desc">生成包含所有资源和文档的可分发 zip 文件</div>
+          </div>
+          <div class="capability-card">
+            <div class="capability-icon">&#128172;</div>
+            <div class="capability-title">Slack 集成</div>
+            <div class="capability-desc">通过 Rube 自动将 Skill 信息发送到指定 Slack 频道</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Workflow -->
+    <section class="body-section" id="workflow">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2 class="section-title">指令流程概览</h2>
+      </div>
+      <div class="section-body">
+        <p>skill-share 的执行流程分为五个阶段，形成完整的 Skill 分发流水线：</p>
+
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <div class="step-icon">1</div>
+            <div class="step-content">
+              <div class="step-title">初始化</div>
+              <div class="step-desc">提供 Skill 名称和描述，触发创建流程</div>
+            </div>
+          </div>
+          <div class="step-arrow">&#8595;</div>
+          <div class="pipeline-step">
+            <div class="step-icon">2</div>
+            <div class="step-content">
+              <div class="step-title">创建</div>
+              <div class="step-desc">生成标准 Skill 目录结构，包括 SKILL.md 模板和必要的子目录</div>
+            </div>
+          </div>
+          <div class="step-arrow">&#8595;</div>
+          <div class="pipeline-step">
+            <div class="step-icon">3</div>
+            <div class="step-content">
+              <div class="step-title">验证</div>
+              <div class="step-desc">检查元数据完整性和命名规范，确保符合团队标准</div>
+            </div>
+          </div>
+          <div class="step-arrow">&#8595;</div>
+          <div class="pipeline-step">
+            <div class="step-icon">4</div>
+            <div class="step-content">
+              <div class="step-title">打包</div>
+              <div class="step-desc">创建 zip 分发包，包含所有相关资源和文档</div>
+            </div>
+          </div>
+          <div class="step-arrow">&#8595;</div>
+          <div class="pipeline-step">
+            <div class="step-icon">5</div>
+            <div class="step-content">
+              <div class="step-title">通知</div>
+              <div class="step-desc">通过 Slack 向团队发送 Skill 创建通知，附带元数据和下载链接</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Slack Integration -->
+    <section class="body-section" id="slack">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Slack 集成能力</h2>
+      </div>
+      <div class="section-body">
+        <p>skill-share 通过 Rube 平台调用 Slack API 实现团队通知，支持三种核心操作：</p>
+
+        <div class="slack-block">
+          <div class="slack-block-title">&#128172; Slack 工具集</div>
+          <div class="slack-block-body">
+            通过 Rube 调用以下工具实现自动化通知：
+          </div>
+          <div class="slack-tools">
+            <span class="slack-tool">SLACK_SEND_MESSAGE</span>
+            <span class="slack-tool">SLACK_POST_MESSAGE_WITH_BLOCKS</span>
+            <span class="slack-tool">SLACK_FIND_CHANNELS</span>
+          </div>
+        </div>
+
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>工具</th>
+              <th>用途</th>
+              <th>触发时机</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>SLACK_SEND_MESSAGE</code></td>
+              <td>发送 Skill 基本信息</td>
+              <td>Skill 创建完成后</td>
+            </tr>
+            <tr>
+              <td><code>SLACK_POST_MESSAGE_WITH_BLOCKS</code></td>
+              <td>分享格式化的 Skill 元数据</td>
+              <td>需要富文本展示时</td>
+            </tr>
+            <tr>
+              <td><code>SLACK_FIND_CHANNELS</code></td>
+              <td>发现目标频道</td>
+              <td>首次配置或频道变更时</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 6: Example -->
+    <section class="body-section" id="example">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2 class="section-title">使用示例</h2>
+      </div>
+      <div class="section-body">
+        <p>以下示例展示创建名为 "pdf-analyzer" 的 Skill 的完整流程：</p>
+
+        <div class="code-block">
+          <code><span class="code-prompt">user:</span> Create a skill called "pdf-analyzer"</code>
+        </div>
+
+        <p>执行流程：</p>
+        <ol>
+          <li>创建 <code>/skill-pdf-analyzer/</code> 目录</li>
+          <li>生成 SKILL.md 模板，包含标准 YAML frontmatter</li>
+          <li>创建 <code>scripts/</code>、<code>references/</code>、<code>assets/</code> 子目录</li>
+          <li>验证结构：检查必填字段、命名规范（hyphen-case）</li>
+          <li>打包为 zip：包含所有资源和文档</li>
+          <li>Slack 通知："New Skill Created: pdf-analyzer — Advanced PDF analysis capabilities"</li>
+        </ol>
+
+        <div class="evidence-margin">
+          <div class="evidence-label">输出示例</div>
+          <div class="evidence-text">Slack 通知将包含 Skill 名称、描述、创建者、打包文件链接和快速安装指令。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Relation to ys-powers -->
+    <section class="body-section" id="relation">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2 class="section-title">与 ys-powers 的关联</h2>
+      </div>
+      <div class="section-body">
+        <p>skill-share 与 ys-powers 项目存在以下关联，为 Skill 库的团队协作维护提供参考：</p>
+
+        <div class="relation-map">
+          <div class="relation-title">关系图谱</div>
+
+          <div class="relation-item">
+            <div class="relation-dot"></div>
+            <div class="relation-text">
+              <strong>与 skill-creator 的关系</strong><br>
+              skill-creator 是「Skill 开发指南」，skill-share 是「Skill 分发工具」。两者配套使用：先用 skill-creator 设计，再用 skill-share 分发
+            </div>
+            <span class="relation-tag">配套使用</span>
+          </div>
+
+          <div class="relation-item">
+            <div class="relation-dot"></div>
+            <div class="relation-text">
+              <strong>借鉴价值</strong><br>
+              其「创建 → 验证 → 打包 → 通知」的流水线是任何内部工具分发流程的参考模板
+            </div>
+            <span class="relation-tag">流程模板</span>
+          </div>
+
+          <div class="relation-item">
+            <div class="relation-dot"></div>
+            <div class="relation-text">
+              <strong>搬运建议</strong><br>
+              中等价值。适合需要团队协作维护 Skill 库的组织。依赖 Rube/Slack 集成
+            </div>
+            <span class="relation-tag">中等优先级</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <div class="question-panel-title">评估清单</div>
+      <ul class="question-list">
+        <li><span class="q-marker">Q1</span> 你的团队是否已有 Slack 工作区用于技术通知？</li>
+        <li><span class="q-marker">Q2</span> 团队是否维护超过 5 个共享 Claude Skills？</li>
+        <li><span class="q-marker">Q3</span> 当前 Skill 分发是否存在"手动复制粘贴"的 friction？</li>
+        <li><span class="q-marker">Q4</span> 是否已有 Rube 或类似的内部自动化平台？</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

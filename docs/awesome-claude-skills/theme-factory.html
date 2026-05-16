@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>theme-factory - 主题工厂</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-4xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      margin-bottom: var(--space-5xl);
+      padding-bottom: var(--space-4xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      background: var(--primary-fixed);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin-bottom: var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .deck {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-width: 640px;
+      margin-bottom: var(--space-xl);
+    }
+
+    .meta-line {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+      display: flex;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .meta-line span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-4xl);
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .reader-rail button {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      padding: var(--space-sm) var(--space-lg);
+      border: 1px solid var(--border);
+      background: var(--surface-container-lowest);
+      color: var(--fg-2);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .reader-rail button:hover {
+      background: var(--surface-container);
+      border-color: var(--outline-variant);
+    }
+
+    .reader-rail button.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-accent);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-5xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: var(--space-3xl) 0 var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-lg);
+      color: var(--fg-2);
+      line-height: 1.7;
+    }
+
+    .body-section ul, .body-section ol {
+      margin: var(--space-lg) 0 var(--space-xl) var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-md);
+      line-height: 1.6;
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .claim-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .claim-card .claim-number {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+
+    .claim-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--fg-1);
+    }
+
+    .claim-card p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* Theme Grid */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .theme-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+
+    .theme-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .theme-swatch {
+      height: 48px;
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
+      display: flex;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .theme-swatch .swatch-1 { flex: 2; }
+    .theme-swatch .swatch-2 { flex: 1; }
+    .theme-swatch .swatch-3 { flex: 1; }
+
+    .theme-card h4 {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--fg-1);
+    }
+
+    .theme-card p {
+      font-size: 13px;
+      color: var(--fg-muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Pull Quote */
+    .pull-quote {
+      border-left: 3px solid var(--primary);
+      padding-left: var(--space-xl);
+      margin: var(--space-2xl) 0;
+      font-style: italic;
+      color: var(--fg-2);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+    }
+
+    .pull-quote cite {
+      display: block;
+      margin-top: var(--space-sm);
+      font-style: normal;
+      font-size: 13px;
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .evidence-margin h4 {
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--fg-1);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .evidence-margin h4::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .evidence-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .evidence-item:last-child {
+      border-bottom: none;
+    }
+
+    .evidence-label {
+      color: var(--fg-2);
+    }
+
+    .evidence-value {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: linear-gradient(135deg, var(--primary-fixed) 0%, #fff5f0 100%);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .caveat-box h4 {
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .caveat-box p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--fg-2);
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin-top: var(--space-4xl);
+    }
+
+    .question-panel h3 {
+      font-family: var(--font-headline);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      margin-top: 0;
+    }
+
+    .question-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .question-list li {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .question-list li:last-child {
+      border-bottom: none;
+    }
+
+    .question-list .q-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 600;
+      min-width: 24px;
+      padding-top: 2px;
+    }
+
+    .question-list .q-text {
+      font-size: 14px;
+      color: var(--fg-2);
+      line-height: 1.5;
+    }
+
+    /* Source Spread */
+    .source-spread {
+      margin-top: var(--space-4xl);
+      padding-top: var(--space-2xl);
+      border-top: 1px solid var(--border-strong);
+    }
+
+    .source-spread h3 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .source-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    .source-meta dt {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xs);
+      color: var(--fg-2);
+    }
+
+    .source-meta dd {
+      margin: 0;
+    }
+
+    /* Flow Steps */
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
+
+    .step-number {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .step-content h4 {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--fg-1);
+    }
+
+    .step-content p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--fg-2);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-2xl) var(--space-lg);
+      }
+
+      .theme-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .reader-rail {
+        padding-bottom: var(--space-sm);
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .theme-card, .claim-card {
+        transition: none;
+      }
+      .theme-card:hover {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover / Masthead -->
+    <header class="cover">
+      <span class="cover-badge">Skill</span>
+      <h1>theme-factory</h1>
+      <p class="deck">为幻灯片、文档、报告或 HTML 页面应用专业字体与配色主题的工具包。内置 10 套预设主题，每套包含协调的调色板和字体搭配，支持一键应用与自定义主题生成。</p>
+      <div class="meta-line">
+        <span>来源: awesome-claude-skills</span>
+        <span>维护: Composio / 社区</span>
+        <span>许可: Apache 2.0</span>
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail" role="tablist" aria-label="阅读模式">
+      <button class="active" role="tab" aria-selected="true">完整概览</button>
+      <button role="tab" aria-selected="false">主题库</button>
+      <button role="tab" aria-selected="false">使用流程</button>
+      <button role="tab" aria-selected="false">关联分析</button>
+    </nav>
+
+    <!-- Body: Positioning -->
+    <section class="body-section">
+      <h2>定位与触发时机</h2>
+      <p>theme-factory 是一个视觉风格配置工具，专注于为各类文档和演示材料快速应用标准化的设计系统。它在以下场景发挥价值：</p>
+      <div class="claim-card">
+        <div class="claim-number">适用场景</div>
+        <h4>何时使用 theme-factory</h4>
+        <ul>
+          <li>需要统一多份文档或幻灯片的视觉风格时</li>
+          <li>创建演示文稿希望快速应用专业配色时</li>
+          <li>需要为不同受众（商务、创意、学术）选择合适视觉风格时</li>
+          <li>现有主题都不满足需求，需要生成自定义主题时</li>
+        </ul>
+      </div>
+      <div class="caveat-box">
+        <h4>不适用场景</h4>
+        <p>当已有明确品牌规范且需严格遵守时（如 Anthropic 品牌物料），应使用 <strong>brand-guidelines</strong> 而非 theme-factory。前者是「约束」，后者是「选择」。</p>
+      </div>
+    </section>
+
+    <!-- Body: Core Capabilities -->
+    <section class="body-section">
+      <h2>核心能力</h2>
+
+      <h3>10 套预设主题</h3>
+      <p>涵盖多种视觉风格，从专业冷静到温暖鲜明，从极简现代到戏剧感强：</p>
+
+      <div class="theme-grid">
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #0a2540;"></div>
+            <div class="swatch-2" style="background: #00d4aa;"></div>
+            <div class="swatch-3" style="background: #e0e7ff;"></div>
+          </div>
+          <h4>Ocean Depths</h4>
+          <p>海洋深蓝，专业冷静</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #ff6b35;"></div>
+            <div class="swatch-2" style="background: #f7c59f;"></div>
+            <div class="swatch-3" style="background: #2ec4b6;"></div>
+          </div>
+          <h4>Sunset Boulevard</h4>
+          <p>暖色活力，温暖鲜明</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #2d5016;"></div>
+            <div class="swatch-2" style="background: #87a878;"></div>
+            <div class="swatch-3" style="background: #e9f5db;"></div>
+          </div>
+          <h4>Forest Canopy</h4>
+          <p>自然大地色，沉稳 grounded</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #f5f5f5;"></div>
+            <div class="swatch-2" style="background: #333333;"></div>
+            <div class="swatch-3" style="background: #e0e0e0;"></div>
+          </div>
+          <h4>Modern Minimalist</h4>
+          <p>灰度极简，干净现代</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #d4a373;"></div>
+            <div class="swatch-2" style="background: #faedcd;"></div>
+            <div class="swatch-3" style="background: #ccd5ae;"></div>
+          </div>
+          <h4>Golden Hour</h4>
+          <p>秋意浓，丰富温暖</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #e0fbfc;"></div>
+            <div class="swatch-2" style="background: #98c1d9;"></div>
+            <div class="swatch-3" style="background: #3d5a80;"></div>
+          </div>
+          <h4>Arctic Frost</h4>
+          <p>冷色 crisp，冬感清爽</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #d8a7b1;"></div>
+            <div class="swatch-2" style="background: #b6e2d3;"></div>
+            <div class="swatch-3" style="background: #fae1dd;"></div>
+          </div>
+          <h4>Desert Rose</h4>
+          <p>柔粉 dusty，精致优雅</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #0a0a0a;"></div>
+            <div class="swatch-2" style="background: #00f5ff;"></div>
+            <div class="swatch-3" style="background: #ff003c;"></div>
+          </div>
+          <h4>Tech Innovation</h4>
+          <p>Bold 科技，现代 bold</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #606c38;"></div>
+            <div class="swatch-2" style="background: #fefae0;"></div>
+            <div class="swatch-3" style="background: #dda15e;"></div>
+          </div>
+          <h4>Botanical Garden</h4>
+          <p>清新有机，花园色调</p>
+        </div>
+
+        <div class="theme-card">
+          <div class="theme-swatch">
+            <div class="swatch-1" style="background: #0b0d17;"></div>
+            <div class="swatch-2" style="background: #7b2cbf;"></div>
+            <div class="swatch-3" style="background: #e0aaff;"></div>
+          </div>
+          <h4>Midnight Galaxy</h4>
+          <p>深邃宇宙，戏剧感强</p>
+        </div>
+      </div>
+
+      <div class="pull-quote">
+        "展示 → 选择 → 应用" 的三步流程是任何「样式配置」功能的通用模式，值得在类似工具中借鉴。
+        <cite>—— 与 ys-powers 的关联分析</cite>
+      </div>
+
+      <h3>其他核心能力</h3>
+      <div class="claim-card">
+        <div class="claim-number">能力 2</div>
+        <h4>主题展示</h4>
+        <p>通过 <code>theme-showcase.pdf</code> 直观展示所有主题效果，让用户在决策前充分预览。</p>
+      </div>
+      <div class="claim-card">
+        <div class="claim-number">能力 3</div>
+        <h4>一键应用</h4>
+        <p>选中主题后自动将配色和字体统一到整个 artifact，无需手动调整每个元素。</p>
+      </div>
+      <div class="claim-card">
+        <div class="claim-number">能力 4</div>
+        <h4>自定义主题</h4>
+        <p>基于用户描述生成新的配色和字体组合，扩展预设库无法覆盖的个性化需求。</p>
+      </div>
+    </section>
+
+    <!-- Body: Workflow -->
+    <section class="body-section">
+      <h2>指令流程概览</h2>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>展示主题库</h4>
+            <p>向用户展示 <code>theme-showcase.pdf</code>，呈现全部 10 套预设主题的视觉效果</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>获取选择</h4>
+            <p>询问用户偏好哪个主题，或根据受众特征推荐合适选项</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>等待确认</h4>
+            <p>获得明确的主题选择，避免假设或默认应用</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>应用主题</h4>
+            <p>读取对应主题文件并统一应用到 artifact，完成视觉风格配置</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Body: ys-powers Relations -->
+    <section class="body-section">
+      <h2>与 ys-powers 的关联</h2>
+
+      <div class="evidence-margin">
+        <h4>关系图谱</h4>
+        <div class="evidence-item">
+          <span class="evidence-label">brand-guidelines</span>
+          <span class="evidence-value">约束 vs 选择</span>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-label">canvas-design</span>
+          <span class="evidence-value">原创艺术 vs 标准化系统</span>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-label">通用模式价值</span>
+          <span class="evidence-value">展示→选择→应用</span>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-label">搬运建议</span>
+          <span class="evidence-value">中等价值</span>
+        </div>
+      </div>
+
+      <h3>详细分析</h3>
+      <p><strong>与 brand-guidelines 的关系：</strong>brand-guidelines 强制执行特定品牌规范（如 Anthropic），theme-factory 提供灵活的视觉风格选择。前者是「约束」，后者是「选择」。两者互补而非替代。</p>
+      <p><strong>与 canvas-design 的关系：</strong>canvas-design 创作原创视觉艺术，theme-factory 应用标准化设计系统。前者解决「从无到有」的创意需求，后者解决「从乱到整」的统一需求。</p>
+      <p><strong>借鉴价值：</strong>其「展示 → 选择 → 应用」的三步流程是任何「样式配置」功能的通用模式。无论是主题选择、模板应用还是配置向导，都可以采用这一交互范式。</p>
+      <p><strong>搬运建议：</strong>中等价值。适合需要频繁创建演示文稿或文档的团队。注意 theme 定义依赖 <code>themes/</code> 目录下的具体文件，迁移时需同步处理资源依赖。</p>
+    </section>
+
+    <!-- Question Panel -->
+    <section class="question-panel">
+      <h3>评估清单</h3>
+      <ol class="question-list">
+        <li>
+          <span class="q-num">01</span>
+          <span class="q-text">团队是否经常需要为不同受众创建多份风格各异的文档或演示？</span>
+        </li>
+        <li>
+          <span class="q-num">02</span>
+          <span class="q-text">现有工作流中是否存在「每次从零设计配色」的重复劳动？</span>
+        </li>
+        <li>
+          <span class="q-num">03</span>
+          <span class="q-text">是否有明确的主题资源目录（<code>themes/</code>）可供管理和扩展？</span>
+        </li>
+        <li>
+          <span class="q-num">04</span>
+          <span class="q-text">是否需要自定义主题生成能力，还是预设主题已足够覆盖场景？</span>
+        </li>
+        <li>
+          <span class="q-num">05</span>
+          <span class="q-text">与 brand-guidelines 的边界是否清晰——何时强制品牌，何时灵活选择？</span>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Source Spread -->
+    <section class="source-spread">
+      <h3>元信息</h3>
+      <dl class="source-meta">
+        <div>
+          <dt>来源</dt>
+          <dd>refer/awesome-claude-skills/theme-factory/SKILL.md</dd>
+        </div>
+        <div>
+          <dt>维护者</dt>
+          <dd>Composio / 社区</dd>
+        </div>
+        <div>
+          <dt>许可证</dt>
+          <dd>Apache 2.0（详见 LICENSE.txt）</dd>
+        </div>
+        <div>
+          <dt>生成日期</dt>
+          <dd>2026-05-17</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <script>
+    // Simple reading mode toggle
+    const tabs = document.querySelectorAll('.reader-rail button');
+    const sections = document.querySelectorAll('.body-section');
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        // Smooth scroll to corresponding section
+        if (sections[index]) {
+          sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
