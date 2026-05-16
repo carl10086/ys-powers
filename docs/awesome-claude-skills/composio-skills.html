@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Composio Skills — 跨平台自动化集成指南</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Document Shell */
+    .document-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-2xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      padding: var(--space-5xl) 0;
+      border-bottom: 1px solid var(--border-strong);
+      margin-bottom: var(--space-4xl);
+    }
+
+    .cover-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin-bottom: var(--space-xl);
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .deck {
+      font-size: 1.15rem;
+      color: var(--fg-2);
+      max-width: 640px;
+      line-height: 1.6;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .meta-line {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      flex-wrap: wrap;
+    }
+
+    .meta-line span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      position: sticky;
+      top: var(--space-2xl);
+      align-self: start;
+    }
+
+    .rail-title {
+      font-family: var(--font-headline);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .rail-nav {
+      list-style: none;
+    }
+
+    .rail-nav li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .rail-nav a {
+      display: block;
+      padding: var(--space-sm) var(--space-md);
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 0.875rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .rail-nav a:hover {
+      background: var(--surface-container);
+      color: var(--fg-1);
+    }
+
+    .rail-nav a.active {
+      background: var(--surface-container-high);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* Body Section */
+    .body-section {
+      margin-bottom: var(--space-5xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: var(--space-3xl) 0 var(--space-lg);
+      color: var(--fg-1);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-lg);
+      color: var(--fg-2);
+    }
+
+    .body-section ul, .body-section ol {
+      margin-left: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Claim Card */
+    .claim-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .claim-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--primary);
+    }
+
+    /* Code Blocks */
+    pre {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      color: var(--fg-1);
+      margin: var(--space-lg) 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      background: var(--surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 0.875rem;
+    }
+
+    .fact-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--surface-container);
+      font-weight: 600;
+      color: var(--fg-1);
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+      vertical-align: top;
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container-low);
+      border-left: 3px solid var(--primary);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .evidence-margin p {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--fg-1);
+    }
+
+    .evidence-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      margin-top: var(--space-sm);
+    }
+
+    /* Caveat Box */
+    .caveat-box {
+      background: linear-gradient(135deg, var(--surface-container) 0%, var(--surface-container-low) 100%);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+    }
+
+    .caveat-box h4 {
+      font-family: var(--font-headline);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--yellow);
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* App Category Grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .category-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: all 0.2s ease;
+    }
+
+    .category-card:hover {
+      border-color: var(--outline-variant);
+      box-shadow: var(--shadow-md);
+    }
+
+    .category-card h4 {
+      font-family: var(--font-headline);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--fg-1);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .category-card ul {
+      list-style: none;
+      margin: 0;
+      font-size: 0.8125rem;
+    }
+
+    .category-card li {
+      padding: var(--space-xs) 0;
+      color: var(--fg-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category-card li:last-child {
+      border-bottom: none;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      margin-top: var(--space-5xl);
+    }
+
+    .question-panel h3 {
+      margin-top: 0;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .question-item {
+      padding: var(--space-lg);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .question-item strong {
+      color: var(--primary);
+      font-size: 0.875rem;
+    }
+
+    .question-item p {
+      margin: var(--space-sm) 0 0;
+      font-size: 0.8125rem;
+      color: var(--fg-muted);
+    }
+
+    /* Search */
+    .search-bar {
+      position: relative;
+      margin-bottom: var(--space-3xl);
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: var(--space-md) var(--space-lg);
+      padding-left: 40px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-pill);
+      background: var(--surface-container);
+      color: var(--fg-1);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(160, 59, 0, 0.1);
+    }
+
+    .search-bar::before {
+      content: "🔍";
+      position: absolute;
+      left: var(--space-lg);
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.5;
+    }
+
+    /* Two Column Layout */
+    .two-column {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: var(--space-4xl);
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+
+      .reader-rail {
+        position: relative;
+        top: 0;
+        order: -1;
+      }
+
+      .rail-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+      }
+
+      .rail-nav li {
+        margin: 0;
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .reader-rail { display: none; }
+      .document-shell { max-width: none; }
+      .cover { padding: 24px 0; }
+      body { background: white; color: black; }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+
+    /* Highlight for search */
+    .highlight {
+      background: var(--primary-fixed);
+      color: var(--primary);
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover -->
+    <header class="cover">
+      <div class="cover-label">Integration Guide / 800+ SaaS Connectors</div>
+      <h1>Composio Skills</h1>
+      <p class="deck">
+        通过 Rube MCP 将 Claude 连接到 800+ SaaS 应用，实现跨 CRM、项目管理、
+        邮件、代码托管、社交媒体等业务系统的自动化操作。
+      </p>
+      <div class="meta-line">
+        <span>📋 技术文档</span>
+        <span>⏱ 阅读约 6 分钟</span>
+        <span>🔧 MCP 集成</span>
+        <span>📡 832 个子技能</span>
+      </div>
+    </header>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="搜索应用、工具或工作流..." />
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="two-column">
+      <!-- Reader Rail -->
+      <nav class="reader-rail">
+        <div class="rail-title">目录</div>
+        <ul class="rail-nav">
+          <li><a href="#positioning" class="active">定位与触发</a></li>
+          <li><a href="#capabilities">核心能力</a></li>
+          <li><a href="#workflow">通用工作流</a></li>
+          <li><a href="#pitfalls">已知陷阱</a></li>
+          <li><a href="#applications">应用分类</a></li>
+          <li><a href="#relation">与 ys-powers 关联</a></li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <main id="content">
+        <!-- Positioning -->
+        <section class="body-section" id="positioning">
+          <h2>定位与触发时机</h2>
+          <p>
+            Composio Skills 是一套通过 Rube MCP（Composio 的 MCP 实现）将 Claude
+            连接到外部业务系统的自动化技能集。它覆盖了 800+ SaaS 应用，
+            让 Claude 能够执行具体的业务操作而非仅仅提供建议。
+          </p>
+
+          <div class="evidence-margin">
+            <p>"每个子 skill 的能力本质相同，只是目标应用不同：工具发现、连接管理、工具执行、会话复用。"</p>
+            <div class="evidence-label">核心设计原则</div>
+          </div>
+
+          <h3>适用场景</h3>
+          <ul>
+            <li>需要将 Claude 与外部业务系统（Salesforce、Slack、GitHub、Gmail 等）集成时</li>
+            <li>需要自动化执行「创建 Issue、发送邮件、更新客户记录」等具体操作时</li>
+            <li>已有 Composio / Rube MCP 连接，需要按最佳实践编排工具调用时</li>
+          </ul>
+
+          <div class="caveat-box">
+            <h4>⚠️ 不适用场景</h4>
+            <p>无 Composio 账号、或目标应用不在 Composio 支持列表中时，不应使用此技能集。需先配置 Rube MCP（<code>https://rube.app/mcp</code>）。</p>
+          </div>
+        </section>
+
+        <!-- Core Capabilities -->
+        <section class="body-section" id="capabilities">
+          <h2>核心能力</h2>
+          <p>所有 composio-skills 遵循同一套能力模型，差异仅在于目标应用不同：</p>
+
+          <div class="claim-card">
+            <h4>1. 工具发现 (RUBE_SEARCH_TOOLS)</h4>
+            <p>动态查询目标应用的可用工具、输入 schema 和执行建议。工具 schema 会变化，<strong>永远不要硬编码</strong> tool slug 或参数。</p>
+          </div>
+
+          <div class="claim-card">
+            <h4>2. 连接管理 (RUBE_MANAGE_CONNECTIONS)</h4>
+            <p>建立和管理与目标应用的 OAuth 连接。执行前必须确认连接状态为 ACTIVE。</p>
+          </div>
+
+          <div class="claim-card">
+            <h4>3. 工具执行 (RUBE_MULTI_EXECUTE_TOOL)</h4>
+            <p>调用具体工具完成业务操作。必须包含 <code>memory</code> 参数，即使为空 <code>{}</code>。</p>
+          </div>
+
+          <div class="claim-card">
+            <h4>4. 会话复用</h4>
+            <p>在同一个工作流中复用 session ID，减少重复认证。新工作流再生成新 ID。</p>
+          </div>
+        </section>
+
+        <!-- Workflow -->
+        <section class="body-section" id="workflow">
+          <h2>通用工作流模式</h2>
+          <p>所有 composio-skills 遵循同一套三段式工作流：</p>
+
+          <h3>Step 1: 发现工具</h3>
+          <pre><code>RUBE_SEARCH_TOOLS
+queries: [{use_case: "your specific task", known_fields: ""}]
+session: {generate_id: true}</code></pre>
+          <p>返回可用工具 slug、输入 schema、推荐执行计划和已知陷阱。</p>
+
+          <h3>Step 2: 检查连接</h3>
+          <pre><code>RUBE_MANAGE_CONNECTIONS
+toolkits: ["target-app-name"]
+session_id: "your_session_id"</code></pre>
+          <p>确认连接状态为 ACTIVE，如未激活则按返回的授权链接完成设置。</p>
+
+          <h3>Step 3: 执行操作</h3>
+          <pre><code>RUBE_MULTI_EXECUTE_TOOL
+tools: [{
+  tool_slug: "TOOL_SLUG_FROM_SEARCH",
+  arguments: {/* schema-compliant args */}
+}]
+memory: {}
+session_id: "your_session_id"</code></pre>
+        </section>
+
+        <!-- Pitfalls -->
+        <section class="body-section" id="pitfalls">
+          <h2>已知陷阱（通用）</h2>
+          <table class="fact-table">
+            <thead>
+              <tr>
+                <th>陷阱</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>必须先搜索</strong></td>
+                <td>工具 schema 会变，永远不要硬编码 tool slug 或参数</td>
+              </tr>
+              <tr>
+                <td><strong>检查连接状态</strong></td>
+                <td>执行前确认 RUBE_MANAGE_CONNECTIONS 返回 ACTIVE</td>
+              </tr>
+              <tr>
+                <td><strong>Schema 合规</strong></td>
+                <td>使用搜索返回的精确字段名和类型</td>
+              </tr>
+              <tr>
+                <td><strong>Memory 参数</strong></td>
+                <td>RUBE_MULTI_EXECUTE_TOOL 必须包含 memory，即使为空 {}</td>
+              </tr>
+              <tr>
+                <td><strong>Session 复用</strong></td>
+                <td>同一工作流复用 session ID，新工作流再生成新 ID</td>
+              </tr>
+              <tr>
+                <td><strong>分页处理</strong></td>
+                <td>检查响应中的分页 token，继续获取直到完整</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Applications -->
+        <section class="body-section" id="applications">
+          <h2>应用分类与代表性示例</h2>
+          <p>832 个子 skill 按业务领域分布如下：</p>
+
+          <div class="category-grid">
+            <div class="category-card">
+              <h4>🎯 CRM & 销售</h4>
+              <ul>
+                <li>salesforce-* — 对象管理、记录操作、SOQL 查询</li>
+                <li>zoho-* — Leads、Contacts、Deals、Accounts</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>📊 项目管理</h4>
+              <ul>
+                <li>atlassian-automation — Jira / Confluence</li>
+                <li>asana-automation — Tasks、Projects</li>
+                <li>notion-automation — Pages、Databases</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>💬 沟通协作</h4>
+              <ul>
+                <li>slackbot-automation — Messages、Channels</li>
+                <li>discordbot-automation — Servers、Roles</li>
+                <li>webex-automation — Meetings、Messages</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>📧 邮件营销</h4>
+              <ul>
+                <li>gmail-automation — Send / Reply、Search</li>
+                <li>mailchimp-automation — Audiences、Campaigns</li>
+                <li>sendgrid-automation — Templates、Contacts</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>⚙️ 代码 & DevOps</h4>
+              <ul>
+                <li>github-automation — Issues、PRs、Actions</li>
+                <li>gitlab-automation — MRs、Pipelines</li>
+                <li>vercel-automation — Deployments、Domains</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>☁️ 存储 & 文件</h4>
+              <ul>
+                <li>googledrive-automation — Upload、Download、Share</li>
+                <li>dropbox-sign-automation — Sign requests</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>🗄️ 电子表格 & 数据库</h4>
+              <ul>
+                <li>baserow-automation — Tables、Rows、Fields</li>
+                <li>influxdb-cloud-automation — Metrics、Queries</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>📅 日历 & 日程</h4>
+              <ul>
+                <li>googlecalendar-automation — Events、Attendees</li>
+                <li>calendarhero-automation — Bookings、Availability</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>🌐 社交媒体</h4>
+              <ul>
+                <li>twitter-automation — Tweets、Search、Users</li>
+                <li>youtube-automation — Videos、Playlists</li>
+                <li>twitch-automation — Streams、Clips</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>🛒 电商 & 支付</h4>
+              <ul>
+                <li>amazon-automation — Products、Orders</li>
+                <li>stripe-automation — Charges、Subscriptions</li>
+                <li>lemon-squeezy-automation — Products、Orders</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>🎨 设计 & 文档</h4>
+              <ul>
+                <li>documenso-automation — Documents、Signatures</li>
+                <li>zeplin-automation — Designs、Screens</li>
+                <li>visme-automation — Presentations</li>
+              </ul>
+            </div>
+
+            <div class="category-card">
+              <h4>🤖 AI & 内容</h4>
+              <ul>
+                <li>elevenlabs-automation — Voice synthesis</li>
+                <li>deepgram-automation — Speech-to-text</li>
+                <li>apify-automation — Web scraping</li>
+                <li>anthropic-* — API 管理</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Relation -->
+        <section class="body-section" id="relation">
+          <h2>与 ys-powers 的关联</h2>
+
+          <div class="evidence-margin">
+            <p>"ys-powers 目前无任何外部 SaaS 集成 skill。composio-skills 提供了现成的「连接层」能力，可直接补全这一空白。"</p>
+            <div class="evidence-label">集成价值评估</div>
+          </div>
+
+          <h3>借鉴价值</h3>
+          <p>
+            其「搜索 → 连接 → 执行」的三段式 MCP 调用模式是通用的工具使用最佳实践，
+            可复用到任何 MCP Server 的调用场景中。
+          </p>
+
+          <h3>搬运建议</h3>
+          <p>
+            搬运价值有限——子 skill 数量过多（800+）且高度同质化。
+            更合理的做法是：在 ys-powers 中创建一个通用的「Composio MCP 使用指南」skill，
+            而非搬运每个子 skill。
+          </p>
+
+          <div class="caveat-box">
+            <h4>📋 元信息</h4>
+            <p><strong>来源：</strong>refer/awesome-claude-skills/composio-skills/（800+ 子目录）</p>
+            <p><strong>维护者：</strong>Composio</p>
+            <p><strong>许可证：</strong>各子 skill 可能不同，以目录内文件为准</p>
+            <p><strong>连接要求：</strong>需配置 Rube MCP（https://rube.app/mcp）</p>
+          </div>
+        </section>
+
+        <!-- Question Panel -->
+        <div class="question-panel">
+          <h3>快速参考</h3>
+          <div class="question-grid">
+            <div class="question-item">
+              <strong>工作流起点</strong>
+              <p>始终从 RUBE_SEARCH_TOOLS 开始，不要硬编码</p>
+            </div>
+            <div class="question-item">
+              <strong>连接检查</strong>
+              <p>执行前确认 ACTIVE 状态</p>
+            </div>
+            <div class="question-item">
+              <strong>Session 管理</strong>
+              <p>同一会话复用 ID，减少认证</p>
+            </div>
+            <div class="question-item">
+              <strong>Memory 参数</strong>
+              <p>必须包含，可为空对象</p>
+            </div>
+            <div class="question-item">
+              <strong>Schema 合规</strong>
+              <p>使用搜索返回的精确字段</p>
+            </div>
+            <div class="question-item">
+              <strong>分页处理</strong>
+              <p>检查 token 直到数据完整</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Active nav highlighting on scroll
+    const sections = document.querySelectorAll('.body-section');
+    const navLinks = document.querySelectorAll('.rail-nav a');
+
+    function updateActiveNav() {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 200) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const content = document.getElementById('content');
+
+    searchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const textNodes = content.querySelectorAll('p, li, h2, h3, h4, td');
+
+      // Remove existing highlights
+      content.querySelectorAll('.highlight').forEach(el => {
+        const parent = el.parentNode;
+        parent.replaceChild(document.createTextNode(el.textContent), el);
+        parent.normalize();
+      });
+
+      if (!term) return;
+
+      textNodes.forEach(node => {
+        if (node.children.length > 0) return; // Skip if has child elements
+        const text = node.textContent;
+        const lowerText = text.toLowerCase();
+
+        if (lowerText.includes(term)) {
+          const regex = new RegExp(`(${term})`, 'gi');
+          node.innerHTML = text.replace(regex, '<span class="highlight">$1</span>');
+        }
+      });
+    });
+
+    // Smooth scroll for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

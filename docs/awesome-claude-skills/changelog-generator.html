@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog Generator - Skill Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .document-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-xl);
+    }
+
+    /* Cover / Masthead */
+    .cover {
+      margin-bottom: var(--space-4xl);
+      padding-bottom: var(--space-3xl);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .cover-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .cover h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin-bottom: var(--space-lg);
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .deck {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--fg-2);
+      max-width: 640px;
+      margin-bottom: var(--space-xl);
+    }
+
+    .caveat-box {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg) var(--space-xl);
+      margin-top: var(--space-xl);
+      font-size: 14px;
+      color: var(--fg-muted);
+    }
+
+    .caveat-box strong {
+      color: var(--fg-2);
+    }
+
+    /* Reader Rail */
+    .reader-rail {
+      display: flex;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-3xl);
+      padding: var(--space-sm);
+      background: var(--surface-container-low);
+      border-radius: var(--radius-pill);
+      width: fit-content;
+      flex-wrap: wrap;
+    }
+
+    .rail-tab {
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+    }
+
+    .rail-tab:hover {
+      color: var(--fg-1);
+      background: var(--surface-container);
+    }
+
+    .rail-tab.active {
+      background: var(--gradient-primary);
+      color: var(--on-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Body Sections */
+    .body-section {
+      margin-bottom: var(--space-4xl);
+    }
+
+    .body-section h2 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    .body-section h3 {
+      font-family: var(--font-headline);
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: var(--space-2xl) 0 var(--space-md);
+      color: var(--fg-1);
+    }
+
+    .body-section p {
+      margin-bottom: var(--space-lg);
+      color: var(--fg-2);
+      line-height: 1.7;
+    }
+
+    .body-section ul,
+    .body-section ol {
+      margin: var(--space-lg) 0 var(--space-lg) var(--space-xl);
+      color: var(--fg-2);
+    }
+
+    .body-section li {
+      margin-bottom: var(--space-md);
+      line-height: 1.7;
+    }
+
+    .body-section li::marker {
+      color: var(--primary);
+    }
+
+    /* Claim Cards */
+    .claim-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .claim-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .claim-card h4 {
+      font-family: var(--font-headline);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      color: var(--fg-1);
+    }
+
+    .claim-card p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* Pull Quote */
+    .pull-quote {
+      border-left: 4px solid var(--primary);
+      padding-left: var(--space-xl);
+      margin: var(--space-2xl) 0;
+      font-style: italic;
+      color: var(--fg-muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    /* Fact Table */
+    .fact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-xl) 0;
+      font-size: 14px;
+    }
+
+    .fact-table th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--surface-container);
+      font-weight: 600;
+      color: var(--fg-1);
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    .fact-table td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg-2);
+    }
+
+    .fact-table tr:hover td {
+      background: var(--surface-container-low);
+    }
+
+    /* Evidence Margin */
+    .evidence-margin {
+      background: var(--surface-container);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg) var(--space-xl);
+      margin: var(--space-xl) 0;
+      font-size: 14px;
+    }
+
+    .evidence-margin .source-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Code Block */
+    pre {
+      background: var(--surface-container-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: var(--space-xl) 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-top: var(--space-3xl);
+    }
+
+    .question-panel h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .question-panel ul {
+      margin: var(--space-md) 0 0 var(--space-xl);
+    }
+
+    .question-panel li {
+      margin-bottom: var(--space-sm);
+      font-size: 14px;
+    }
+
+    /* Source Spread */
+    .source-spread {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .source-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+
+    .source-card .meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .source-card .value {
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .document-shell {
+        padding: var(--space-xl) var(--space-lg);
+      }
+
+      .reader-rail {
+        width: 100%;
+      }
+
+      .source-spread {
+        grid-template-columns: 1fr;
+      }
+
+      .cover h1 {
+        font-size: 2rem;
+      }
+    }
+
+    /* Print */
+    @media print {
+      body {
+        background: white;
+      }
+
+      .reader-rail {
+        display: none;
+      }
+    }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Focus states */
+    .rail-tab:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="document-shell">
+    <!-- Cover / Masthead -->
+    <header class="cover">
+      <div class="cover-label">Skill Documentation</div>
+      <h1>Changelog Generator</h1>
+      <p class="deck">
+        将技术性的 Git 提交历史自动转换为用户友好的发布日志（changelog），把开发语言翻译成客户语言，减少手动整理发布说明的时间。
+      </p>
+      <div class="caveat-box">
+        <strong>来源：</strong>refer/awesome-claude-skills/changelog-generator/SKILL.md<br>
+        <strong>维护者：</strong>Composio / 社区 | <strong>许可证：</strong>Apache 2.0
+      </div>
+    </header>
+
+    <!-- Reader Rail -->
+    <nav class="reader-rail" role="tablist" aria-label="文档章节导航">
+      <button class="rail-tab active" onclick="scrollToSection('positioning')" role="tab">定位</button>
+      <button class="rail-tab" onclick="scrollToSection('triggers')" role="tab">触发时机</button>
+      <button class="rail-tab" onclick="scrollToSection('capabilities')" role="tab">核心能力</button>
+      <button class="rail-tab" onclick="scrollToSection('workflow')" role="tab">指令流程</button>
+      <button class="rail-tab" onclick="scrollToSection('usage')" role="tab">使用方式</button>
+      <button class="rail-tab" onclick="scrollToSection('example')" role="tab">输出示例</button>
+      <button class="rail-tab" onclick="scrollToSection('relation')" role="tab">与 ys-powers 关联</button>
+    </nav>
+
+    <!-- Body Sheet -->
+    <main>
+      <!-- Section: Positioning -->
+      <section class="body-section" id="positioning">
+        <h2>定位</h2>
+        <p>
+          Changelog Generator 是一个专注于<strong>发布内容生产</strong>的自动化工具。它填补了从代码变更到用户沟通之间的空白，将开发者视角的技术提交转换为终端用户能够理解和欣赏的产品更新说明。
+        </p>
+        <div class="pull-quote">
+          "把开发语言翻译成客户语言，减少手动整理发布说明的时间。"
+        </div>
+      </section>
+
+      <!-- Section: Triggers -->
+      <section class="body-section" id="triggers">
+        <h2>触发时机</h2>
+        <p>在以下场景中，Changelog Generator 能够发挥最大价值：</p>
+        <ul>
+          <li>准备新版本发布说明时</li>
+          <li>需要写周报、月报形式的产品更新摘要时</li>
+          <li>向客户或用户文档化变更时</li>
+          <li>为应用商店提交或更新通知撰写 changelog 时</li>
+          <li>维护公开的 changelog 或产品更新页面时</li>
+        </ul>
+        <div class="claim-card">
+          <h4>不适用场景</h4>
+          <p>内部纯技术重构、无用户可见变更的提交 —— 这类提交会被自动过滤，不进入最终输出。</p>
+        </div>
+      </section>
+
+      <!-- Section: Core Capabilities -->
+      <section class="body-section" id="capabilities">
+        <h2>核心能力</h2>
+        <div class="source-spread">
+          <div class="source-card">
+            <div class="meta">Capability 01</div>
+            <div class="value">扫描 Git 历史</div>
+            <p style="margin-top: 8px; font-size: 14px; color: var(--fg-muted);">分析特定时间段或版本之间的提交记录</p>
+          </div>
+          <div class="source-card">
+            <div class="meta">Capability 02</div>
+            <div class="value">智能分类</div>
+            <p style="margin-top: 8px; font-size: 14px; color: var(--fg-muted);">自动归入 Features、Improvements、Bug Fixes、Breaking Changes、Security 等类别</p>
+          </div>
+          <div class="source-card">
+            <div class="meta">Capability 03</div>
+            <div class="value">语言翻译</div>
+            <p style="margin-top: 8px; font-size: 14px; color: var(--fg-muted);">将开发者提交信息转换为面向客户的清晰描述</p>
+          </div>
+          <div class="source-card">
+            <div class="meta">Capability 04</div>
+            <div class="value">噪声过滤</div>
+            <p style="margin-top: 8px; font-size: 14px; color: var(--fg-muted);">自动排除内部提交（重构、测试、CI 等无用户价值的内容）</p>
+          </div>
+          <div class="source-card">
+            <div class="meta">Capability 05</div>
+            <div class="value">品牌语调适配</div>
+            <p style="margin-top: 8px; font-size: 14px; color: var(--fg-muted);">可结合品牌风格指南统一输出语气</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Workflow -->
+      <section class="body-section" id="workflow">
+        <h2>指令流程概览</h2>
+        <ol>
+          <li><strong>确定范围</strong> — 时间范围或版本区间（如 "自上次发布以来"、"过去一周"、"v2.4.0 到 v2.5.0"）</li>
+          <li><strong>扫描历史</strong> — 提取对应区间的 Git 提交记录</li>
+          <li><strong>分类过滤</strong> — 按类别分组并过滤内部提交</li>
+          <li><strong>语言转换</strong> — 将技术描述翻译为客户语言</li>
+          <li><strong>格式化输出</strong> — 生成结构化 changelog（Markdown 格式）</li>
+        </ol>
+      </section>
+
+      <!-- Section: Usage -->
+      <section class="body-section" id="usage">
+        <h2>使用方式</h2>
+        <p>通过自然语言指令触发，支持以下典型用法：</p>
+        <pre><code>Create a changelog from commits since last release
+Generate changelog for all commits from the past week
+Create release notes for version 2.5.0
+Create a changelog for commits since v2.4.0, using my changelog guidelines from CHANGELOG_STYLE.md</code></pre>
+      </section>
+
+      <!-- Section: Example Output -->
+      <section class="body-section" id="example">
+        <h2>输出示例</h2>
+        <div class="evidence-margin">
+          <div class="source-label">Markdown Output</div>
+          <pre style="margin: 0; background: transparent; border: none; padding: 0;"><code># Updates - Week of March 10, 2024
+
+## ✨ New Features
+
+- **Team Workspaces**: Create separate workspaces for different projects.
+- **Keyboard Shortcuts**: Press ? to see all available shortcuts.
+
+## 🔧 Improvements
+
+- **Faster Sync**: Files now sync 2x faster across devices
+- **Better Search**: Search now includes file contents</code></pre>
+        </div>
+      </section>
+
+      <!-- Section: Relation to ys-powers -->
+      <section class="body-section" id="relation">
+        <h2>与 ys-powers 的关联</h2>
+        <table class="fact-table">
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>现有能力关系</td>
+              <td>ys-powers 有 <code>git-workflow-and-versioning</code> skill 和 <code>shipping-and-launch</code> skill，但无专门的 changelog 生成能力</td>
+            </tr>
+            <tr>
+              <td>价值定位</td>
+              <td>补全发布流程中的「内容生产」环节</td>
+            </tr>
+            <tr>
+              <td>借鉴价值</td>
+              <td>其「技术提交 → 用户语言」的翻译模式可复用到任何需要将内部技术输出转化为外部-facing 文档的场景</td>
+            </tr>
+            <tr>
+              <td>搬运建议</td>
+              <td><strong style="color: var(--green);">高价值</strong>，发布流程中非常实用，建议搬运到 ys-powers 的 <code>skills/</code> 中</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- Question Panel -->
+    <aside class="question-panel">
+      <h3>后续可探索的问题</h3>
+      <ul>
+        <li>如何与 ys-powers 现有的 <code>shipping-and-launch</code> skill 集成？</li>
+        <li>是否需要支持多语言 changelog 输出？</li>
+        <li>品牌语调适配的具体实现机制是什么？</li>
+        <li>如何处理大型仓库（数千条提交）的性能问题？</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+    // Smooth scroll to section and update active tab
+    function scrollToSection(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Update active tab
+        document.querySelectorAll('.rail-tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+      }
+    }
+
+    // Intersection Observer to update active tab on scroll
+    const sections = document.querySelectorAll('.body-section');
+    const tabs = document.querySelectorAll('.rail-tab');
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -80% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tabs.forEach((tab, index) => {
+            tab.classList.remove('active');
+            if (tab.getAttribute('onclick').includes(id)) {
+              tab.classList.add('active');
+            }
+          });
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
