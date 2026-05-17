@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="teaching">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>html-anything Skill 步骤说明 — 交互式学习指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Clockless Tokens + Teaching Override ===== */
+:root {
+  --primary: #0f766e;
+  --primary-container: #115e59;
+  --primary-fixed: #ccfbf1;
+  --primary-fixed-dim: #99f6e4;
+  --on-primary: #ffffff;
+  --accent-glow: #14b8a6;
+  --secondary: #f59e0b;
+  --secondary-container: #d97706;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #f6fbfb;
+  --surface: #f6fbfb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #edf7f5;
+  --surface-container: #e5f1ee;
+  --surface-container-high: #d8e8e4;
+  --fg-1: #10201f;
+  --fg-2: #304c49;
+  --fg-muted: #647b78;
+  --border: rgba(15, 118, 110, 0.14);
+  --border-strong: rgba(15, 118, 110, 0.22);
+  --outline-variant: #99f6e4;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(16, 32, 31, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 32, 31, 0.08);
+  --shadow-lg: 0 8px 24px rgba(16, 32, 31, 0.12);
+  --shadow-accent: 0 8px 24px rgba(15, 118, 110, 0.18);
+  --gradient-primary: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+  --gradient-hero: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
+  --gradient-text: linear-gradient(135deg, #0f766e 0%, #f59e0b 100%);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  color: var(--fg-1);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(15, 118, 110, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 118, 110, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button, select { font: inherit; }
+button { cursor: pointer; }
+
+/* ===== Studio / Lesson Shell ===== */
+.studio {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(300px, 380px);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+}
+
+.panel {
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.left-panel, .right-panel {
+  min-height: calc(100vh - 32px);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.left-panel { gap: var(--space-xl); }
+
+.eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1, h2, h3, p { margin-top: 0; }
+
+h1 {
+  margin-bottom: var(--space-md);
+  font-family: var(--font-headline);
+  font-size: clamp(30px, 4.5vw, 56px);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.gradient-text {
+  color: transparent;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.intro {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* ===== Mode Card ===== */
+.mode-card {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.mode-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.mode-card p {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ===== Controls ===== */
+.controls {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.control-row label {
+  color: var(--fg-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  background: var(--surface-container);
+  border-radius: var(--radius-pill);
+}
+
+.segmented button, .pill-button {
+  min-height: 40px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--fg-2);
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 800;
+  transition: transform 0.18s cubic-bezier(0.4,0,0.2,1), background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.segmented button.active, .pill-button.active {
+  color: var(--on-primary);
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-accent);
+}
+
+.pill-button {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-container-lowest);
+}
+
+.segmented button:active, .pill-button:active, .step-button:active {
+  transform: scale(0.97);
+}
+
+/* ===== Step Rail ===== */
+.step-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: auto;
+}
+
+.step-button {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-md);
+  color: var(--fg-2);
+  text-align: left;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s cubic-bezier(0.4,0,0.2,1), border-color 0.18s, box-shadow 0.18s;
+}
+
+.step-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.step-button.active {
+  color: var(--fg-1);
+  border-color: rgba(15, 118, 110, 0.4);
+  box-shadow: var(--shadow-accent);
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-container);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.step-button.active .step-num {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.step-button span:nth-child(2) {
+  font-weight: 800;
+  font-size: 13.5px;
+}
+
+.step-button small {
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+/* ===== Stage ===== */
+.stage-wrap {
+  position: relative;
+  min-height: calc(100vh - 32px);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(420px, 1fr) auto;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(246,251,251,0.9)),
+    radial-gradient(circle at 50% 48%, rgba(15,118,110,0.05), transparent 48%);
+}
+
+.stage-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-xl) 0;
+}
+
+.stage-header h2 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: clamp(22px, 2.8vw, 36px);
+  letter-spacing: -0.04em;
+}
+
+.stage-header p {
+  max-width: 520px;
+  margin: var(--space-sm) 0 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.step-badge {
+  align-self: flex-start;
+  min-width: 140px;
+  padding: var(--space-md) var(--space-lg);
+  color: var(--fg-2);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ===== Flow Stage ===== */
+.flow-stage {
+  position: relative;
+  min-height: 480px;
+  margin: var(--space-md);
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(204,251,241,0.6) 0 12%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(245,158,11,0.08), transparent 48%),
+    linear-gradient(160deg, rgba(16,32,31,0.92), rgba(20,45,42,0.86) 50%, rgba(30,60,55,0.80));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), var(--shadow-lg);
+}
+
+.flow-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.9) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(255,255,255,0.45) 0 1px, transparent 1.3px);
+  background-size: 72px 72px, 118px 118px;
+  background-position: 4px 13px, 34px 52px;
+  pointer-events: none;
+}
+
+/* Flow nodes */
+.flow-node {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--w, 120px);
+  height: var(--h, 64px);
+  margin-left: calc(var(--w, 120px) / -2);
+  margin-top: calc(var(--h, 64px) / -2);
+  display: grid;
+  place-items: center;
+  padding: var(--space-sm) var(--space-md);
+  color: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(12px);
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.35;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s, background 0.3s;
+  cursor: pointer;
+}
+
+.flow-node:hover, .flow-node.active {
+  transform: translate(-50%, -50%) scale(1.06);
+  background: rgba(255,255,255,0.18);
+  box-shadow: 0 0 0 8px rgba(20,184,166,0.18), 0 14px 34px rgba(0,0,0,0.25);
+  z-index: 5;
+}
+
+.flow-node.active {
+  border-color: rgba(20,184,166,0.5);
+  box-shadow: 0 0 0 10px rgba(20,184,166,0.22), 0 0 40px rgba(20,184,166,0.35);
+}
+
+.flow-node .node-num {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* SVG connectors */
+.flow-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.flow-svg path {
+  fill: none;
+  stroke: rgba(255,255,255,0.18);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  transition: stroke 0.4s, stroke-width 0.4s;
+}
+
+.flow-svg path.active {
+  stroke: rgba(20,184,166,0.65);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+
+/* Focus card */
+.focus-card {
+  position: absolute;
+  left: var(--space-xl);
+  bottom: var(--space-xl);
+  z-index: 5;
+  width: min(360px, calc(100% - 40px));
+  padding: var(--space-lg);
+  color: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.11);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(18px);
+}
+
+.focus-card span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: rgba(204,251,241,0.88);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.focus-card strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.focus-card p {
+  margin: 0;
+  color: rgba(255,255,255,0.78);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ===== Stage Footer / Mini Stats ===== */
+.stage-footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  padding: 0 var(--space-xl) var(--space-xl);
+}
+
+.mini-stat {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.mini-stat span {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.mini-stat strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+/* ===== Right Panel / Inspector ===== */
+.right-panel { gap: var(--space-lg); }
+
+.inspector-top {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--font-headline);
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 0 0 8px rgba(15,118,110,0.08);
+}
+
+.inspector-top h2 {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.kind-pill {
+  display: inline-flex;
+  margin-top: var(--space-sm);
+  padding: 5px 10px;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.tagline {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+/* Metric grid */
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.metric {
+  min-height: 90px;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.metric span {
+  display: block;
+  margin-bottom: var(--space-sm);
+  color: var(--fg-muted);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 20px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+/* Detail sections */
+.detail-section {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.detail-section h3 {
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.detail-section p, .detail-section li {
+  color: var(--fg-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.detail-section p:last-child { margin-bottom: 0; }
+
+.detail-section ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Check panel */
+.check-panel {
+  margin-top: auto;
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, rgba(15,118,110,0.06), rgba(245,158,11,0.06));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.check-panel h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.check-options {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.check-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--fg-2);
+  text-align: left;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.check-btn:hover { transform: translateY(-1px); }
+
+.check-btn.correct {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+  color: var(--green);
+}
+
+.check-btn.wrong {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+  color: var(--red);
+}
+
+.check-feedback {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.check-feedback.correct {
+  background: rgba(16,185,129,0.08);
+  color: #047857;
+}
+
+.check-feedback.wrong {
+  background: rgba(239,68,68,0.08);
+  color: #b91c1c;
+}
+
+/* ===== Recap ===== */
+.recap-strip {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.recap-strip h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.recap-item {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.recap-item:last-child { margin-bottom: 0; }
+
+.recap-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.recap-item p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1160px) {
+  .studio {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .right-panel {
+    grid-column: 1 / -1;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .inspector-top, .tagline, .metric-grid { grid-column: 1; }
+  .detail-section, .check-panel, .recap-strip { grid-column: 2; }
+}
+
+@media (max-width: 820px) {
+  .studio {
+    display: block;
+    padding: var(--space-md);
+  }
+  .left-panel, .stage-wrap, .right-panel {
+    min-height: auto;
+    margin-bottom: var(--space-md);
+  }
+  .step-list {
+    grid-template-columns: 1fr 1fr;
+    margin-top: 0;
+  }
+  .stage-header, .stage-footer { display: block; }
+  .step-badge { margin-top: var(--space-md); }
+  .flow-stage { min-height: 420px; }
+  .stage-footer { padding: 0 var(--space-md) var(--space-md); }
+  .mini-stat { margin-top: var(--space-md); }
+  .right-panel { display: flex; }
+}
+
+@media (max-width: 560px) {
+  .studio {
+    padding: var(--space-sm);
+    overflow-x: hidden;
+  }
+  .left-panel, .right-panel {
+    padding: var(--space-lg);
+    overflow: hidden;
+  }
+  h1 { font-size: 28px; line-height: 1.02; }
+  h1 .gradient-text { display: block; }
+  .intro { font-size: 13.5px; }
+  .step-list { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .flow-stage {
+    min-height: 380px;
+    margin: var(--space-sm);
+  }
+  .stage-header { padding: var(--space-lg) var(--space-lg) 0; }
+  .stage-header h2 { font-size: 24px; }
+  .step-badge {
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .metric strong { font-size: 18px; overflow-wrap: anywhere; }
+  .focus-card {
+    left: var(--space-md);
+    bottom: var(--space-md);
+    width: calc(100% - 24px);
+  }
+  .flow-node { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<main class="studio lesson-shell object-lab">
+
+  <!-- ===== LEFT PANEL: Step Rail ===== -->
+  <aside class="panel left-panel step-rail concept-drawer" aria-label="工作流步骤导航">
+    <section>
+      <p class="eyebrow">交互式学习指南</p>
+      <h1>html-anything <span class="gradient-text">Skill 步骤</span></h1>
+      <p class="intro">将想法、文件、文件夹、URL 或导出数据集转换为精美单一 HTML 页面的完整工作流。点击左侧步骤，查看每个阶段的可视化流程与详细说明。</p>
+    </section>
+
+    <section class="mode-card">
+      <strong>不是文档，是工作流。</strong>
+      <p>本页面将 10 步标准工作流转化为可交互的学习界面，帮助你理解 html-anything skill 的内部机制与设计决策。</p>
+    </section>
+
+    <section class="controls try-control" aria-label="显示控制">
+      <div class="segmented" aria-label="视图模式">
+        <button class="active" type="button" data-view="flow">流程视图</button>
+        <button type="button" data-view="detail">详情视图</button>
+      </div>
+      <button class="pill-button active" type="button" id="autoPlay">自动播放步骤</button>
+    </section>
+
+    <nav class="step-list" id="stepList" aria-label="工作流步骤"></nav>
+  </aside>
+
+  <!-- ===== CENTER: Stage ===== -->
+  <section class="panel stage-wrap lesson-stage model-stage object-stage" aria-label="工作流可视化舞台">
+    <header class="stage-header">
+      <div>
+        <p class="eyebrow" id="stageEyebrow">标准工作流</p>
+        <h2 id="stageTitle">理解请求</h2>
+        <p id="stageCopy">决定用户提供的输入类型：idea、file、folder、URL 还是 export request。</p>
+      </div>
+      <div class="step-badge" id="stepBadge">Step 1 / 10</div>
+    </header>
+
+    <div class="flow-stage" id="flowStage" aria-label="工作流流程图">
+      <svg class="flow-svg" id="flowSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      <div id="flowNodes"></div>
+      <article class="focus-card" aria-live="polite">
+        <span id="focusKind">输入理解</span>
+        <strong id="focusName">Step 1: Understand</strong>
+        <p id="focusText">识别输入类型是整个工作流的起点，决定后续所有处理路径。</p>
+      </article>
+    </div>
+
+    <footer class="stage-footer" aria-label="步骤快速指标">
+      <div class="mini-stat">
+        <span>当前步骤</span>
+        <strong id="quickStep">1</strong>
+      </div>
+      <div class="mini-stat">
+        <span>预计耗时</span>
+        <strong id="quickTime">1-2 min</strong>
+      </div>
+      <div class="mini-stat">
+        <span>关键产出</span>
+        <strong id="quickOutput">输入分类</strong>
+      </div>
+    </footer>
+  </section>
+
+  <!-- ===== RIGHT PANEL: Inspector ===== -->
+  <aside class="panel right-panel inspector-panel check-yourself recap-strip" aria-label="步骤检查器">
+    <section class="inspector-top">
+      <div class="step-icon" id="stepIcon">1</div>
+      <div>
+        <p class="eyebrow">选中步骤</p>
+        <h2 id="inspectorTitle">理解请求</h2>
+        <span class="kind-pill" id="inspectorKind">输入识别</span>
+      </div>
+    </section>
+
+    <p class="tagline" id="inspectorTagline">决定用户提供的输入类型，为后续处理奠定基础。</p>
+
+    <section class="metric-grid" aria-label="步骤指标">
+      <div class="metric">
+        <span>优先级</span>
+        <strong id="metricPriority">高</strong>
+      </div>
+      <div class="metric">
+        <span>复杂度</span>
+        <strong id="metricComplexity">低</strong>
+      </div>
+      <div class="metric">
+        <span>自动化</span>
+        <strong id="metricAuto">部分</strong>
+      </div>
+      <div class="metric">
+        <span>人工判断</span>
+        <strong id="metricHuman">必需</strong>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h3>核心动作</h3>
+      <ul id="actionList">
+        <li>分析用户输入的自然语言意图</li>
+        <li>识别输入类型（idea / file / folder / URL / export）</li>
+        <li>标记模糊或需要澄清的请求</li>
+      </ul>
+    </section>
+
+    <section class="detail-section">
+      <h3>常见陷阱</h3>
+      <ul id="pitfallList">
+        <li>将 export request 误认为已有文件</li>
+        <li>忽略用户隐含的 style 偏好</li>
+        <li>未识别出敏感数据类型</li>
+      </ul>
+    </section>
+
+    <section class="check-panel">
+      <h3>自检问题</h3>
+      <div class="check-options" id="checkOptions">
+        <button class="check-btn" data-correct="true" type="button">A. 必须首先识别输入类型</button>
+        <button class="check-btn" data-correct="false" type="button">B. 可以直接跳到生成 HTML</button>
+        <button class="check-btn" data-correct="false" type="button">C. 不需要理解用户意图</button>
+      </div>
+      <div class="check-feedback" id="checkFeedback" style="display:none"></div>
+    </section>
+
+    <section class="recap-strip">
+      <h3>步骤要点</h3>
+      <div class="recap-item">
+        <div class="recap-dot"></div>
+        <p>输入类型决定后续所有处理路径</p>
+      </div>
+      <div class="recap-item">
+        <div class="recap-dot"></div>
+        <p>模糊请求需要澄清，不要猜测</p>
+      </div>
+      <div class="recap-item">
+        <div class="recap-dot"></div>
+        <p>标记敏感数据以触发隐私保护</p>
+      </div>
+    </section>
+  </aside>
+
+</main>
+
+<script>
+const DATA = {
+  steps: [
+    {
+      id: "step1",
+      num: 1,
+      title: "理解请求",
+      short: "Understand",
+      tagline: "决定用户提供的输入类型，为后续处理奠定基础。",
+      kind: "输入识别",
+      category: "输入理解",
+      time: "1-2 min",
+      output: "输入分类",
+      priority: "高",
+      complexity: "低",
+      automation: "部分",
+      human: "必需",
+      description: "决定用户提供的输入类型：idea、file、folder、URL 还是 export request。",
+      actions: [
+        "分析用户输入的自然语言意图",
+        "识别输入类型（idea / file / folder / URL / export）",
+        "标记模糊或需要澄清的请求"
+      ],
+      pitfalls: [
+        "将 export request 误认为已有文件",
+        "忽略用户隐含的 style 偏好",
+        "未识别出敏感数据类型"
+      ],
+      checkQuestion: "Step 1 的核心目标是什么？",
+      checkOptions: [
+        { text: "A. 必须首先识别输入类型", correct: true },
+        { text: "B. 可以直接跳到生成 HTML", correct: false },
+        { text: "C. 不需要理解用户意图", correct: false }
+      ],
+      checkCorrect: "正确！识别输入类型是整个工作流的起点。",
+      checkWrong: "再想想。所有后续步骤都依赖于正确的输入分类。",
+      recap: [
+        "输入类型决定后续所有处理路径",
+        "模糊请求需要澄清，不要猜测",
+        "标记敏感数据以触发隐私保护"
+      ],
+      flowPos: { x: 50, y: 12 },
+      flowSize: { w: 140, h: 52 }
+    },
+    {
+      id: "step2",
+      num: 2,
+      title: "引导导出",
+      short: "Onboard exports",
+      tagline: "若用户提到 source 但没有文件，提供导出指导。",
+      kind: "导出辅助",
+      category: "导出引导",
+      time: "2-5 min",
+      output: "导出指南",
+      priority: "高",
+      complexity: "中",
+      automation: "低",
+      human: "主导",
+      description: "若用户提到 source 但没有文件，读取对应 source prompt 的导出步骤，给出简明指导。",
+      actions: [
+        "识别用户提到的平台或 source 类型",
+        "读取 prompts/sources/<source>.md 中的导出步骤",
+        "提供简明的导出指导",
+        "停止等待，除非文件已可用"
+      ],
+      pitfalls: [
+        "假设用户已经知道如何导出",
+        "提供过于复杂的导出步骤",
+        "未在用户导出前停止处理"
+      ],
+      checkQuestion: "当用户提到 source 但没有文件时应该怎么做？",
+      checkOptions: [
+        { text: "A. 读取 source prompt 并提供导出指导", correct: true },
+        { text: "B. 直接继续生成 HTML", correct: false },
+        { text: "C. 要求用户手动描述数据", correct: false }
+      ],
+      checkCorrect: "正确！先指导用户导出，再处理文件。",
+      checkWrong: "不对。必须先获得文件才能继续处理。",
+      recap: [
+        "识别 source 类型是关键",
+        "导出指导要简明扼要",
+        "文件可用前停止处理"
+      ],
+      flowPos: { x: 50, y: 30 },
+      flowSize: { w: 140, h: 52 }
+    },
+    {
+      id: "step3",
+      num: 3,
+      title: "检查 Source",
+      short: "Inspect source",
+      tagline: "读取代表性样本，收集统计信息，理解数据形状。",
+      kind: "数据检查",
+      category: "source 分析",
+      time: "2-5 min",
+      output: "数据画像",
+      priority: "高",
+      complexity: "中",
+      automation: "部分",
+      human: "辅助",
+      description: "读取文件样本、获取 URL 内容或创建结构化内容计划，理解 source 的形状与特征。",
+      actions: [
+        "文件：读取表头、前后几行、列统计",
+        "聊天：首末消息、发送者列表、时间跨度",
+        "长文本：标题、首节、字数、章节大纲",
+        "URL：获取足够内容以理解页面结构"
+      ],
+      pitfalls: [
+        "加载过大的私人导出到模型中",
+        "仅读取文件开头而忽略尾部结构",
+        "忽略数据中的异常值或缺失值"
+      ],
+      checkQuestion: "检查 source 时应该避免什么？",
+      checkOptions: [
+        { text: "A. 将巨大私人导出不必要地加载到模型", correct: true },
+        { text: "B. 读取代表性样本", correct: false },
+        { text: "C. 收集列统计和日期范围", correct: false }
+      ],
+      checkCorrect: "正确！采样是为了理解形状，而非加载全部数据。",
+      checkWrong: "不对。读取样本和统计是正确做法。",
+      recap: [
+        "采样足够理解形状即可",
+        "关注数据的统计特征",
+        "注意异常和缺失模式"
+      ],
+      flowPos: { x: 50, y: 48 },
+      flowSize: { w: 140, h: 52 }
+    },
+    {
+      id: "step4",
+      num: 4,
+      title: "加载指南",
+      short: "Load guidance",
+      tagline: "读取 design system、style catalog、source prompt 和 style prompt。",
+      kind: "指南加载",
+      category: "配置读取",
+      time: "1-2 min",
+      output: "风格配置",
+      priority: "高",
+      complexity: "低",
+      automation: "高",
+      human: "少量",
+      description: "读取 _design.md、catalog.json、source prompt、style prompt 及参考 HTML，建立视觉目标。",
+      actions: [
+        "读取 prompts/styles/_design.md（Clockless tokens）",
+        "读取 prompts/styles/catalog.json（style 元数据）",
+        "读取最接近的 source prompt",
+        "读取并遵循 prompts/styles/<style>.md",
+        "若存在 referenceHtml，读取作为视觉目标"
+      ],
+      pitfalls: [
+        "跳过 catalog entry 直接写 HTML",
+        "忽略 referenceHtml 的视觉目标",
+        "未读取共享 family prompts"
+      ],
+      checkQuestion: "加载指南时最重要的是什么？",
+      checkOptions: [
+        { text: "A. 按顺序读取所有配置文件", correct: true },
+        { text: "B. 直接开始写 HTML", correct: false },
+        { text: "C. 仅读取 style prompt", correct: false }
+      ],
+      checkCorrect: "正确！完整读取配置链才能保证风格一致性。",
+      checkWrong: "不对。跳过配置会导致风格偏差。",
+      recap: [
+        "配置链是风格一致性的基础",
+        "referenceHtml 是视觉目标",
+        "family prompts 包含共享规则"
+      ],
+      flowPos: { x: 28, y: 66 },
+      flowSize: { w: 130, h: 52 }
+    },
+    {
+      id: "step5",
+      num: 5,
+      title: "选择 Style",
+      short: "Choose style",
+      tagline: "内部选择页面 style，不询问用户。",
+      kind: "风格路由",
+      category: "自动选择",
+      time: "30 sec",
+      output: "style ID",
+      priority: "高",
+      complexity: "低",
+      automation: "高",
+      human: "无",
+      description: "基于用户意图和 source 类型，从 17 种 auto styles 中内部选择最适合的 style。",
+      actions: [
+        "分析用户自然语言中的 style 线索",
+        "根据 source 类型匹配 bestSources",
+        "应用自然语言路由规则",
+        "无匹配时回退到 default"
+      ],
+      pitfalls: [
+        "询问用户选择 style（默认不应询问）",
+        "将 style 仅视为 CSS 换色",
+        "忽略用户明确的 style 方向"
+      ],
+      checkQuestion: "选择 style 时是否应该询问用户？",
+      checkOptions: [
+        { text: "A. 默认不询问，内部自动选择", correct: true },
+        { text: "B. 总是询问用户偏好", correct: false },
+        { text: "C. 随机选择一个 style", correct: false }
+      ],
+      checkCorrect: "正确！默认使用 auto，除非用户明确要求选项。",
+      checkWrong: "不对。auto 路由是默认行为。",
+      recap: [
+        "auto 是默认行为",
+        "style 是页面形状而非皮肤",
+        "用户明确方向时应遵从"
+      ],
+      flowPos: { x: 72, y: 66 },
+      flowSize: { w: 130, h: 52 }
+    },
+    {
+      id: "step6",
+      num: 6,
+      title: "提取契约",
+      short: "Extract contract",
+      tagline: "识别 style 的 5-8 个核心不变量。",
+      kind: "契约提取",
+      category: "风格分析",
+      time: "1-2 min",
+      output: "不变量列表",
+      priority: "高",
+      complexity: "中",
+      automation: "中",
+      human: "辅助",
+      description: "在编写 HTML 前，识别所选 style 的核心不变量：首屏几何、布局脚手架、排版角色、颜色语言、组件词汇、交互模型、动效语法。",
+      actions: [
+        "从 catalog.json 提取 required primitives 和 avoid rules",
+        "从 style prompt 提取视觉细节",
+        "从 reference HTML 提取首屏结构",
+        "列出 5-8 个核心不变量"
+      ],
+      pitfalls: [
+        "直接写 HTML 而不先提取契约",
+        "忽略 avoid rules 中的反模式",
+        "仅提取颜色而忽略布局结构"
+      ],
+      checkQuestion: "提取 style contract 时应该关注什么？",
+      checkOptions: [
+        { text: "A. 首屏几何、布局脚手架、组件词汇等", correct: true },
+        { text: "B. 仅提取颜色 token", correct: false },
+        { text: "C. 不需要提取，直接写代码", correct: false }
+      ],
+      checkCorrect: "正确！契约是风格保真度的基础。",
+      checkWrong: "不对。完整的不变量列表才能确保风格一致。",
+      recap: [
+        "不变量是风格保真的基础",
+        "required primitives 必须出现",
+        "avoid rules 同样重要"
+      ],
+      flowPos: { x: 28, y: 84 },
+      flowSize: { w: 130, h: 52 }
+    },
+    {
+      id: "step7",
+      num: 7,
+      title: "构建页面",
+      short: "Build page",
+      tagline: "直接创建 HTML/CSS/JS，保持交互性和响应式。",
+      kind: "页面构建",
+      category: "实现",
+      time: "5-15 min",
+      output: "HTML 文件",
+      priority: "高",
+      complexity: "高",
+      automation: "中",
+      human: "主导",
+      description: "创建 HTML/CSS/JS，保持页面有用、可交互、移动响应式、内容特定。在根 html 元素上放置 data-ha-style。",
+      actions: [
+        "使用 style 的类/组件词汇",
+        "包含搜索/过滤/复制功能（如需要）",
+        "内联 CSS 和 JS，无外部依赖",
+        "确保键盘和触摸交互可用"
+      ],
+      pitfalls: [
+        "创建通用报告而非 style 原生页面",
+        "忽略移动端适配",
+        "使用外部 JS/CDN 依赖"
+      ],
+      checkQuestion: "构建页面时最重要的约束是什么？",
+      checkOptions: [
+        { text: "A. 遵循所选 style 的组件词汇和布局", correct: true },
+        { text: "B. 使用最熟悉的 CSS 框架", correct: false },
+        { text: "C. 尽可能添加更多动画", correct: false }
+      ],
+      checkCorrect: "正确！style 的组件词汇和布局是核心约束。",
+      checkWrong: "不对。熟悉度和动画量都不是首要约束。",
+      recap: [
+        "style 的词汇是强制约束",
+        "移动端适配不可忽略",
+        "内联资源保证离线可用"
+      ],
+      flowPos: { x: 72, y: 84 },
+      flowSize: { w: 130, h: 52 }
+    },
+    {
+      id: "step8",
+      num: 8,
+      title: "生成资源",
+      short: "Generate assets",
+      tagline: "在需要时生成图片、精灵图等本地媒体。",
+      kind: "资源生成",
+      category: "资产",
+      time: "2-5 min",
+      output: "assets/ 文件夹",
+      priority: "中",
+      complexity: "中",
+      automation: "高",
+      human: "少量",
+      description: "在生成新资源前检查 referenceAssets 和示例资源文件夹，重用适当文件，必要时使用 imagegen skill。",
+      actions: [
+        "检查 referenceAssets 和官方示例",
+        "在许可允许时重用资源",
+        "使用 imagegen 生成 raster 资源",
+        "将资源保存到输出文件夹的 assets/"
+      ],
+      pitfalls: [
+        "忽略现有参考资源而重复生成",
+        "将资源仅留在 $CODEX_HOME/generated_images",
+        "生成与内容无关的装饰性图片"
+      ],
+      checkQuestion: "生成资源前应该先做什么？",
+      checkOptions: [
+        { text: "A. 检查现有 referenceAssets 和示例", correct: true },
+        { text: "B. 直接调用 imagegen", correct: false },
+        { text: "C. 从网上下载图片", correct: false }
+      ],
+      checkCorrect: "正确！优先重用现有资源。",
+      checkWrong: "不对。重用优先于生成。",
+      recap: [
+        "重用优先于生成",
+        "资源应保存到项目文件夹",
+        "避免装饰性图片"
+      ],
+      flowPos: { x: 28, y: 66 },
+      flowSize: { w: 130, h: 52 }
+    },
+    {
+      id: "step9",
+      num: 9,
+      title: "浏览器验证",
+      short: "Verify browser",
+      tagline: "检查渲染、交互、style fidelity 和响应式。",
+      kind: "质量验证",
+      category: "测试",
+      time: "2-3 min",
+      output: "验证报告",
+      priority: "高",
+      complexity: "中",
+      automation: "低",
+      human: "主导",
+      description: "通过本地文件或 HTTP 打开 HTML，检查页面非空白、响应式、对比度可读、交互正常、style fidelity 达标。",
+      actions: [
+        "检查页面非空白",
+        "验证桌面和移动视口渲染",
+        "测试核心交互和键盘路径",
+        "确认 style fidelity：首屏匹配、组件出现、无回退"
+      ],
+      pitfalls: [
+        "跳过浏览器验证直接交付",
+        "仅在桌面视口测试",
+        "忽略 style fidelity checklist"
+      ],
+      checkQuestion: "浏览器验证时不需要检查什么？",
+      checkOptions: [
+        { text: "A. 页面在 IE6 下的兼容性", correct: true },
+        { text: "B. 桌面和移动视口渲染", correct: false },
+        { text: "C. Style fidelity checklist", correct: false }
+      ],
+      checkCorrect: "正确！现代浏览器支持即可，无需兼容 IE6。",
+      checkWrong: "不对。视口和 style fidelity 都是必检项。",
+      recap: [
+        "多视口测试不可少",
+        "style fidelity 是硬要求",
+        "交互必须可键盘访问"
+      ],
+      flowPos: { x: 72, y: 66 },
+      flowSize: { w: 130, h: 52 }
+    },
+    {
+      id: "step10",
+      num: 10,
+      title: "交接交付",
+      short: "Handoff",
+      tagline: "给出路径、提及资源、保持解释简短。",
+      kind: "交付",
+      category: "完成",
+      time: "30 sec",
+      output: "交付信息",
+      priority: "高",
+      complexity: "低",
+      automation: "高",
+      human: "少量",
+      description: "给用户本地路径或实时链接，提及重要生成资源和浏览器验证，保持解释简短，不解释内部 pipeline。",
+      actions: [
+        "提供 HTML 的本地路径或链接",
+        "提及生成的 assets（如有）",
+        "提及浏览器验证完成",
+        "保持解释简短，不展开 pipeline"
+      ],
+      pitfalls: [
+        "解释内部 pipeline 细节",
+        "忘记提及生成的资源",
+        "提供过长的使用说明"
+      ],
+      checkQuestion: "交接时应该避免什么？",
+      checkOptions: [
+        { text: "A. 解释内部 pipeline 细节", correct: true },
+        { text: "B. 提供文件路径", correct: false },
+        { text: "C. 提及浏览器验证", correct: false }
+      ],
+      checkCorrect: "正确！用户不需要了解内部 pipeline。",
+      checkWrong: "不对。路径和验证信息是应该提供的。",
+      recap: [
+        "简短是交付的美德",
+        "路径和资源信息必需",
+        "pipeline 细节留给文档"
+      ],
+      flowPos: { x: 50, y: 48 },
+      flowSize: { w: 140, h: 52 }
+    }
+  ]
+};
+
+const state = {
+  selected: "step1",
+  view: "flow",
+  autoPlay: true,
+  autoPlayInterval: null
+};
+
+const els = {
+  stepList: document.getElementById("stepList"),
+  flowNodes: document.getElementById("flowNodes"),
+  flowSvg: document.getElementById("flowSvg"),
+  stageEyebrow: document.getElementById("stageEyebrow"),
+  stageTitle: document.getElementById("stageTitle"),
+  stageCopy: document.getElementById("stageCopy"),
+  stepBadge: document.getElementById("stepBadge"),
+  focusKind: document.getElementById("focusKind"),
+  focusName: document.getElementById("focusName"),
+  focusText: document.getElementById("focusText"),
+  quickStep: document.getElementById("quickStep"),
+  quickTime: document.getElementById("quickTime"),
+  quickOutput: document.getElementById("quickOutput"),
+  stepIcon: document.getElementById("stepIcon"),
+  inspectorTitle: document.getElementById("inspectorTitle"),
+  inspectorKind: document.getElementById("inspectorKind"),
+  inspectorTagline: document.getElementById("inspectorTagline"),
+  metricPriority: document.getElementById("metricPriority"),
+  metricComplexity: document.getElementById("metricComplexity"),
+  metricAuto: document.getElementById("metricAuto"),
+  metricHuman: document.getElementById("metricHuman"),
+  actionList: document.getElementById("actionList"),
+  pitfallList: document.getElementById("pitfallList"),
+  checkOptions: document.getElementById("checkOptions"),
+  checkFeedback: document.getElementById("checkFeedback"),
+  autoPlayBtn: document.getElementById("autoPlay")
+};
+
+function stepById(id) {
+  return DATA.steps.find(s => s.id === id) || DATA.steps[0];
+}
+
+function renderStepList() {
+  els.stepList.innerHTML = DATA.steps.map(step => `
+    <button class="step-button ${step.id === state.selected ? 'active' : ''}" type="button" data-id="${step.id}">
+      <span class="step-num">${step.num}</span>
+      <span>${step.title}</span>
+      <small>${step.short}</small>
+    </button>
+  `).join("");
+
+  els.stepList.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => setStep(btn.dataset.id));
+  });
+}
+
+function renderFlowNodes() {
+  els.flowNodes.innerHTML = DATA.steps.map(step => `
+    <div class="flow-node ${step.id === state.selected ? 'active' : ''}"
+         data-id="${step.id}"
+         style="left:${step.flowPos.x}%;top:${step.flowPos.y}%;--w:${step.flowSize.w}px;--h:${step.flowSize.h}px;">
+      <span class="node-num">${step.num}</span>
+      ${step.title}
+    </div>
+  `).join("");
+
+  els.flowNodes.querySelectorAll(".flow-node").forEach(node => {
+    node.addEventListener("click", () => setStep(node.dataset.id));
+  });
+}
+
+function renderFlowConnections() {
+  const svg = els.flowSvg;
+  const paths = [];
+
+  for (let i = 0; i < DATA.steps.length - 1; i++) {
+    const a = DATA.steps[i];
+    const b = DATA.steps[i + 1];
+    const active = (a.id === state.selected || b.id === state.selected) ? 'active' : '';
+
+    paths.push(`<path class="${active}" d="M${a.flowPos.x},${a.flowPos.y + (a.flowSize.h / 2 / 5)} L${b.flowPos.x},${b.flowPos.y - (b.flowSize.h / 2 / 5)}" />`);
+  }
+
+  svg.innerHTML = paths.join("");
+}
+
+function renderSelected() {
+  const step = stepById(state.selected);
+
+  els.stageEyebrow.textContent = "标准工作流 — Step " + step.num;
+  els.stageTitle.textContent = step.title;
+  els.stageCopy.textContent = step.description;
+  els.stepBadge.textContent = `Step ${step.num} / ${DATA.steps.length}`;
+
+  els.focusKind.textContent = step.category;
+  els.focusName.textContent = `Step ${step.num}: ${step.short}`;
+  els.focusText.textContent = step.tagline;
+
+  els.quickStep.textContent = step.num;
+  els.quickTime.textContent = step.time;
+  els.quickOutput.textContent = step.output;
+
+  els.stepIcon.textContent = step.num;
+  els.inspectorTitle.textContent = step.title;
+  els.inspectorKind.textContent = step.kind;
+  els.inspectorTagline.textContent = step.tagline;
+
+  els.metricPriority.textContent = step.priority;
+  els.metricComplexity.textContent = step.complexity;
+  els.metricAuto.textContent = step.automation;
+  els.metricHuman.textContent = step.human;
+
+  els.actionList.innerHTML = step.actions.map(a => `<li>${a}</li>`).join("");
+  els.pitfallList.innerHTML = step.pitfalls.map(p => `<li>${p}</li>`).join("");
+
+  renderCheckPanel(step);
+  renderRecap(step);
+}
+
+function renderCheckPanel(step) {
+  els.checkOptions.innerHTML = step.checkOptions.map((opt, idx) => `
+    <button class="check-btn" data-correct="${opt.correct}" data-index="${idx}" type="button">${opt.text}</button>
+  `).join("");
+
+  els.checkFeedback.style.display = "none";
+  els.checkFeedback.className = "check-feedback";
+
+  els.checkOptions.querySelectorAll(".check-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const isCorrect = btn.dataset.correct === "true";
+      els.checkOptions.querySelectorAll(".check-btn").forEach(b => {
+        b.classList.remove("correct", "wrong");
+        b.disabled = true;
+      });
+      btn.classList.add(isCorrect ? "correct" : "wrong");
+
+      els.checkFeedback.style.display = "block";
+      els.checkFeedback.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+      els.checkFeedback.textContent = isCorrect ? step.checkCorrect : step.checkWrong;
+    });
+  });
+}
+
+function renderRecap(step) {
+  const recapEl = document.querySelector(".recap-strip");
+  recapEl.innerHTML = `
+    <h3>步骤要点</h3>
+    ${step.recap.map(r => `
+      <div class="recap-item">
+        <div class="recap-dot"></div>
+        <p>${r}</p>
+      </div>
+    `).join("")}
+  `;
+}
+
+function setStep(id) {
+  state.selected = id;
+  renderAll();
+}
+
+function renderAll() {
+  renderStepList();
+  renderFlowNodes();
+  renderFlowConnections();
+  renderSelected();
+}
+
+// View toggle
+document.querySelectorAll("[data-view]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    state.view = btn.dataset.view;
+    document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === state.view));
+  });
+});
+
+// Auto play
+els.autoPlayBtn.addEventListener("click", () => {
+  state.autoPlay = !state.autoPlay;
+  els.autoPlayBtn.classList.toggle("active", state.autoPlay);
+  els.autoPlayBtn.textContent = state.autoPlay ? "暂停自动播放" : "自动播放步骤";
+
+  if (state.autoPlay) {
+    startAutoPlay();
+  } else {
+    stopAutoPlay();
+  }
+});
+
+function startAutoPlay() {
+  if (state.autoPlayInterval) clearInterval(state.autoPlayInterval);
+  state.autoPlayInterval = setInterval(() => {
+    const currentIdx = DATA.steps.findIndex(s => s.id === state.selected);
+    const nextIdx = (currentIdx + 1) % DATA.steps.length;
+    setStep(DATA.steps[nextIdx].id);
+  }, 4000);
+}
+
+function stopAutoPlay() {
+  if (state.autoPlayInterval) {
+    clearInterval(state.autoPlayInterval);
+    state.autoPlayInterval = null;
+  }
+}
+
+// Keyboard nav
+document.addEventListener("keydown", (e) => {
+  const currentIdx = DATA.steps.findIndex(s => s.id === state.selected);
+  if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+    const nextIdx = (currentIdx + 1) % DATA.steps.length;
+    setStep(DATA.steps[nextIdx].id);
+  } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+    const prevIdx = (currentIdx - 1 + DATA.steps.length) % DATA.steps.length;
+    setStep(DATA.steps[prevIdx].id);
+  }
+});
+
+// Init
+renderAll();
+if (state.autoPlay) startAutoPlay();
+</script>
+</body>
+</html>
