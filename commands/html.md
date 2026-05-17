@@ -41,6 +41,19 @@ Agent tool:
     
     Generate the HTML artifact following skills/html-anything/SKILL.md.
     Apply the Output Path Rule and return the result in the specified output format.
+    
+    Additional constraints:
+    1. Mermaid diagram support:
+       - If the input contains ```mermaid code blocks, render them as interactive diagrams using mermaid.js.
+       - If the input contains code files or architecture descriptions, generate supplementary mermaid flowcharts (call graphs, module dependencies, etc.) to enhance understanding.
+       - Use mermaid.js CDN (this is a permitted external dependency for diagram rendering).
+       - Customize the mermaid theme using the Clockless token system (colors, fonts, border-radius must match the page design).
+       - Ensure diagrams are responsive and scrollable on mobile.
+       - Provide a plain-text fallback if mermaid rendering fails.
+    2. Chinese content:
+       - All user-visible text (titles, descriptions, button labels, tags, data labels, chart axes, legends) must be in Chinese.
+       - Keep technical terms in English: style names (e.g., teaching, dashboard), HTML/CSS/JS terms (e.g., data-ha-style, prefers-reduced-motion), code identifiers, and file paths.
+       - Use natural Chinese expressions; avoid machine-translated phrasing.
 ```
 
 Wait for the subagent to complete and return its output.
