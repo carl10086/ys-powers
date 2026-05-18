@@ -1,5 +1,6 @@
 """文件系统操作：安装策略、stale cleanup、卸载"""
 
+import filecmp
 import json
 import shutil
 import sys
@@ -58,6 +59,45 @@ def cleanup_stale_files(project_root: Path, source_name: str, target_dir: Path) 
             pass
         except OSError as e:
             print(f"  错误: 无法删除 {old_name}: {e}", file=sys.stderr)
+
+
+def collect_changes(source_dir: Path, target_dir: Path) -> list[tuple[str, str]]:
+    """收集源目录相对于目标目录的一级子项变更。
+
+    Args:
+        source_dir: 源目录路径
+        target_dir: 目标目录路径
+
+    Returns:
+        [(mark, name), ...]，mark 为 'A'（新增）或 'M'（修改）
+    """
+    changes: list[tuple[str, str]] = []
+
+    for item in source_dir.iterdir():
+        if "/" in item.name or "\\" in item.name or item.name.startswith("."):
+            continue
+
+        target_item = target_dir / item.name
+        if not target_item.exists():
+            changes.append(("A", item.name))
+            continue
+
+        try:
+            if item.is_file() and target_item.is_file():
+                if not filecmp.cmp(item, target_item, shallow=True):
+                    changes.append(("M", item.name))
+            elif item.is_dir() and target_item.is_dir():
+                dc = filecmp.dircmp(str(item), str(target_item))
+                if dc.diff_files or dc.left_only or dc.right_only or dc.funny_files:
+                    changes.append(("M", item.name))
+            else:
+                # 类型不同（文件 vs 目录）→ 视为修改
+                changes.append(("M", item.name))
+        except (PermissionError, OSError):
+            # 无法读取目标项时保守标记为修改
+            changes.append(("M", item.name))
+
+    return changes
 
 
 def install_folder_level(source_dir: Path, target_dir: Path) -> bool:
@@ -163,6 +203,9 @@ def install_directory(
     if strategy == "file":
         cleanup_stale_files(project_root, source_name, target_subdir)
 
+    # 收集变更（在安装前，基于当前源和目标状态）
+    changes = collect_changes(source_dir, target_subdir)
+
     # 根据策略执行复制
     if strategy == "folder":
         strategy_desc = "文件夹级全量覆盖"
@@ -179,6 +222,8 @@ def install_directory(
         print(f"✓ {source_name.capitalize()} 安装成功（{strategy_desc}）")
         print(f"  源目录: {source_dir}")
         print(f"  目标目录: {target_subdir}")
+        for mark, name in changes:
+            print(f"  {mark} {name}")
     else:
         print(f"✗ {source_name.capitalize()} 安装失败", file=sys.stderr)
 
