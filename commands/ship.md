@@ -8,7 +8,15 @@ Invoke the shipping-and-launch skill.
 
 ## Phase A — Parallel fan-out
 
-Spawn three subagents concurrently using the Agent tool. **Issue all three Agent tool calls in a single assistant turn so they execute in parallel** — sequential calls defeat the purpose of this command.
+Before spawning subagents, ask the user whether to run `security-auditor`:
+
+> 是否执行 security-auditor（安全审计）？预计耗时较长。
+> 1. 执行（默认）
+> 2. 跳过
+
+If the user chooses to skip, omit `security-auditor` from the fan-out and adjust Phase B accordingly.
+
+Then spawn the selected subagents concurrently using the Agent tool. **Issue all Agent tool calls in a single assistant turn so they execute in parallel** — sequential calls defeat the purpose of this command.
 
 In Claude Code, each call passes `subagent_type` matching the persona's `name` field:
 
@@ -30,7 +38,7 @@ Constraints (from Claude Code's subagent model):
 Once all three reports are back, the main agent (not a sub-persona) synthesizes them:
 
 1. **Code Quality** — Aggregate Critical/Important findings from `code-reviewer` and any failing tests, lint, or build output. Resolve duplicates between reviewers.
-2. **Security** — Promote any Critical/High `security-auditor` findings to launch blockers. Cross-reference with `code-reviewer`'s security axis.
+2. **Security** — If `security-auditor` was run, promote any Critical/High findings to launch blockers and cross-reference with `code-reviewer`'s security axis. If it was skipped, rely on `code-reviewer`'s security axis alone and note the skip in the output.
 3. **Performance** — Pull from `code-reviewer`'s performance axis; cross-check Core Web Vitals if applicable.
 4. **Accessibility** — Verify keyboard nav, screen reader support, contrast (not covered by the three personas — handle directly here, or invoke the accessibility checklist).
 5. **Infrastructure** — Env vars, migrations, monitoring, feature flags. Verify directly.
@@ -59,13 +67,13 @@ Produce a single output:
 
 ### Specialist reports (full)
 - [code-reviewer report]
-- [security-auditor report]
+- [security-auditor report — or "已跳过" if omitted]
 - [test-engineer report]
 ```
 
 ## Rules
 
-1. The three Phase A personas run in parallel — never sequentially.
+1. Phase A personas run in parallel — never sequentially. `security-auditor` is optional based on user confirmation; the other two always run.
 2. Personas do not call each other. The main agent merges in Phase B.
 3. The rollback plan is mandatory before any GO decision.
 4. If any persona returns a Critical finding, the default verdict is NO-GO unless the user explicitly accepts the risk.
