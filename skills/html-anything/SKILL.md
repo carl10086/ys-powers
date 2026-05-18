@@ -378,6 +378,9 @@ General requirements:
   examples, a polished light-mode Clockless surface is acceptable.
 - Inline CSS and JS in the HTML.
 - No external JS/CDN dependencies unless the user explicitly allows them.
+  **Exception: mermaid.js is permitted for diagram rendering when the source
+  contains diagram-worthy content (e.g., ` ```mermaid ` blocks, code files,
+  architecture descriptions, flowcharts).**
 - The only default external font call is the Google Fonts import from
   `prompts/styles/_design.md`.
 - Use generated bitmap assets when the experience needs rich visual
@@ -385,6 +388,40 @@ General requirements:
 - Do not build a generic landing page when the user asked for a tool,
   teaching site, dashboard, report, or explorer. Build the actual usable
   experience as the first screen.
+
+## Mermaid Diagram Support
+
+When the source content contains diagram-worthy material, embed and render
+mermaid.js in the generated HTML:
+
+- **Trigger conditions:**
+  - The input contains ` ```mermaid ` code blocks.
+  - The input is a code file and a flowchart, call graph, or module-dependency
+    diagram would improve understanding.
+  - The input is markdown/text describing processes, state machines, or
+    architecture.
+
+- **Implementation rules:**
+  - Load mermaid.js from a trusted CDN (e.g., `https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js`).
+  - Initialize mermaid in a small inline `<script>` after the DOM is ready.
+  - Customize the mermaid theme with Clockless CSS variables so diagram colors,
+    fonts, and border-radius match the surrounding page.
+  - Make diagrams responsive: `overflow-x: auto` on the container, adequate
+    padding, and minimum touch-target sizing.
+  - If mermaid fails to render, keep the original source code visible as a
+    plain-text fallback inside a `<pre>` block.
+
+## Content Language
+
+Default to Chinese for all user-visible text unless the user explicitly asks
+for English.
+
+- **In Chinese:** titles, descriptions, button labels, tags, section headings,
+  navigation items, data labels, chart axes, legends, tooltips, and helper text.
+- **In English (technical terms only):** style names (`teaching`, `dashboard`,
+  `love-romance-3d`), HTML/CSS/JS terms (`data-ha-style`, `prefers-reduced-motion`),
+  code identifiers, file paths, and command names.
+- Use natural, fluent Chinese. Avoid literal/machine-translated phrasing.
 
 ## Data And Privacy Defaults
 
