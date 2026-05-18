@@ -61,16 +61,24 @@ def cleanup_stale_files(project_root: Path, source_name: str, target_dir: Path) 
             print(f"  错误: 无法删除 {old_name}: {e}", file=sys.stderr)
 
 
-def collect_changes(source_dir: Path, target_dir: Path) -> list[tuple[str, str]]:
+def _collect_changes(source_dir: Path, target_dir: Path) -> list[tuple[str, str]]:
     """收集源目录相对于目标目录的一级子项变更。
 
     Args:
-        source_dir: 源目录路径
+        source_dir: 源目录路径（调用者需确保存在）
         target_dir: 目标目录路径
 
     Returns:
         [(mark, name), ...]，mark 为 'A'（新增）或 'M'（修改）
     """
+    # 目标目录不存在时，所有源子项均为新增，避免重复调用 exists()
+    if not target_dir.exists():
+        return [
+            ("A", item.name)
+            for item in source_dir.iterdir()
+            if "/" not in item.name and "\\" not in item.name and not item.name.startswith(".")
+        ]
+
     changes: list[tuple[str, str]] = []
 
     for item in source_dir.iterdir():
@@ -93,8 +101,8 @@ def collect_changes(source_dir: Path, target_dir: Path) -> list[tuple[str, str]]
             else:
                 # 类型不同（文件 vs 目录）→ 视为修改
                 changes.append(("M", item.name))
-        except (PermissionError, OSError):
-            # 无法读取目标项时保守标记为修改
+        except OSError:
+            # 无法读取目标项时保守标记为修改（PermissionError/FileNotFoundError 等均为 OSError 子类）
             changes.append(("M", item.name))
 
     return changes
@@ -204,7 +212,7 @@ def install_directory(
         cleanup_stale_files(project_root, source_name, target_subdir)
 
     # 收集变更（在安装前，基于当前源和目标状态）
-    changes = collect_changes(source_dir, target_subdir)
+    changes = _collect_changes(source_dir, target_subdir)
 
     # 根据策略执行复制
     if strategy == "folder":
