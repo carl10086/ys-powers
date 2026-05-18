@@ -59,6 +59,14 @@ Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出
 - 借鉴 `refer/` 内容时，应在 ys-powers 自有目录中重写，而非搬运。
 - `install/local-install.py` 的覆盖策略详见 `README.md`，本文件不重复说明。
 
+## 撰写 Skills / Commands 的强制约束
+
+**新建或重大修改 `skills/` 与 `commands/` 下文件前，必须先阅读 [`skills/writing-skills/anthropic-best-practices.md`](skills/writing-skills/anthropic-best-practices.md)。**
+
+- `skills/` 下的 SKILL.md 与子文件：**严格遵循**全部条款（YAML frontmatter、SKILL.md 500 行上限、progressive disclosure、gerund 命名、anti-patterns 等）。
+- `commands/` 下的命令手册：**参考其中通用原则**（简洁、术语一致、workflow/checklist 模式、避免时间敏感信息、anti-patterns），无需照搬 SKILL.md 专属条款。
+- 小幅微调（typo、措辞、单条 bullet）不强制重读；但凡涉及结构、段落、frontmatter 变更必须先核对。
+
 ## STALE-FILE-CLEANUP
 
 `install/local-install.py` 对 commands/rules/hooks/references 目录使用「文件级同名覆盖」策略。当源侧文件重命名（如 `review.md` → `ys-review.md`）时，目标项目中的旧名文件不会自动消失，导致新旧共存。
