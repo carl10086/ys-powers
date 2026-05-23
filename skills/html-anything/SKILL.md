@@ -301,13 +301,19 @@ Honor explicit style direction in natural language:
    reference HTML. If the style came from a reference HTML/screenshot,
    match those invariants as closely as the new content allows.
 
-7. **Build the page.**
+7. **Validate mermaid diagrams if present.**
+   If the source contains ` ```mermaid ` code blocks, read
+   [`mermaid-support.md`](mermaid-support.md) and run syntax validation
+   before generating the HTML. Do not proceed to build if validation fails;
+   report errors to the user instead.
+
+8. **Build the page.**
    Create the HTML/CSS/JS directly. Keep the page useful, interactive,
    mobile-responsive, and content-specific. Include search/filter/copy
    where it genuinely helps. Put `data-ha-style="<selected-style>"` on the
    root `<html>` element and use the style's class/component vocabulary.
 
-8. **Generate assets when they improve the artifact.**
+9. **Generate assets when they improve the artifact.**
    Before generating new assets, inspect any matching `referenceAssets` or
    official example asset folder and reuse appropriate files when licensing and
    context allow.
@@ -316,7 +322,7 @@ Honor explicit style direction in natural language:
    assets into the output folder. Do not leave referenced assets only in
    `$CODEX_HOME/generated_images`.
 
-9. **Verify in a browser.**
+10. **Verify in a browser.**
    For frontend artifacts, open the HTML via local file or local HTTP.
    Check:
    - page is nonblank,
@@ -334,7 +340,7 @@ Honor explicit style direction in natural language:
      that is the selected style.
    If any of these fails, revise the HTML before handoff.
 
-10. **Handoff.**
+11. **Handoff.**
    Give the user the local path or live link. Keep the explanation short.
 
 ## Style Fidelity Gate
@@ -392,24 +398,10 @@ General requirements:
 ## Mermaid Diagram Support
 
 When the source content contains diagram-worthy material, embed and render
-mermaid.js in the generated HTML:
-
-- **Trigger conditions:**
-  - The input contains ` ```mermaid ` code blocks.
-  - The input is a code file and a flowchart, call graph, or module-dependency
-    diagram would improve understanding.
-  - The input is markdown/text describing processes, state machines, or
-    architecture.
-
-- **Implementation rules:**
-  - Load mermaid.js from a trusted CDN (e.g., `https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js`).
-  - Initialize mermaid in a small inline `<script>` after the DOM is ready.
-  - Customize the mermaid theme with Clockless CSS variables so diagram colors,
-    fonts, and border-radius match the surrounding page.
-  - Make diagrams responsive: `overflow-x: auto` on the container, adequate
-    padding, and minimum touch-target sizing.
-  - If mermaid fails to render, keep the original source code visible as a
-    plain-text fallback inside a `<pre>` block.
+mermaid.js in the generated HTML. See [`mermaid-support.md`](mermaid-support.md)
+for full implementation rules, including: trigger conditions, CDN loading,
+Clockless theme customization, syntax validation workflow, responsive scrolling,
+zoom controls, and render-fallback behavior.
 
 ## Content Language
 
