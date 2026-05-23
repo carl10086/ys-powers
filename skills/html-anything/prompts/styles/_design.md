@@ -122,6 +122,16 @@ Plus Jakarta Sans, the only two web-font calls allowed):
 - **Body** in `var(--font-body)` (Plus Jakarta Sans), 14.5–16px,
   line-height 1.5–1.6.
 - **Mono** in `var(--font-mono)` for numerics, code, IDs.
+- **Code blocks** must preserve whitespace:
+  ```css
+  .code-block, pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  ```
 - **Surfaces are warm cream in light mode** (`var(--surface)`,
   `var(--surface-container-*)`) — not white. Cards on cream feel right.
 - **Accent is brand orange** `var(--primary)` — use sparingly, mainly
