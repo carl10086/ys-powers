@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="dashboard">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gstack 能力借鉴与集成分析</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --primary: #a03b00;
+      --primary-container: #c94c00;
+      --primary-fixed: #ffdbcd;
+      --primary-fixed-dim: #ffb597;
+      --on-primary: #ffffff;
+      --accent-glow: #E8400D;
+      --secondary: #d5baff;
+      --secondary-container: #7b40e0;
+      --tertiary: #4d44e3;
+      --accent-cyan: #00D4FF;
+      --bg: #fff8f6;
+      --surface: #fff8f6;
+      --surface-container-lowest: #ffffff;
+      --surface-container-low: #fbf2ef;
+      --surface-container: #f5ece9;
+      --surface-container-high: #efe6e3;
+      --fg-1: #1e1b19;
+      --fg-2: #594138;
+      --fg-muted: #8d7166;
+      --border: rgba(0, 0, 0, 0.06);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      --outline-variant: #e1bfb2;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+      --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+      --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+      --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+      --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+      --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+      --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+      --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+      --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+      --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #060B18;
+        --surface: #0B1426;
+        --surface-container-lowest: #101D35;
+        --surface-container-low: #101D35;
+        --surface-container: #162544;
+        --surface-container-high: #1c2d52;
+        --fg-1: #F8FAFC;
+        --fg-2: #CBD5E1;
+        --fg-muted: #64748B;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --primary: #FF6B35;
+        --accent-glow: #00D4FF;
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-1);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Navigation */
+    .nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 248, 246, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-md) var(--space-2xl);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .nav-bar { background: rgba(6, 11, 24, 0.92); }
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+
+    .nav-brand {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--space-xs);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-link {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      color: var(--fg-2);
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      background: var(--surface-container);
+      color: var(--fg-1);
+    }
+
+    .nav-link.active {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    /* Hero */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-5xl) var(--space-2xl) var(--space-4xl);
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--primary-fixed);
+      color: var(--primary);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xl);
+    }
+
+    .hero h1 {
+      font-family: var(--font-headline);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-lg);
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--fg-2);
+      max-width: 640px;
+      line-height: 1.6;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+      color: var(--fg-muted);
+      font-size: 13px;
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* KPI Rail */
+    .kpi-rail {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-2xl) var(--space-4xl);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .kpi-cell {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: box-shadow 0.2s;
+    }
+
+    .kpi-cell:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .kpi-value {
+      font-family: var(--font-headline);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--fg-1);
+      line-height: 1.2;
+    }
+
+    .kpi-context {
+      font-size: 13px;
+      color: var(--fg-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* Section headers */
+    .section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-4xl) var(--space-2xl);
+    }
+
+    .section-header {
+      margin-bottom: var(--space-3xl);
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container-high);
+      color: var(--fg-muted);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+    }
+
+    .section h2 {
+      font-family: var(--font-headline);
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--space-md);
+    }
+
+    .section-desc {
+      color: var(--fg-2);
+      font-size: 16px;
+      max-width: 640px;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface-container-lowest);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      padding: var(--space-md) var(--space-lg);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+      background: var(--surface-container);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: var(--surface-container-low); }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+    }
+
+    .badge-yellow {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+
+    .badge-blue {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+    }
+
+    .badge-purple {
+      background: rgba(123, 64, 224, 0.12);
+      color: #7b40e0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+      .badge-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+      .badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+      .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+      .badge-purple { background: rgba(123, 64, 224, 0.2); color: #a78bfa; }
+    }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      transition: box-shadow 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .card-title {
+      font-family: var(--font-headline);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg-1);
+    }
+
+    .card-body {
+      color: var(--fg-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .card-body p + p {
+      margin-top: var(--space-md);
+    }
+
+    /* Mermaid */
+    .mermaid-wrap {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin: var(--space-xl) 0;
+      overflow-x: auto;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      min-width: 600px;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border-strong);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: var(--space-3xl);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    .timeline-item.completed::before {
+      background: var(--green);
+      box-shadow: 0 0 0 2px var(--green);
+    }
+
+    .timeline-item.pending::before {
+      background: var(--yellow);
+      box-shadow: 0 0 0 2px var(--yellow);
+    }
+
+    .timeline-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: var(--space-xs);
+    }
+
+    .timeline-meta {
+      font-size: 12px;
+      color: var(--fg-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .timeline-body {
+      color: var(--fg-2);
+      font-size: 14px;
+    }
+
+    /* Priority sections */
+    .priority-a { border-left: 4px solid var(--green); }
+    .priority-b { border-left: 4px solid var(--yellow); }
+    .priority-c { border-left: 4px solid var(--blue); }
+    .priority-exclude { border-left: 4px solid var(--red); }
+
+    /* Appendix cards */
+    .appendix-card {
+      background: var(--surface-container-lowest);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-3xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .appendix-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .appendix-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .appendix-title {
+      font-family: var(--font-headline);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .appendix-subtitle {
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    .code-block {
+      background: var(--surface-container);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: var(--space-md) 0;
+    }
+
+    /* Comparison highlight */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+
+    .compare-col {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+    }
+
+    .compare-col h4 {
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 768px) {
+      .compare-grid { grid-template-columns: 1fr; }
+      .nav-inner { flex-wrap: wrap; }
+      .nav-links { width: 100%; order: 3; }
+      .kpi-rail { grid-template-columns: 1fr 1fr; }
+      .card-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-rail { grid-template-columns: 1fr; }
+    }
+
+    /* Smooth scroll offset for sticky nav */
+    :target {
+      scroll-margin-top: 80px;
+    }
+
+    /* Utility */
+    .text-gradient {
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .mt-lg { margin-top: var(--space-2xl); }
+    .mt-xl { margin-top: var(--space-3xl); }
+
+    strong { font-weight: 600; color: var(--fg-1); }
+
+    ul, ol {
+      padding-left: var(--space-xl);
+      margin: var(--space-md) 0;
+    }
+
+    li {
+      margin: var(--space-sm) 0;
+      color: var(--fg-2);
+    }
+
+    h3 {
+      font-family: var(--font-headline);
+      font-size: 20px;
+      font-weight: 600;
+      margin: var(--space-2xl) 0 var(--space-md);
+    }
+
+    h4 {
+      font-family: var(--font-headline);
+      font-size: 16px;
+      font-weight: 600;
+      margin: var(--space-xl) 0 var(--space-sm);
+    }
+
+    p {
+      color: var(--fg-2);
+      margin: var(--space-md) 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <div class="nav-inner">
+      <div class="nav-brand">gstack 分析</div>
+      <div class="nav-links">
+        <a href="#overview" class="nav-link active">概览</a>
+        <a href="#advantages" class="nav-link">优势对比</a>
+        <a href="#complementary" class="nav-link">互补点</a>
+        <a href="#excluded" class="nav-link">排除项</a>
+        <a href="#recommendations" class="nav-link">建议</a>
+        <a href="#appendix" class="nav-link">附录</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-label">能力借鉴与集成分析</div>
+    <h1>gstack 与 ys-powers：<br>互补而非代差</h1>
+    <p class="hero-subtitle">
+      基于对 gstack 50+ 技能与 ys-powers 现有能力的完整审计，本分析识别真正的互补点，
+      提出 6 项可落地的集成建议，并附 3 个重点能力的详细设计草案。
+    </p>
+    <div class="hero-meta">
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        2026/05/25
+      </span>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        3 份源文档
+      </span>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        阅读约 12 分钟
+      </span>
+    </div>
+  </header>
+
+  <!-- KPI Rail -->
+  <section class="kpi-rail">
+    <div class="kpi-cell">
+      <div class="kpi-label">gstack 技能总数</div>
+      <div class="kpi-value">50+</div>
+      <div class="kpi-context">7 大分类，覆盖全生命周期</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">ys-powers 现有能力</div>
+      <div class="kpi-value">45</div>
+      <div class="kpi-context">25 skills + 20 commands</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">建议引入</div>
+      <div class="kpi-value" style="color: var(--green);">6</div>
+      <div class="kpi-context">按投入产出比排序</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">明确排除</div>
+      <div class="kpi-value" style="color: var(--red);">9</div>
+      <div class="kpi-context">平台特定或定位冲突</div>
+    </div>
+  </section>
+
+  <!-- Overview -->
+  <section class="section" id="overview">
+    <div class="section-header">
+      <div class="section-tag">项目定位</div>
+      <h2>gstack 是什么</h2>
+      <p class="section-desc">
+        gstack 是一套将 Claude Code 转化为虚拟工程团队的开源技能框架，
+        由 Y Combinator 总裁 Garry Tan 维护。核心差异不是个人能力，而是工具链。
+      </p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Process over prompts</div>
+        </div>
+        <div class="card-body">
+          gstack 是一个冲刺流程，不是提示词集合。技能之间环环相扣：
+          /office-hours 产出设计文档 → /plan-ceo-review 审视 → /plan-eng-review 锁定架构 → /qa 执行测试。
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Boil the Lake</div>
+        </div>
+        <div class="card-body">
+          在 AI 时代，完整性比捷径更便宜。每个技能都追求端到端的彻底实现，
+          而非最小可行演示。/ship 会自举测试框架，/qa 会打开真实浏览器找 bug。
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Real browser as first-class</div>
+        </div>
+        <div class="card-body">
+          浏览器不是事后补丁，而是整个体系的硬核心。持久化 Chromium 守护进程、
+          亚秒级延迟、真实 Cookie 导入、反 bot stealth。
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Measurable claims</div>
+        </div>
+        <div class="card-body">
+          所有生产力声明都有方法论、复现脚本和可审计数据。
+          Garry Tan 在 2026 年前 4 个月的生产力是他 2013 年水平的 240 倍。
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mt-xl">架构概览</h3>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+graph TB
+    A[gstack] --> B[skills/]
+    A --> C[browse/]
+    A --> D[extension/]
+    A --> E[bin/]
+    A --> F[hosts/]
+    A --> G[docs/designs/]
+    B --> B1[规划类: office-hours, autoplan...]
+    B --> B2[实现类: review, investigate...]
+    B --> B3[发布类: ship, canary...]
+    B --> B4[运营类: learn, health...]
+    B --> B5[浏览器: browse, pair-agent...]
+    B --> B6[iOS QA: ios-qa, ios-fix...]
+    B --> B7[安全: cso, guard...]
+    C --> C1[headless Chromium 守护进程]
+    D --> D1[Chrome 侧边栏扩展]
+    E --> E1[60+ CLI 工具]
+    F --> F1[多智能体适配层]
+    G --> G1[18 份架构决策记录]
+      </div>
+    </div>
+
+    <h3 class="mt-xl">生命周期流程</h3>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+graph LR
+    A[Think<br/>思考] --> B[Plan<br/>计划]
+    B --> C[Build<br/>构建]
+    C --> D[Review<br/>审查]
+    D --> E[Test<br/>测试]
+    E --> F[Ship<br/>发布]
+    F --> G[Reflect<br/>复盘]
+    G --> A
+    style A fill:#a03b00,stroke:#fff,color:#fff
+    style B fill:#c94c00,stroke:#fff,color:#fff
+    style C fill:#7b40e0,stroke:#fff,color:#fff
+    style D fill:#4d44e3,stroke:#fff,color:#fff
+    style E fill:#00D4FF,stroke:#fff,color:#1e1b19
+    style F fill:#10b981,stroke:#fff,color:#fff
+    style G fill:#f59e0b,stroke:#fff,color:#1e1b19
+      </div>
+    </div>
+  </section>
+
+  <!-- Advantages -->
+  <section class="section" id="advantages">
+    <div class="section-header">
+      <div class="section-tag">第一部分</div>
+      <h2>公允对比：ys-powers 的优势领域</h2>
+      <p class="section-desc">
+        经过对 26 个 skills、19 个 commands、rules、SOP 系统的完整审计，
+        ys-powers 在以下领域明显更强或至少持平。
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>领域</th>
+            <th>ys-powers 能力深度</th>
+            <th>gstack 对应能力</th>
+            <th>结论</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>技能编写方法论</strong></td>
+            <td>writing-skills 用 RED-GREEN-REFACTOR 写技能，TDD 式压力测试验证</td>
+            <td>直接写模板，无测试验证机制</td>
+            <td><span class="badge badge-green">ys-powers 独有</span></td>
+          </tr>
+          <tr>
+            <td><strong>编码规范体系</strong></td>
+            <td>code.md 行为指南 + code-simplification + 五轴审查 + Code Smells 目录</td>
+            <td>审查有子专家分工，但无系统规范约束</td>
+            <td><span class="badge badge-green">ys-powers 更系统</span></td>
+          </tr>
+          <tr>
+            <td><strong>Git 工作流</strong></td>
+            <td>git-workflow-and-versioning + gc + s2m + local-commit + worktree 支持</td>
+            <td>基础 git 操作 + /ship</td>
+            <td><span class="badge badge-green">ys-powers 更完整</span></td>
+          </tr>
+          <tr>
+            <td><strong>发布流程</strong></td>
+            <td>shipping-and-launch（feature flag、staged rollout、rollback plan、监控阈值表）</td>
+            <td>/ship 自举测试框架，但发布策略较薄</td>
+            <td><span class="badge badge-green">ys-powers 更深</span></td>
+          </tr>
+          <tr>
+            <td><strong>文档工程</strong></td>
+            <td>documentation-and-adrs + build-doc（强制 HTML 预览）+ doc-codebase（8 段 ARCHITECTURE.md 模板）</td>
+            <td>Diataxis 体系 + /document-generate</td>
+            <td><span class="badge badge-blue">各有特色，持平</span></td>
+          </tr>
+          <tr>
+            <td><strong>HTML 生成</strong></td>
+            <td>html-anything（17+ 风格，30+ 数据源）</td>
+            <td>/design-html（Pretext UI，30KB）</td>
+            <td><span class="badge badge-green">ys-powers 更丰富</span></td>
+          </tr>
+          <tr>
+            <td><strong>经验沉淀</strong></td>
+            <td>sop-search + sop-add（从会话自动提取结构化 SOP）</td>
+            <td>/learn（结构化学习记录）</td>
+            <td><span class="badge badge-blue">各有特色，持平</span></td>
+          </tr>
+          <tr>
+            <td><strong>源码驱动</strong></td>
+            <td>source-driven-development（强制引用官方文档，拒绝 Stack Overflow）</td>
+            <td>无对应能力</td>
+            <td><span class="badge badge-green">ys-powers 独有</span></td>
+          </tr>
+          <tr>
+            <td><strong>教学能力</strong></td>
+            <td>teach-code（"教一段问一段"交互模式）</td>
+            <td>无</td>
+            <td><span class="badge badge-green">ys-powers 独有</span></td>
+          </tr>
+          <tr>
+            <td><strong>调试方法论</strong></td>
+            <td>debugging-and-error-recovery（Stop-the-Line、最小失败用例、回归测试）</td>
+            <td>/investigate（系统化根因分析）</td>
+            <td><span class="badge badge-blue">持平</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top: var(--space-xl);">
+      <div class="card-body">
+        <strong>关键洞察：</strong>ys-powers 不是"缺东西"，而是<strong>角度不同</strong>。
+        ys-powers 聚焦<strong>工程正确性</strong>（编码规范、Git 工作流、测试方法论、源码验证），
+        gstack 聚焦<strong>产品交付速度</strong>（CEO 视角、设计探索、浏览器闭环、发布后监控）。
+        两者的差异是<strong>互补</strong>，不是<strong>代差</strong>。
+      </div>
+    </div>
+  </section>
+
+  <!-- Complementary -->
+  <section class="section" id="complementary">
+    <div class="section-header">
+      <div class="section-tag">第二部分</div>
+      <h2>真正的互补点</h2>
+      <p class="section-desc">
+        以下 gstack 能力可以为 ys-powers 用户带来明确增益，按投入产出比分为 A/B/C 三类。
+      </p>
+    </div>
+
+    <h3>A 类：低投入高回报（建议近期引入）</h3>
+
+    <div class="card-grid">
+      <div class="card priority-a">
+        <div class="card-header">
+          <div>
+            <div class="card-title">ys-guard：安全防护硬边界</div>
+          </div>
+          <span class="badge badge-green">低投入高回报</span>
+        </div>
+        <div class="card-body">
+          <p><strong>gstack 做法：</strong>/careful 在破坏性命令前强制警告；/freeze 硬阻断对指定目录外的编辑；/guard 同时激活两者。</p>
+          <p><strong>ys-powers 现状：</strong>完全无此能力，依赖 Claude 内置安全机制和用户确认。</p>
+          <p><strong>为什么值得关心：</strong>防止 AI 在自主模式下误执行危险操作（rm -rf、force-push、误删迁移文件）。这是<strong>防御性基础设施</strong>，投入极低，收益明确。</p>
+          <p><strong>集成建议：</strong>新增 ys-guard command，通过规则注入实现"冻结目录"和"危险命令警告"。不改动现有 workflow，作为可选安全网。</p>
+        </div>
+      </div>
+
+      <div class="card priority-a">
+        <div class="card-header">
+          <div>
+            <div class="card-title">ys-health：代码健康仪表盘</div>
+          </div>
+          <span class="badge badge-green">低投入高回报</span>
+        </div>
+        <div class="card-body">
+          <p><strong>gstack 做法：</strong>聚合类型检查、lint、测试、死代码检测，输出 0-10 分质量分数和趋势。</p>
+          <p><strong>ys-powers 现状：</strong>有 code-review-and-quality、code-simplification、security-and-hardening，但无<strong>统一量化仪表盘</strong>。</p>
+          <p><strong>为什么值得关心：</strong>质量退化是渐进的，需要<strong>可量化的监控</strong>才能及时发现。对技术负责人管理多项目尤其有价值。</p>
+          <p><strong>集成建议：</strong>新增 ys-health command，聚合 tsc、eslint、test、knip 结果并输出分数。复用现有工具，不引入新依赖。</p>
+        </div>
+      </div>
+
+      <div class="card priority-a">
+        <div class="card-header">
+          <div>
+            <div class="card-title">context-save/restore：跨会话快照</div>
+          </div>
+          <span class="badge badge-green">低投入高回报</span>
+        </div>
+        <div class="card-body">
+          <p><strong>gstack 做法：</strong>保存当前工作状态（git 状态、决策、剩余任务、关键文件），跨会话恢复。</p>
+          <p><strong>ys-powers 现状：</strong>context-engineering 管理上下文层次，但无<strong>持久化快照</strong>机制。</p>
+          <p><strong>为什么值得关心：</strong>Claude 的上下文压缩会导致"每次会话从零开始"，特别是对于多日的复杂任务。快照恢复可显著降低续作成本。</p>
+          <p><strong>集成建议：</strong>基于 .claude/memory/ 扩展，新增 context-save / context-restore commands。格式为结构化 Markdown + YAML frontmatter，无需外部数据库。</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>B 类：中等投入，场景特定（按需引入）</h3>
+
+    <div class="card-grid">
+      <div class="card priority-b">
+        <div class="card-header">
+          <div>
+            <div class="card-title">ys-office-hours：产品视角前置</div>
+          </div>
+          <span class="badge badge-yellow">中等投入</span>
+        </div>
+        <div class="card-body">
+          <p><strong>gstack 做法：</strong>YC 风格的 6 个强制性问题，从商业/用户价值角度重新框定需求。</p>
+          <p><strong>为什么值得关心：</strong>工程团队容易陷入"用优雅方案解决错误问题"。/office-hours 是<strong>项目启动时的疫苗</strong>——在投入大量工程资源前验证方向。</p>
+          <p><strong>为什么不是 P0：</strong>对已有明确需求的工程任务价值有限，不是每次编码都需要。</p>
+        </div>
+      </div>
+
+      <div class="card priority-b">
+        <div class="card-header">
+          <div>
+            <div class="card-title">浏览器闭环 QA</div>
+          </div>
+          <span class="badge badge-yellow">中等投入</span>
+        </div>
+        <div class="card-body">
+          <p><strong>gstack 做法：</strong>打开真实浏览器 → 找 bug → 原子修复 → 回归验证 → 生成回归测试。</p>
+          <p><strong>为什么值得关心：</strong>把浏览器测试从"人看报告"升级为"AI 闭环修复"，对前端项目有明确增益。</p>
+          <p><strong>为什么不是 P0：</strong>实现较重（需 Playwright 或 headless browser），且 browser-testing-with-devtools 已覆盖 80% 场景。</p>
+        </div>
+      </div>
+
+      <div class="card priority-b">
+        <div class="card-header">
+          <div>
+            <div class="card-title">ys-retro：工程复盘</div>
+          </div>
+          <span class="badge badge-yellow">中等投入</span>
+        </div>
+        <div class="card-body">
+          <p><strong>gstack 做法：</strong>每周复盘，含个人分工、shipping streak、质量趋势。</p>
+          <p><strong>为什么值得关心：</strong>帮助个人和小团队建立持续改进循环。对独立开发者尤其有价值。</p>
+          <p><strong>集成建议：</strong>新增 ys-retro command，基于 git log 和本周变更自动生成结构化复盘模板。低投入。</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>C 类：观望中（待验证需求）</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>能力</th>
+            <th>说明</th>
+            <th>观望理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>/canary 发布后持续监控</strong></td>
+            <td>部署后循环检测控制台错误、性能回退</td>
+            <td>shipping-and-launch 已有 post-launch 验证，持续监控可用现有监控工具替代</td>
+          </tr>
+          <tr>
+            <td><strong>/design-shotgun 视觉探索</strong></td>
+            <td>AI mockup 变体生成</td>
+            <td>依赖 GPT Image API，投入高，场景窄（非设计师用户）</td>
+          </tr>
+          <tr>
+            <td><strong>/devex-review DX 审计</strong></td>
+            <td>真实走 onboarding，截图错误</td>
+            <td>有价值但耗时（20-45 分钟），适合季度而非日常</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Excluded -->
+  <section class="section" id="excluded">
+    <div class="section-header">
+      <div class="section-tag">第三部分</div>
+      <h2>明确排除的能力</h2>
+      <p class="section-desc">
+        以下能力与 ys-powers 的定位冲突，或投入产出比过低，明确排除。
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>能力</th>
+            <th>排除理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>iOS 全系列</strong>（/ios-qa、/ios-fix 等）</td>
+            <td>平台特定，仅 iOS 开发者需要，且依赖 macOS + Xcode</td>
+          </tr>
+          <tr>
+            <td><strong>Chrome 扩展</strong>（extension/）</td>
+            <td>独立产品级别工作量，与 ys-powers CLI 工具定位冲突</td>
+          </tr>
+          <tr>
+            <td><strong>多智能体适配层</strong>（hosts/）</td>
+            <td>ys-powers 明确聚焦 Claude Code 生态，不追求跨 CLI 兼容</td>
+          </tr>
+          <tr>
+            <td><strong>OpenClaw 集成</strong></td>
+            <td>除非用户明确使用 OpenClaw，否则不进入此赛道</td>
+          </tr>
+          <tr>
+            <td><strong>/codex</strong>（第二意见）</td>
+            <td>依赖 OpenAI Codex CLI，与单模型专注冲突</td>
+          </tr>
+          <tr>
+            <td><strong>gbrain 跨机器同步</strong></td>
+            <td>基础设施重（PGLite/Supabase），.claude/memory/ + SOP 已覆盖 80% 场景</td>
+          </tr>
+          <tr>
+            <td><strong>/make-pdf</strong></td>
+            <td>独立工具，与核心工程工作流无关</td>
+          </tr>
+          <tr>
+            <td><strong>/benchmark-models</strong></td>
+            <td>跨模型技能基准，偏研究性质，对终端用户价值有限</td>
+          </tr>
+          <tr>
+            <td><strong>/scrape + /skillify</strong></td>
+            <td>网页数据抓取 → 固化技能，场景偏窄</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Recommendations -->
+  <section class="section" id="recommendations">
+    <div class="section-header">
+      <div class="section-tag">第四部分</div>
+      <h2>集成建议与路线图</h2>
+      <p class="section-desc">
+        基于"不追全覆盖、低投入优先、重写而非搬运、与现有体系兼容"四项原则。
+      </p>
+    </div>
+
+    <h3>建议引入清单</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>优先级</th>
+            <th>能力</th>
+            <th>形式</th>
+            <th>投入</th>
+            <th>预期收益</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-green">1</span></td>
+            <td><strong>ys-guard</strong>（安全防护边界）</td>
+            <td>command</td>
+            <td>低（规则注入）</td>
+            <td>防止 AI 误执行危险操作</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">2</span></td>
+            <td><strong>ys-health</strong>（代码健康仪表盘）</td>
+            <td>command</td>
+            <td>低（工具聚合）</td>
+            <td>量化质量监控</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">3</span></td>
+            <td><strong>context-save/restore</strong>（上下文快照）</td>
+            <td>command pair</td>
+            <td>中（基于 memory 扩展）</td>
+            <td>跨会话续作</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">4</span></td>
+            <td><strong>ys-office-hours</strong>（产品视角审查）</td>
+            <td>command</td>
+            <td>低（prompt 工程）</td>
+            <td>项目启动方向验证</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">5</span></td>
+            <td><strong>ys-retro</strong>（工程复盘）</td>
+            <td>command</td>
+            <td>低（git log 聚合）</td>
+            <td>持续改进循环</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">6</span></td>
+            <td><strong>浏览器闭环 QA</strong></td>
+            <td>skill 扩展</td>
+            <td>高（需 Playwright）</td>
+            <td>前端 bug 自动修复</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="mt-xl">实施路线图</h3>
+    <div class="timeline">
+      <div class="timeline-item completed">
+        <div class="timeline-title">Phase 0：分析完成</div>
+        <div class="timeline-meta">2026/05/25</div>
+        <div class="timeline-body">完成 gstack 完整技能审计，识别互补点与排除项，输出三份分析文档。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-title">Phase 1：防御性基础设施（2 周）</div>
+        <div class="timeline-meta">预计 2026/06</div>
+        <div class="timeline-body">实现 ys-guard（规则注入）、ys-health（工具聚合）、context-save/restore（memory 扩展）。三项均为低投入，可并行。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-title">Phase 2：流程增强（2 周）</div>
+        <div class="timeline-meta">预计 2026/06-07</div>
+        <div class="timeline-body">实现 ys-office-hours（产品审查 prompt）、ys-retro（git log 复盘模板）。与现有 spec/plan/build 流程集成。</div>
+      </div>
+      <div class="timeline-item pending">
+        <div class="timeline-title">Phase 3：浏览器闭环（待定）</div>
+        <div class="timeline-meta">视需求验证</div>
+        <div class="timeline-body">调研 Playwright MCP 可行性，评估是否扩展 browser-testing-with-devtools 的"修复 + 回归测试"分支。高投入，需明确 ROI。</div>
+      </div>
+    </div>
+
+    <h3 class="mt-xl">不建议做的事情</h3>
+    <div class="card-grid">
+      <div class="card priority-exclude">
+        <div class="card-title" style="margin-bottom: var(--space-md);">不引入 /autoplan 一键流水线</div>
+        <div class="card-body">
+          ys-powers 的 spec → plan → build → test → ship 流程已足够系统，
+          强制串行审查反而降低灵活性。
+        </div>
+      </div>
+      <div class="card priority-exclude">
+        <div class="card-title" style="margin-bottom: var(--space-md);">不升级 security-and-hardening 为子专家模式</div>
+        <div class="card-body">
+          当前的五轴审查 + security-and-hardening 三层级（Always/Ask/Never）已足够系统，
+          子专家分工增加复杂度而不增加覆盖率。
+        </div>
+      </div>
+      <div class="card priority-exclude">
+        <div class="card-title" style="margin-bottom: var(--space-md);">不引入 Diataxis 文档类型标记</div>
+        <div class="card-body">
+          build-doc 的强制 HTML 预览 + doc-codebase 的 8 段模板已足够实用，
+          Diataxis 分类增加认知负担。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Appendix -->
+  <section class="section" id="appendix">
+    <div class="section-header">
+      <div class="section-tag">附录</div>
+      <h2>重点能力详细设计</h2>
+      <p class="section-desc">
+        以下为建议近期引入的 3 个能力的详细设计草案，供 implementation 参考。
+      </p>
+    </div>
+
+    <!-- Appendix A -->
+    <div class="appendix-card">
+      <div class="appendix-header">
+        <div class="appendix-icon">A</div>
+        <div>
+          <div class="appendix-title">ys-guard 安全防护边界</div>
+          <div class="appendix-subtitle">防御性基础设施 | 零外部依赖 | 纯规则注入</div>
+        </div>
+      </div>
+
+      <h4>定位</h4>
+      <p>通过 CLAUDE.md 规则注入，在 AI 自主执行 workflow（如 /build、/refactor）时提供硬边界，防止误删、误改、误推。</p>
+
+      <h4>触发条件</h4>
+      <ul>
+        <li>用户显式运行 /ys-guard 或 /ys-guard on</li>
+        <li>可在 plan 或 spec 阶段作为可选步骤自动建议启用</li>
+        <li>对涉及数据库迁移、文件删除、git 强制操作的会话自动激活</li>
+      </ul>
+
+      <h4>工作流</h4>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+graph LR
+    A[检测项目根目录] --> B[写入 .claude/rules/guard.md]
+    B --> C[定义 DANGEROUS_COMMANDS]
+    B --> D[定义 FREEZE_SCOPE]
+    B --> E[规则：危险命令前必须确认]
+    B --> F[规则：禁止编辑冻结范围外文件]
+    C --> G[向用户确认 guard 已激活]
+    D --> G
+    E --> G
+    F --> G
+    G --> H[可选：/ys-guard off 解除]
+        </div>
+      </div>
+
+      <h4>输出格式</h4>
+      <div class="code-block">🛡️ ys-guard 已激活
+冻结范围：/Users/carlyu/project/xyz
+危险命令拦截：rm -rf, git push --force, DROP TABLE, ...
+运行 /ys-guard off 解除</div>
+
+      <h4>实现约束</h4>
+      <ul>
+        <li><strong>零外部依赖</strong> — 纯规则注入，不写代码</li>
+        <li><strong>文件体积</strong> — guard.md &lt; 100 行</li>
+        <li><strong>不阻断正常 workflow</strong> — 只拦截明确危险的命令</li>
+        <li><strong>可逆</strong> — 用户可随时 /ys-guard off 解除</li>
+      </ul>
+    </div>
+
+    <!-- Appendix B -->
+    <div class="appendix-card">
+      <div class="appendix-header">
+        <div class="appendix-icon">B</div>
+        <div>
+          <div class="appendix-title">ys-health 代码健康仪表盘</div>
+          <div class="appendix-subtitle">量化质量监控 | 复用现有工具 | 零配置优先</div>
+        </div>
+      </div>
+
+      <h4>定位</h4>
+      <p>聚合项目中已有的质量工具，输出统一分数和趋势，让质量退化<strong>可见</strong>。</p>
+
+      <h4>触发条件</h4>
+      <ul>
+        <li>用户显式运行 /ys-health</li>
+        <li>建议作为 ship command 的 pre-check 可选步骤</li>
+        <li>建议每周由用户手动运行一次（不适合每次 commit 运行，避免噪音）</li>
+      </ul>
+
+      <h4>工作流</h4>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+graph LR
+    A[探测项目类型] --> B{TypeScript?}
+    A --> C{Python?}
+    A --> D{Go?}
+    A --> E{Rust?}
+    B --> F[检查 tsc/eslint/knip]
+    C --> G[检查 mypy/ruff/vulture]
+    D --> H[检查 go vet/staticcheck]
+    E --> I[检查 cargo check/clippy]
+    F --> J[并行运行可用工具]
+    G --> J
+    H --> J
+    I --> J
+    J --> K[统计五维度分数]
+    K --> L[计算总分 0-10]
+    L --> M[对比历史趋势]
+    M --> N[生成修复建议]
+        </div>
+      </div>
+
+      <h4>输出格式</h4>
+      <div class="code-block"># 代码健康报告 — 2026/05/25
+
+**总分：7.2 / 10** （上次：6.8 ↑）
+
+| 维度 | 分数 | 状态 | 详情 |
+|------|------|------|------|
+| 类型安全 | 8.5 | 🟢 | tsc: 0 错误 |
+| 代码规范 | 7.0 | 🟡 | eslint: 12 warnings（3 个可自动修复）|
+| 测试覆盖 | 6.5 | 🟡 | 通过率 100%，覆盖率 62%（目标 80%）|
+| 死代码 | 9.0 | 🟢 | knip: 2 个未引用导出 |
+| 安全漏洞 | 5.0 | 🔴 | npm audit: 1 critical, 3 high |
+
+## 优先修复
+1. [🔴] 运行 npm audit fix 修复 1 critical 漏洞
+2. [🟡] 运行 eslint --fix 自动修复 3 个 warning
+3. [🟡] 为 src/utils/validator.ts 补充测试（当前 0% 覆盖）</div>
+
+      <h4>实现约束</h4>
+      <ul>
+        <li><strong>复用现有工具</strong> — 不引入新的 linter/类型检查器</li>
+        <li><strong>零配置优先</strong> — 自动探测工具链，用户无需手动配置</li>
+        <li><strong>历史记录轻量</strong> — 只保留最近 10 次运行</li>
+        <li><strong>失败优雅</strong> — 若某工具未安装，该维度标记为 N/A</li>
+      </ul>
+    </div>
+
+    <!-- Appendix C -->
+    <div class="appendix-card">
+      <div class="appendix-header">
+        <div class="appendix-icon">C</div>
+        <div>
+          <div class="appendix-title">context-save / context-restore</div>
+          <div class="appendix-subtitle">跨会话上下文快照 | 纯 Markdown | 自动清理</div>
+        </div>
+      </div>
+
+      <h4>定位</h4>
+      <p>解决 Claude 上下文压缩导致的"每次会话从零开始"问题。保存复杂任务的中间状态，支持跨日续作。</p>
+
+      <h4>触发条件</h4>
+      <p><strong>context-save：</strong></p>
+      <ul>
+        <li>用户显式运行 /context-save</li>
+        <li>长任务（&gt; 30 分钟）结束时自动建议</li>
+        <li>会话结束前检测到未完成任务时提示</li>
+      </ul>
+      <p><strong>context-restore：</strong></p>
+      <ul>
+        <li>用户显式运行 /context-restore</li>
+        <li>进入项目时检测到存在未恢复的上下文快照时提示</li>
+      </ul>
+
+      <h4>工作流</h4>
+      <div class="mermaid-wrap">
+        <div class="mermaid">
+graph TB
+    subgraph Save [context-save]
+      S1[收集会话状态] --> S2[git 状态]
+      S1 --> S3[当前活跃任务]
+      S1 --> S4[关键决策]
+      S1 --> S5[剩余工作清单]
+      S1 --> S6[关键文件路径]
+      S1 --> S7[已知阻塞点]
+      S2 --> S8[生成快照文件]
+      S3 --> S8
+      S4 --> S8
+      S5 --> S8
+      S6 --> S8
+      S7 --> S8
+    end
+    subgraph Restore [context-restore]
+      R1[扫描快照目录] --> R2[列出最近快照]
+      R2 --> R3[用户选择快照]
+      R3 --> R4[展示摘要]
+      R4 --> R5[用户确认]
+      R5 --> R6[加载文件上下文]
+      R6 --> R7[继续执行]
+    end
+        </div>
+      </div>
+
+      <h4>快照文件格式</h4>
+      <div class="code-block">---
+type: context-snapshot
+created: 2026-05-25T14:30:00
+project: ys-powers
+branch: feat/health-command
+keyword: health-command-halfway
+---
+
+# 上下文快照：health-command-halfway
+
+## 当前任务
+实现 ys-health command（源自 gstack 借鉴分析）
+- [x] 阅读 gstack /health 实现参考
+- [x] 设计 ys-health 工作流和输出格式
+- [ ] 编写 command 文件
+- [ ] 测试在 TypeScript 项目上的行为
+- [ ] 更新 integration-analysis.md 文档
+
+## 已做出的关键决策
+1. **工具探测策略**：自动检测 tsc/eslint/knip
+2. **分数算法**：加权平均
+3. **历史记录**：只保留 10 次
+
+## 已知阻塞点
+- 不确定 Python 项目的工具链探测是否准确
+- 与 ship command 的集成方式待确认
+
+## 相关文件
+- docs/gstack/integration-analysis.md
+- （待创建）commands/ys-health.md
+
+## Git 状态
+- 分支：feat/health-command
+- 未提交：docs/gstack/integration-analysis.md</div>
+
+      <h4>实现约束</h4>
+      <ul>
+        <li><strong>无外部数据库</strong> — 纯 Markdown 文件，基于 .claude/memory/ 扩展</li>
+        <li><strong>自动清理</strong> — 只保留最近 20 个快照，超出的自动归档</li>
+        <li><strong>轻量提取</strong> — 不尝试用 NLP 分析整个 conversation</li>
+        <li><strong>人工确认</strong> — restore 时必须经过用户确认</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="max-width: 1200px; margin: 0 auto; padding: var(--space-4xl) var(--space-2xl); text-align: center; color: var(--fg-muted); font-size: 13px; border-top: 1px solid var(--border);">
+    <p>分析日期：2026/05/25 | 来源：refer/gstack/ vs ys-powers/ 现有能力</p>
+    <p style="margin-top: var(--space-sm);">约束：refer/ 下文件只读；借鉴时须在 ys-powers 自有目录重写，禁止直接复制粘贴</p>
+  </footer>
+
+  <script>
+    // Initialize Mermaid
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#fff8f6',
+        primaryTextColor: '#1e1b19',
+        primaryBorderColor: '#e1bfb2',
+        lineColor: '#8d7166',
+        secondaryColor: '#f5ece9',
+        tertiaryColor: '#fff8f6',
+        fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    // Navigation active state
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function updateActiveNav() {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+    updateActiveNav();
+
+    // Smooth scroll for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
