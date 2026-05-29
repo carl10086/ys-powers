@@ -4,6 +4,13 @@
 
 ## 安装
 
+### 前置依赖
+
+- **[uv](https://docs.astral.sh/uv/)** — Python 包管理器（安装脚本通过 `uv run --python 3.12` 执行）
+- **Python 3.12** — 由 uv 自动安装：`uv python install 3.12`
+
+若系统 Python 版本低于 3.10 且未安装 uv，运行安装命令时脚本会输出安装指引。
+
 ys-powers 提供两种安装方式，分别适用于不同场景：
 
 | 方式 | 命令 | 适用场景 |

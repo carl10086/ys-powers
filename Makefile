@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := help
 
 YS_POWERS_ROOT := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+PYTHON := uv run --python 3.12 python
 
 .PHONY: help sync-html global-install local-install update-global update-local uninstall-global uninstall-local
 
@@ -32,40 +33,40 @@ help:
 	@echo "  hooks 注入 settings.json (global) 或 settings.local.json (local)"
 
 sync-html:
-	python3 scripts/sync_html_anything.py
+	$(PYTHON) scripts/sync_html_anything.py
 
 global-install:
-	python3 $(YS_POWERS_ROOT)/install/install.py install global
+	$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install global
 
 local-install:
 	@if [ -n "$(project-dir)" ]; then \
-		python3 $(YS_POWERS_ROOT)/install/install.py install local --target $(project-dir); \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install local --target $(project-dir); \
 	elif [ -n "$(p)" ]; then \
-		python3 $(YS_POWERS_ROOT)/install/install.py install local --target $(p); \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install local --target $(p); \
 	else \
-		python3 $(YS_POWERS_ROOT)/install/install.py install local; \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install local; \
 	fi
 
 update-global:
-	python3 $(YS_POWERS_ROOT)/install/install.py update global
+	$(PYTHON) $(YS_POWERS_ROOT)/install/install.py update global
 
 update-local:
 	@if [ -n "$(project-dir)" ]; then \
-		python3 $(YS_POWERS_ROOT)/install/install.py update local --target $(project-dir); \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py update local --target $(project-dir); \
 	elif [ -n "$(p)" ]; then \
-		python3 $(YS_POWERS_ROOT)/install/install.py update local --target $(p); \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py update local --target $(p); \
 	else \
-		python3 $(YS_POWERS_ROOT)/install/install.py update local; \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py update local; \
 	fi
 
 uninstall-global:
-	python3 $(YS_POWERS_ROOT)/install/install.py uninstall global
+	$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall global
 
 uninstall-local:
 	@if [ -n "$(project-dir)" ]; then \
-		python3 $(YS_POWERS_ROOT)/install/install.py uninstall local --target $(project-dir); \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall local --target $(project-dir); \
 	elif [ -n "$(p)" ]; then \
-		python3 $(YS_POWERS_ROOT)/install/install.py uninstall local --target $(p); \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall local --target $(p); \
 	else \
-		python3 $(YS_POWERS_ROOT)/install/install.py uninstall local; \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall local; \
 	fi
