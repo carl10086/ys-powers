@@ -15,11 +15,26 @@ Follow explore-then-ask's full flow: surface assumptions, propose 2-3 approaches
 
 ## Phase 2: Write Skill
 
+**Before writing, read `skills/writing-skills/anthropic-best-practices.md` for mandatory authoring constraints.**
+
 Invoke the **writing-skills** skill to run the RED-GREEN-REFACTOR cycle:
 
 1. **RED** — Create pressure scenarios, run WITHOUT the skill, document baseline behavior
 2. **GREEN** — Write minimal `SKILL.md` addressing the baseline failures, run WITH the skill
 3. **REFACTOR** — Close loopholes, add red flags, re-test until bulletproof
+
+## Phase 3: Verify Checklist
+
+Before finishing, confirm every item below:
+
+- [ ] **Read `skills/writing-skills/anthropic-best-practices.md`** — All constraints reviewed (naming, description format, gerund naming, progressive disclosure, token limits, CSO rules)
+- [ ] **Content language** — Skill body is in Chinese; technical terms, code identifiers, file paths, and command names remain in English
+- [ ] **YAML frontmatter** — `name` (kebab-case, ≤64 chars) and `description` (starts with "Use when...", third person, ≤1024 chars) are correct
+- [ ] **SKILL.md body ≤ 500 lines** — If exceeded, split into separate files using progressive disclosure
+- [ ] **RED phase completed** — Baseline behavior documented with specific rationalizations/failures
+- [ ] **GREEN phase completed** — Skill addresses baseline failures; agent complies with skill present
+- [ ] **REFACTOR phase completed** — Loopholes closed, rationalization table built, re-tested
+- [ ] **Saved to correct path** — `.claude/skills/<skill-name>/SKILL.md` (kebab-case)
 
 <IMPORTANT>
 - Write all skill content in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
