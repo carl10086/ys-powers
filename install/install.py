@@ -11,8 +11,22 @@ Usage:
     python install/install.py uninstall local [--target <path>]
 """
 
-import argparse
 import sys
+
+if sys.version_info < (3, 10):
+    _py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    print(f"✗ 需要 Python 3.10+，当前: {_py_ver}", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("推荐方式（通过 uv）:", file=sys.stderr)
+    print("  curl -LsSf https://astral.sh/uv/install.sh | sh", file=sys.stderr)
+    print("  uv python install 3.12", file=sys.stderr)
+    print("  uv run --python 3.12 python install/install.py <action> <scope>", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("其他方式:", file=sys.stderr)
+    print("  自行安装 Python 3.10+，然后重新运行安装命令", file=sys.stderr)
+    sys.exit(1)
+
+import argparse
 from pathlib import Path
 
 from lib.config import DIRECTORIES
