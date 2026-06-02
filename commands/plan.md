@@ -6,8 +6,13 @@ Invoke the planning-and-task-breakdown skill.
 
 Read the spec for this feature. If a spec was generated earlier in this session, use that file path. Otherwise, check `docs/ys-powers/specs/` for the most recent spec file, or ask the user for the spec path if ambiguous. Then read the relevant codebase sections. Then:
 
-1. Enter plan mode — read only, no code changes
-2. Identify the dependency graph between components
+<HARD-RULE name="plan-no-code-changes">
+
+- Read only — no code changes。仅本命令产物 `docs/ys-powers/plans/YYYY-MM-DD-<feature-name>.md` 可写。
+
+</HARD-RULE>
+
+1. Identify the dependency graph between components
 3. Slice work vertically (one complete path per task, not horizontal layers)
 4. Write tasks with acceptance criteria and verification steps
 5. Add checkpoints between phases
