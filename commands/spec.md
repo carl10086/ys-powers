@@ -4,6 +4,12 @@ description: Start spec-driven development — explore context, clarify requirem
 
 ## Phase 1: Explore and Clarify
 
+<HARD-RULE name="spec-no-code-changes">
+
+- Read only — no code changes。仅本命令产物 `docs/ys-powers/specs/YYYY-MM-DD-<feature-name>-design.md` 可写。
+
+</HARD-RULE>
+
 Begin by understanding what the user wants to build.
 
 Invoke the **explore-then-ask** skill to ask clarifying questions one at a time (in Chinese) about:
