@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>get-shit-done 架构分析与借鉴指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --primary: #a03b00;
+    --primary-container: #c94c00;
+    --primary-fixed: #ffdbcd;
+    --primary-fixed-dim: #ffb597;
+    --on-primary: #ffffff;
+    --accent-glow: #E8400D;
+    --secondary: #d5baff;
+    --secondary-container: #7b40e0;
+    --tertiary: #4d44e3;
+    --accent-cyan: #00D4FF;
+    --bg: #fff8f6;
+    --surface: #fff8f6;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #fbf2ef;
+    --surface-container: #f5ece9;
+    --surface-container-high: #efe6e3;
+    --fg-1: #1e1b19;
+    --fg-2: #594138;
+    --fg-muted: #8d7166;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --outline-variant: #e1bfb2;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+    --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+    --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+    --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+    --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+    --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+    --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+    --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+    --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+    --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+    --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #060B18;
+      --surface: #0B1426;
+      --surface-container-lowest: #101D35;
+      --surface-container-low: #101D35;
+      --surface-container: #162544;
+      --surface-container-high: #1c2d52;
+      --fg-1: #F8FAFC;
+      --fg-2: #CBD5E1;
+      --fg-muted: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --primary: #FF6B35;
+      --accent-glow: #00D4FF;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fg-1);
+    background: var(--bg);
+  }
+
+  /* Document shell */
+  .document-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+  }
+
+  /* Cover */
+  .cover {
+    background: var(--gradient-hero);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-4xl) var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+    color: var(--on-primary);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover h1 {
+    font-family: var(--font-headline);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-lg);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .cover .meta {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-bottom: var(--space-xl);
+  }
+  .cover .deck {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    max-width: 700px;
+    opacity: 0.95;
+  }
+
+  /* Reader rail */
+  .reader-rail {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-3xl);
+    flex-wrap: wrap;
+    position: sticky;
+    top: var(--space-lg);
+    z-index: 10;
+    background: var(--bg);
+    padding: var(--space-md) 0;
+  }
+  .reader-rail a {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    background: var(--surface-container);
+    color: var(--fg-2);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+  .reader-rail a:hover,
+  .reader-rail a:focus {
+    background: var(--primary);
+    color: var(--on-primary);
+    outline: none;
+    box-shadow: var(--shadow-accent);
+  }
+
+  /* Body sections */
+  .body-section {
+    margin-bottom: var(--space-4xl);
+  }
+  .body-section h2 {
+    font-family: var(--font-headline);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    margin: 0 0 var(--space-xl);
+    letter-spacing: -0.01em;
+    color: var(--fg-1);
+  }
+  .body-section h3 {
+    font-family: var(--font-headline);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: var(--space-2xl) 0 var(--space-md);
+    color: var(--fg-2);
+  }
+  .body-section h4 {
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: var(--space-xl) 0 var(--space-md);
+    color: var(--fg-2);
+  }
+  .body-section p {
+    margin: 0 0 var(--space-lg);
+    color: var(--fg-2);
+  }
+
+  /* Claim cards */
+  .claim-card {
+    background: var(--surface-container-low);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    transition: box-shadow 0.2s ease;
+  }
+  .claim-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+  .claim-card strong {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Fact table */
+  .fact-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-xl) 0;
+    font-size: 0.95rem;
+  }
+  .fact-table th,
+  .fact-table td {
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .fact-table th {
+    font-weight: 600;
+    color: var(--fg-1);
+    background: var(--surface-container);
+    font-family: var(--font-headline);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .fact-table td {
+    color: var(--fg-2);
+  }
+  .fact-table tr:hover td {
+    background: var(--surface-container-low);
+  }
+
+  /* Evidence margin */
+  .evidence-margin {
+    border-left: 3px solid var(--primary);
+    padding-left: var(--space-lg);
+    margin: var(--space-xl) 0;
+    color: var(--fg-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Pull quote */
+  .pull-quote {
+    font-family: var(--font-headline);
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--primary);
+    margin: var(--space-2xl) 0;
+    padding: var(--space-xl) var(--space-2xl);
+    background: var(--surface-container);
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+  .pull-quote::before {
+    content: '"';
+    font-size: 3rem;
+    position: absolute;
+    top: -0.2em;
+    left: var(--space-md);
+    opacity: 0.2;
+    font-family: Georgia, serif;
+  }
+
+  /* Caveat box */
+  .caveat-box {
+    background: var(--surface-container-high);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg) var(--space-xl);
+    margin: var(--space-xl) 0;
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+  }
+  .caveat-box strong {
+    color: var(--fg-2);
+  }
+
+  /* Question panel */
+  .question-panel {
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    margin-top: var(--space-2xl);
+  }
+  .question-panel h3 {
+    margin-top: 0;
+    font-family: var(--font-headline);
+    font-size: 1.1rem;
+    color: var(--fg-1);
+  }
+  .question-panel ul {
+    margin: 0;
+    padding-left: var(--space-xl);
+    color: var(--fg-2);
+  }
+  .question-panel li {
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Source spread */
+  .source-spread {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+  }
+  .source-spread .claim-card {
+    margin-bottom: 0;
+  }
+
+  /* Priority tags */
+  .priority-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: var(--space-sm);
+  }
+  .priority-p0 {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--red);
+  }
+  .priority-p1 {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--yellow);
+  }
+  .priority-p2 {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--blue);
+  }
+
+  /* Code/pre */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--surface-container);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+  }
+  pre {
+    background: var(--surface-container-high);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--fg-2);
+    border: 1px solid var(--border);
+  }
+
+  /* Mermaid */
+  .mermaid-wrapper {
+    overflow-x: auto;
+    padding: var(--space-lg);
+    background: var(--surface-container-low);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    margin: var(--space-xl) 0;
+    position: relative;
+  }
+  .mermaid-zoom-controls {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    display: flex;
+    gap: var(--space-xs);
+    z-index: 5;
+  }
+  .mermaid-zoom-controls button {
+    background: var(--surface-container-high);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--fg-2);
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mermaid-zoom-controls button:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+  .mermaid-container {
+    transform-origin: top left;
+    transition: transform 0.2s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mermaid-container {
+      transition: none;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .document-shell {
+      padding: var(--space-xl) var(--space-lg);
+    }
+    .cover {
+      padding: var(--space-2xl) var(--space-xl);
+    }
+    .reader-rail {
+      position: relative;
+      top: auto;
+    }
+    .source-spread {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .claim-card { transition: none; }
+    .reader-rail a { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <h1>get-shit-done 架构分析与借鉴指南</h1>
+    <div class="meta">ys-powers 参考文档 &nbsp;&middot;&nbsp; 2026-06-01</div>
+    <div class="deck">
+      深入解析 GSD（get-shit-done）重型框架的架构设计、命令系统、Agent 角色和质量门机制，并与 ys-powers 进行五维度结构化对比，提炼出适合轻量定位的借鉴点和实施路线图。
+    </div>
+  </header>
+
+  <!-- Reader rail -->
+  <nav class="reader-rail" role="navigation" aria-label="章节导航">
+    <a href="#overview">架构总览</a>
+    <a href="#comparison">对比分析</a>
+    <a href="#takeaways">借鉴建议</a>
+    <a href="#roadmap">实施路线</a>
+  </nav>
+
+  <!-- Part 1: Overview -->
+  <section class="body-section" id="overview">
+    <h2>一、GSD 架构与设计理念总览</h2>
+
+    <div class="pull-quote">
+      get-shit-done（简称 GSD）是一套完整的 AI 驱动软件开发工作流系统，目标是为 Claude Code、Copilot、Gemini CLI、Codex、Cursor 等 15+ 个 AI 编码工具提供统一的工程化流程支持。
+    </div>
+
+    <h3>1.1 项目定位</h3>
+    <p>与 ys-powers 的「轻量增强」定位不同，GSD 是一个<strong>重型框架</strong>：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li>拥有完整的 Node.js CLI 和 TypeScript SDK</li>
+      <li>自带 <code>.planning/</code> 目录状态管理系统</li>
+      <li>86+ 个命令、30+ 个 Agent 角色</li>
+      <li>多运行时安装器与兼容层</li>
+    </ul>
+
+    <h3>1.2 核心生命周期</h3>
+    <div class="mermaid-wrapper">
+      <div class="mermaid-zoom-controls">
+        <button onclick="zoomMermaid(this, -0.2)">-</button>
+        <button onclick="zoomMermaid(this, 0.2)">+</button>
+        <button onclick="resetMermaid(this)">重置</button>
+      </div>
+      <div class="mermaid-container">
+        <pre class="mermaid">
+flowchart TD
+    A[new-project] --> B[discuss-phase]
+    B --> C[spec-phase]
+    C --> D[ui-phase<br/>可选]
+    B --> E[plan-phase]
+    E --> F[execute-phase]
+    F --> G[verify-work]
+    G -->|gaps-only loop| E
+    G --> H[ship]
+    H --> I[complete-milestone]
+    H --> J[audit-milestone]
+        </pre>
+      </div>
+    </div>
+
+    <h3>1.3 关键阶段说明</h3>
+    <table class="fact-table">
+      <thead>
+        <tr><th>阶段</th><th>产出物</th><th>核心机制</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>new-project</code></td><td>PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md, config.json</td><td>深度上下文收集 + 结构化初始化</td></tr>
+        <tr><td><code>discuss-phase</code></td><td>{phase}-CONTEXT.md, {phase}-DISCUSSION-LOG.md</td><td>Socratic 问答 + 自适应追问</td></tr>
+        <tr><td><code>spec-phase</code></td><td>{phase}-SPEC.md</td><td>模糊度评分（4 维度，≤0.20 阈值）</td></tr>
+        <tr><td><code>plan-phase</code></td><td>RESEARCH.md, PLAN.md</td><td>研究 → 规划 → 验证循环</td></tr>
+        <tr><td><code>execute-phase</code></td><td>SUMMARY.md, 原子提交</td><td>Wave 并行执行 + 子 Agent 调度</td></tr>
+        <tr><td><code>verify-work</code></td><td>{phase}-UAT.md</td><td>对话式 UAT + 自动诊断修复</td></tr>
+        <tr><td><code>ship</code></td><td>PR + 审查</td><td>推分支 → 创建 PR → 追踪合并</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.4 文档系统</h3>
+    <p>GSD 强制使用一套<strong>结构化文档体系</strong>来管理项目状态：</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid-zoom-controls">
+        <button onclick="zoomMermaid(this, -0.2)">-</button>
+        <button onclick="zoomMermaid(this, 0.2)">+</button>
+        <button onclick="resetMermaid(this)">重置</button>
+      </div>
+      <div class="mermaid-container">
+        <pre class="mermaid">
+graph TD
+    A[.planning/] --> B[PROJECT.md]
+    A --> C[REQUIREMENTS.md]
+    A --> D[ROADMAP.md]
+    A --> E[STATE.md]
+    A --> F[config.json]
+    A --> G[research/]
+    A --> H[phases/]
+    H --> I[01-{name}/]
+    I --> J[01-SPEC.md]
+    I --> K[01-CONTEXT.md]
+    I --> L[01-PLAN.md]
+    I --> M[01-SUMMARY.md]
+    I --> N[01-UAT.md]
+    A --> O[workstreams/]
+        </pre>
+      </div>
+    </div>
+
+    <h3>1.5 命令系统</h3>
+    <p>GSD 拥有 <strong>86+ 个稳定命令</strong>，分布在多个命名空间下：</p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>命名空间</th><th>命令示例</th><th>职责</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>gsd-workflow</code></td><td>plan-phase, execute-phase, verify-work, phase, progress</td><td>阶段流水线</td></tr>
+        <tr><td><code>gsd-project</code></td><td>new-milestone, complete-milestone, audit-milestone, summary</td><td>项目生命周期</td></tr>
+        <tr><td><code>gsd-quality</code></td><td>code-review, debug, audit-fix, security, eval-review, ui-review</td><td>质量门</td></tr>
+        <tr><td><code>gsd-context</code></td><td>map-codebase, graphify, ingest-docs, extract-learnings</td><td>代码库智能</td></tr>
+        <tr><td><code>gsd-manage</code></td><td>config, workspace, workstreams, thread, update, ship, inbox</td><td>管理操作</td></tr>
+        <tr><td><code>gsd-ideate</code></td><td>explore, sketch, spike, spec, capture</td><td>探索与捕获</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.6 Namespace Meta-Skills（两级路由）</h3>
+    <p>GSD v1.40 引入了<strong>命名空间元技能</strong>来解决「技能列表 token 消耗」问题：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li>传统方式：86 个技能平铺列出 → 约 2,150 tokens</li>
+      <li>命名空间方式：6 个路由器 + 按需展开 → 约 120 tokens</li>
+    </ul>
+    <p>每个命名空间是一个「一级路由」，模型先选命名空间，再选具体命令。所有具体命令仍然可以直接调用。</p>
+
+    <h3>1.7 Agent 系统</h3>
+    <p>GSD 定义了 <strong>34 个专门化的 Agent 角色</strong>，每个都有明确的职责边界和触发条件。</p>
+    <h4>核心执行 Agent</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>Agent</th><th>触发者</th><th>职责</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>gsd-planner</code></td><td>plan-phase</td><td>创建可执行的 PLAN.md，含依赖分析和 wave 分组</td></tr>
+        <tr><td><code>gsd-executor</code></td><td>execute-phase</td><td>原子执行计划，每任务一个 commit，处理偏差</td></tr>
+        <tr><td><code>gsd-verifier</code></td><td>verify-work</td><td>验证执行结果，生成 UAT 报告</td></tr>
+        <tr><td><code>gsd-debugger</code></td><td>debug</td><td>调试会话管理，诊断问题</td></tr>
+        <tr><td><code>gsd-code-reviewer</code></td><td>code-review</td><td>代码审查</td></tr>
+      </tbody>
+    </table>
+
+    <h4>研究型 Agent</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>Agent</th><th>触发者</th><th>职责</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>gsd-phase-researcher</code></td><td>plan-phase --research</td><td>领域研究，生成 RESEARCH.md</td></tr>
+        <tr><td><code>gsd-domain-researcher</code></td><td>new-project</td><td>项目领域研究</td></tr>
+        <tr><td><code>gsd-ai-researcher</code></td><td>自主模式</td><td>AI 集成相关研究</td></tr>
+        <tr><td><code>gsd-assumptions-analyzer</code></td><td>discuss-phase --assumptions</td><td>分析实现假设</td></tr>
+      </tbody>
+    </table>
+
+    <h4>质量门 Agent</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>Agent</th><th>触发者</th><th>职责</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>gsd-plan-checker</code></td><td>plan-phase</td><td>验证 PLAN.md 的可执行性</td></tr>
+        <tr><td><code>gsd-security-auditor</code></td><td>secure-phase</td><td>安全审计</td></tr>
+        <tr><td><code>gsd-ui-auditor</code></td><td>ui-review</td><td>UI 审查</td></tr>
+        <tr><td><code>gsd-eval-auditor</code></td><td>eval-review</td><td>评估审计</td></tr>
+        <tr><td><code>gsd-nyquist-auditor</code></td><td>验证流程</td><td>Nyquist 采样验证</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.8 质量门与验证机制</h3>
+    <p>GSD 在多个环节嵌入了强制性的质量检查：</p>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>规划阶段</strong><br/>
+        Plan Checker：验证 PLAN.md 的可执行性（任务是否可分解、依赖是否可达）<br/>
+        Nyquist Validation：确保计划采样足够密集，不会遗漏关键步骤<br/>
+        Stall Detection：检测 plan-phase 是否卡死
+      </div>
+      <div class="claim-card">
+        <strong>执行阶段</strong><br/>
+        MVP+TDD Gate：当 <code>MVP_MODE=true</code> 且 <code>TDD_MODE=true</code> 时，行为添加任务必须先有 failing test commit<br/>
+        Wave Execution：将任务按依赖分组为 wave，wave 内并行、wave 间串行<br/>
+        Checkpoint Protocol：执行器在 checkpoint 处暂停等待用户确认
+      </div>
+      <div class="claim-card">
+        <strong>验证阶段</strong><br/>
+        Conversational UAT：对话式用户验收测试<br/>
+        Cross-Phase Regression Gate：检查是否破坏其他阶段的功能<br/>
+        Requirements Coverage Gate：验证需求覆盖度
+      </div>
+      <div class="claim-card">
+        <strong>交付阶段</strong><br/>
+        Cross-AI Peer Review：调用外部 AI CLI（Gemini、Claude、Codex 等）独立评审计划<br/>
+        Security Enforcement：安全强制检查<br/>
+        Post-Merge Hunk Verification：合并后逐块验证
+      </div>
+    </div>
+
+    <h3>1.9 MVP 模式与垂直切片</h3>
+    <p>GSD 的 MVP 模式是其最具特色的设计之一：</p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>概念</th><th>定义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>MVP Mode</strong></td><td>以垂直切片（UI→API→DB）而非水平分层组织任务</td></tr>
+        <tr><td><strong>Vertical Slice</strong></td><td>单功能端到端交付（从用户视角的一个完整能力）</td></tr>
+        <tr><td><strong>Walking Skeleton</strong></td><td>新项目 Phase 1 的最薄端到端栈，证明各层能协同工作</td></tr>
+        <tr><td><strong>User Story</strong></td><td>标准格式：<code>As a [role], I want to [capability], so that [outcome].</code></td></tr>
+        <tr><td><strong>SPIDR Splitting</strong></td><td>五轴分解法：Spike, Paths, Interfaces, Data, Rules</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.10 技术架构</h3>
+    <h4>双运行时架构</h4>
+    <p>GSD 采用 <strong>CJS 兼容层 + TypeScript SDK</strong> 的双层设计：</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid-zoom-controls">
+        <button onclick="zoomMermaid(this, -0.2)">-</button>
+        <button onclick="zoomMermaid(this, 0.2)">+</button>
+        <button onclick="resetMermaid(this)">重置</button>
+      </div>
+      <div class="mermaid-container">
+        <pre class="mermaid">
+flowchart TD
+    A[CLI 入口<br/>bin/gsd-tools.cjs] --> B[CJS Command Router<br/>兼容层]
+    A --> C[TypeScript SDK<br/>sdk/src/]
+    B --> D[Sync Runtime Bridge]
+    C --> E[Query Dispatch Pipeline]
+    C --> F[Phase Runner]
+    C --> G[Runtime Bridge<br/>async]
+    C --> H[Runtime Bridge Sync<br/>Worker + Atomics.wait]
+        </pre>
+      </div>
+    </div>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li><strong>Sync Runtime Bridge</strong>：使用 <code>synckit</code> + <code>SharedArrayBuffer</code> + Worker 线程实现同步调用异步 SDK，首调用开销 ~80ms，稳态 ~0.1ms</li>
+      <li><strong>Command Routing Hub</strong>：纯结果合约（不抛异常、不退出、不打印），统一 6 值错误枚举</li>
+    </ul>
+
+    <h4>安装系统</h4>
+    <p>GSD 支持 15 个运行时的安装：</p>
+    <p style="color: var(--fg-2);"><code>claude, antigravity, augment, cline, codebuddy, codex, copilot, cursor, gemini, hermes, kilo, opencode, qwen, trae, windsurf</code></p>
+    <p>安装时根据运行时类型转换命令格式（hyphen/colon/dollar 前缀）、Agent 格式、技能布局等。</p>
+
+    <h3>1.11 与 ys-powers 的本质差异</h3>
+    <table class="fact-table">
+      <thead>
+        <tr><th>维度</th><th>get-shit-done</th><th>ys-powers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>定位</strong></td><td>重型框架，完整生命周期管理</td><td>轻量增强，聚焦 Claude Code</td></tr>
+        <tr><td><strong>运行时</strong></td><td>Node.js CLI + SDK，有实际可执行代码</td><td>纯配置（skills/rules/commands），无运行时</td></tr>
+        <tr><td><strong>状态管理</strong></td><td><code>.planning/</code> 目录体系，STATE.md 为核心</td><td>无状态，不管理项目级状态</td></tr>
+        <tr><td><strong>命令数量</strong></td><td>86+</td><td>20</td></tr>
+        <tr><td><strong>Agent 数量</strong></td><td>34</td><td>3（code-reviewer, security-auditor, test-engineer）</td></tr>
+        <tr><td><strong>多运行时</strong></td><td>15 个运行时兼容</td><td>仅 Claude Code</td></tr>
+        <tr><td><strong>安装方式</strong></td><td>npm 包 + 运行时安装器</td><td>Python 脚本安装到 <code>.claude/</code></td></tr>
+        <tr><td><strong>交互语言</strong></td><td>英文为主，多语言文档</td><td>中文优先</td></tr>
+        <tr><td><strong>TDD 强制</strong></td><td>MVP+TDD Gate 可强制 failing test 先提交</td><td>推荐 TDD，不强制</td></tr>
+        <tr><td><strong>Context Rot 缓解</strong></td><td>Context Window Monitoring、Prompt Thinning</td><td>依赖 spec/plan 文档化</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.12 关键设计亮点</h3>
+    <div class="source-spread">
+      <div class="claim-card"><strong>1. Namespace Meta-Skills</strong><br/>两级路由降低 token 消耗的创新方案</div>
+      <div class="claim-card"><strong>2. Ambiguity Scoring</strong><br/>spec-phase 的定量化模糊度评分机制</div>
+      <div class="claim-card"><strong>3. User Decision Fidelity</strong><br/>locked/deferred/discretion 三级决策保真度</div>
+      <div class="claim-card"><strong>4. Wave Parallelization</strong><br/>execute-phase 的依赖感知并行执行</div>
+      <div class="claim-card"><strong>5. Cross-AI Peer Review</strong><br/>多 AI 独立评审的工程质量实践</div>
+      <div class="claim-card"><strong>6. Context Window Utilization Guard</strong><br/>主动监控和压缩上下文</div>
+      <div class="claim-card"><strong>7. Skill Surface Budget</strong><br/>通过 profile 和 cluster 控制技能暴露面</div>
+      <div class="claim-card"><strong>8. Sync Runtime Bridge</strong><br/>CJS/ESM 互操作的工程化方案</div>
+    </div>
+  </section>
+
+  <!-- Part 2: Comparison -->
+  <section class="body-section" id="comparison">
+    <h2>二、ys-powers 与 get-shit-done 对比分析</h2>
+    <p>从命令覆盖、Skill 组织、Agent 系统、状态管理、质量门五个维度进行结构化对比。</p>
+
+    <h3>2.1 命令覆盖对比</h3>
+    <h4>核心工作流命令</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>阶段</th><th>get-shit-done</th><th>ys-powers</th><th>差距分析</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>项目初始化</td><td><code>/gsd-new-project</code></td><td>无</td><td>GSD 有完整的项目脚手架，ys-powers 假设项目已存在</td></tr>
+        <tr><td>需求澄清</td><td><code>/gsd-discuss-phase</code>, <code>/gsd-spec-phase</code></td><td><code>/spec</code></td><td>两者都有 spec 驱动，但 GSD 多了 Socratic 问答 + 模糊度评分</td></tr>
+        <tr><td>规划</td><td><code>/gsd-plan-phase</code></td><td><code>/plan</code></td><td>GSD 有内置研究 Agent 和验证循环；ys-powers 更轻量</td></tr>
+        <tr><td>执行</td><td><code>/gsd-execute-phase</code></td><td><code>/build</code></td><td>GSD 有 wave 并行；ys-powers 是单线程增量实现</td></tr>
+        <tr><td>验证</td><td><code>/gsd-verify-work</code></td><td><code>/test</code></td><td>GSD 是对话式 UAT；ys-powers 是 TDD 技能调用</td></tr>
+        <tr><td>交付</td><td><code>/gsd-ship</code></td><td><code>/ship</code></td><td>两者都有 fan-out 评审，但 GSD 还管 PR 创建和合并追踪</td></tr>
+        <tr><td>自主模式</td><td><code>/gsd-autonomous</code></td><td>无</td><td>GSD 可全自动跑完所有剩余阶段</td></tr>
+      </tbody>
+    </table>
+
+    <h4>GSD 独有的命令类别</h4>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>上下文工程</strong><br/>
+        <code>/gsd-map-codebase</code> — 代码库映射<br/>
+        <code>/gsd-graphify</code> — 知识图谱构建<br/>
+        <code>/gsd-ingest-docs</code> — 文档摄取<br/>
+        <code>/gsd-extract-learnings</code> — 经验提取
+      </div>
+      <div class="claim-card">
+        <strong>质量门</strong><br/>
+        <code>/gsd-code-review --fix</code> — 代码审查 + 自动修复<br/>
+        <code>/gsd-eval-review</code> — AI 评估审查<br/>
+        <code>/gsd-nyquist-auditor</code> — Nyquist 采样验证<br/>
+        <code>/gsd-secure-phase</code> — 安全阶段审查
+      </div>
+      <div class="claim-card">
+        <strong>管理</strong><br/>
+        <code>/gsd-workspace</code> — 多仓库工作空间<br/>
+        <code>/gsd-workstreams</code> — 工作流命名空间<br/>
+        <code>/gsd-thread</code> — 持久化上下文线程<br/>
+        <code>/gsd-inbox</code> — 待办捕获
+      </div>
+      <div class="claim-card">
+        <strong>探索</strong><br/>
+        <code>/gsd-spike</code> — 技术探针<br/>
+        <code>/gsd-sketch</code> — 快速草图<br/>
+        <code>/gsd-explore</code> — 代码库探索
+      </div>
+    </div>
+
+    <h4>ys-powers 独有的命令</h4>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li><code>/gc</code> — 智能 Git 工作流（分支→提交→推送→PR 一键完成）</li>
+      <li><code>/s2m</code> — worktree 回主分支清理</li>
+      <li><code>/scout</code> — 多渠道并行信息探索</li>
+      <li><code>/local-commit</code> — 极简本地提交</li>
+      <li><code>/alias</code> — zsh 别名管理</li>
+      <li><code>/html</code> — 转换为 HTML 页面</li>
+      <li><code>/doc-codebase</code> — 代码库文档化</li>
+    </ul>
+
+    <h3>2.2 Skill 组织对比</h3>
+    <h4>GSD 的 Skill 模式</h4>
+    <p>GSD 的 <code>skills/</code> 不是传统意义上的 skill 目录，而是<strong>运行时技能表面预算系统</strong>：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li><strong>安装时</strong>：通过 profile（core/standard/full）决定写入多少技能</li>
+      <li><strong>运行时</strong>：通过 <code>/gsd:surface</code> 动态启用/禁用技能簇</li>
+      <li><strong>技能格式</strong>：与命令格式相同（YAML frontmatter + Markdown）</li>
+      <li><strong>依赖解析</strong>：<code>requires:</code> 字段定义依赖，安装器计算传递闭包</li>
+    </ul>
+
+    <h4>ys-powers 的 Skill 模式</h4>
+    <p>ys-powers 采用<strong>传统 skill 定义</strong>：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li><code>skills/&lt;name&gt;/SKILL.md</code> — 主 skill 文件</li>
+      <li><code>skills/&lt;name&gt;/*.md</code> — 辅助文件（示例、框架、模板等）</li>
+      <li>安装时完整复制到目标项目的 <code>.claude/skills/</code></li>
+      <li>无运行时动态开关机制</li>
+    </ul>
+
+    <h4>Skill 内容深度对比（以「规划」为例）</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>维度</th><th>GSD plan-phase</th><th>ys-powers planning-and-task-breakdown</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>前置研究</td><td>内置 <code>--research</code> 模式，自动 spawn researcher</td><td>无内置研究，依赖外部 spec</td></tr>
+        <tr><td>验证循环</td><td>内置 plan-checker，迭代到通过或最大次数</td><td>无内置验证，依赖 human review</td></tr>
+        <tr><td>输出格式</td><td>PLAN.md（含 wave 分组、依赖图）</td><td>plan markdown（任务列表）</td></tr>
+        <tr><td>重规划</td><td><code>--reviews</code> 支持跨 AI 反馈重规划</td><td>无内置重规划机制</td></tr>
+        <tr><td>交互深度</td><td>多 flag 控制（--auto, --gaps, --skip-verify 等）</td><td>单一流程</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.3 Agent 系统对比</h3>
+    <h4>Agent 数量与覆盖度</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>类别</th><th>GSD Agents</th><th>ys-powers Agents</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>规划</td><td>gsd-planner, gsd-plan-checker, gsd-roadmapper</td><td>无</td></tr>
+        <tr><td>执行</td><td>gsd-executor, gsd-code-fixer</td><td>无</td></tr>
+        <tr><td>验证</td><td>gsd-verifier, gsd-eval-auditor, gsd-nyquist-auditor</td><td>无</td></tr>
+        <tr><td>调试</td><td>gsd-debugger, gsd-debug-session-manager</td><td>无</td></tr>
+        <tr><td>代码审查</td><td>gsd-code-reviewer</td><td>code-reviewer</td></tr>
+        <tr><td>安全审计</td><td>gsd-security-auditor</td><td>security-auditor</td></tr>
+        <tr><td>测试</td><td>无专门测试 Agent</td><td>test-engineer</td></tr>
+        <tr><td>研究</td><td>gsd-phase-researcher, gsd-domain-researcher 等 6 个</td><td>无</td></tr>
+        <tr><td>UI</td><td>gsd-ui-auditor, gsd-ui-checker, gsd-ui-researcher</td><td>无</td></tr>
+        <tr><td>文档</td><td>gsd-doc-writer, gsd-doc-synthesizer 等 4 个</td><td>无</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Agent 设计差异</h4>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>GSD Agent 特点</strong><br/>
+        - 每个 Agent 有明确的触发者和输入输出合约<br/>
+        - 支持 <code>tools:</code> 限制和 <code>hooks:</code>（如 PostToolUse 自动 eslint）<br/>
+        - 有颜色标记（<code>color: green/yellow</code>）用于 UI 区分<br/>
+        - 强制引用 <code>@~/.claude/get-shit-done/references/mandatory-initial-read.md</code>
+      </div>
+      <div class="claim-card">
+        <strong>ys-powers Agent 特点</strong><br/>
+        - 仅 3 个通用评审 Agent，用于 <code>/ship</code> 的 fan-out<br/>
+        - 无触发者概念，直接由命令调用<br/>
+        - 无工具限制（继承主会话的工具权限）<br/>
+        - 更轻量，无需额外配置
+      </div>
+    </div>
+
+    <h3>2.4 状态管理对比</h3>
+    <h4>GSD 的状态系统</h4>
+    <p>GSD 是<strong>有状态框架</strong>，项目状态集中管理：</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid-zoom-controls">
+        <button onclick="zoomMermaid(this, -0.2)">-</button>
+        <button onclick="zoomMermaid(this, 0.2)">+</button>
+        <button onclick="resetMermaid(this)">重置</button>
+      </div>
+      <div class="mermaid-container">
+        <pre class="mermaid">
+flowchart LR
+    A[.planning/STATE.md<br/>全局状态] --> B[ROADMAP.md<br/>路线图]
+    A --> C[config.json<br/>配置]
+    D[{phase_dir}/SUMMARY.md<br/>阶段总结] --> E[{phase_dir}/{phase}-UAT.md<br/>验收结果]
+        </pre>
+      </div>
+    </div>
+    <p>状态机：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li>阶段状态：<code>not_started</code> → <code>in_progress</code> → <code>completed</code></li>
+      <li>里程碑管理：归档、审计、完成</li>
+      <li>Workstream：多工作流隔离</li>
+    </ul>
+
+    <h4>ys-powers 的状态系统</h4>
+    <p>ys-powers 是<strong>无状态系统</strong>：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li>不管理项目级状态文件</li>
+      <li>Spec 和 Plan 保存在 <code>docs/ys-powers/specs/</code> 和 <code>docs/ys-powers/plans/</code></li>
+      <li>状态由用户自行管理（git 提交、GitHub Issues 等）</li>
+      <li>无 <code>.planning/</code> 目录要求</li>
+    </ul>
+
+    <h4>利弊分析</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>维度</th><th>GSD 有状态</th><th>ys-powers 无状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>上手成本</td><td>高（需要理解 .planning 体系）</td><td>低（直接用命令）</td></tr>
+        <tr><td>项目迁移</td><td>难（状态绑定目录）</td><td>易（纯配置）</td></tr>
+        <tr><td>自动化程度</td><td>高（可自主推进）</td><td>低（依赖用户决策）</td></tr>
+        <tr><td>上下文保持</td><td>强（STATE.md 持久化）</td><td>弱（依赖会话记忆）</td></tr>
+        <tr><td>适用场景</td><td>长期项目、团队协作</td><td>快速任务、个人工作流</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.5 质量门对比</h3>
+    <h4>GSD 的多层质量门</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>层级</th><th>机制</th><th>强制性</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>规划</td><td>Plan Checker + Nyquist Validation</td><td>强制（可 --skip-verify 跳过）</td></tr>
+        <tr><td>执行</td><td>MVP+TDD Gate + Checkpoint Protocol</td><td>条件强制（MVP+TDD 模式下）</td></tr>
+        <tr><td>验证</td><td>Conversational UAT + Gap Closure</td><td>强制</td></tr>
+        <tr><td>交付</td><td>Cross-AI Peer Review + Security Audit</td><td>可选</td></tr>
+        <tr><td>合并</td><td>Post-Merge Hunk Verification</td><td>可选</td></tr>
+      </tbody>
+    </table>
+
+    <h4>ys-powers 的质量门</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>层级</th><th>机制</th><th>强制性</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>规划</td><td>Human Review（plan 文件确认）</td><td>强制（需用户确认保存路径）</td></tr>
+        <tr><td>执行</td><td>Incremental Implementation + TDD</td><td>推荐（技能引导）</td></tr>
+        <tr><td>验证</td><td>Test + Build + Browser Test</td><td>推荐（技能引导）</td></tr>
+        <tr><td>交付</td><td>/ship fan-out（code-reviewer + security-auditor + test-engineer）</td><td>强制（/ship 命令自动执行）</td></tr>
+      </tbody>
+    </table>
+
+    <h4>关键差距</h4>
+    <div class="source-spread">
+      <div class="claim-card"><strong>1.</strong> GSD 有自动验证 Agent，ys-powers 依赖 human review</div>
+      <div class="claim-card"><strong>2.</strong> GSD 有 TDD 强制门，ys-powers 只是推荐</div>
+      <div class="claim-card"><strong>3.</strong> GSD 有 Cross-AI Review，ys-powers 的 /ship 是单运行时内的 subagent</div>
+      <div class="claim-card"><strong>4.</strong> GSD 有 Gap Closure Loop，ys-powers 无内置的修复→重执行循环</div>
+    </div>
+
+    <h3>2.6 交互设计对比</h3>
+    <h4>语言策略</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>维度</th><th>GSD</th><th>ys-powers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>主要语言</td><td>英文</td><td>中文</td></tr>
+        <tr><td>文档多语言</td><td>有（ja-JP, ko-KR, pt-BR, zh-CN）</td><td>无</td></tr>
+        <tr><td>命令名</td><td>英文</td><td>英文缩写（/gc, /s2m 等）</td></tr>
+      </tbody>
+    </table>
+
+    <h4>交互深度</h4>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>GSD</strong><br/>
+        - 大量 <code>--auto</code> / <code>--interactive</code> 模式切换<br/>
+        - Socratic 问答（多轮对话）<br/>
+        - Batch 模式（批量回答问题）<br/>
+        - Power 模式（从文件批量导入答案）
+      </div>
+      <div class="claim-card">
+        <strong>ys-powers</strong><br/>
+        - 大多数命令直接执行<br/>
+        - 关键决策点询问用户（如 workspace 策略选择）<br/>
+        - Explore-then-ask skill 有结构化问答，但不是所有命令都用
+      </div>
+    </div>
+
+    <h3>2.7 架构复杂度对比</h3>
+    <h4>代码量与依赖</h4>
+    <table class="fact-table">
+      <thead>
+        <tr><th>维度</th><th>GSD</th><th>ys-powers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>主要语言</td><td>TypeScript + CommonJS</td><td>Python + Markdown</td></tr>
+        <tr><td>依赖数量</td><td>大量（npm 包、synckit、Vitest 等）</td><td>极少（标准库）</td></tr>
+        <tr><td>测试覆盖</td><td>70%+ 行覆盖要求</td><td>无强制要求</td></tr>
+        <tr><td>CI/CD</td><td>完整（CodeRabbit、secret-scan、lint 等）</td><td>简单 Makefile</td></tr>
+        <tr><td>ADR</td><td>12+ 个架构决策记录</td><td>无</td></tr>
+      </tbody>
+    </table>
+
+    <h4>可维护性</h4>
+    <div class="source-spread">
+      <div class="claim-card">
+        <strong>GSD</strong><br/>
+        优点：工程化程度高，有完整测试和文档<br/>
+        缺点：架构复杂（CJS/SDK 双运行时、Sync Bridge、15 运行时兼容），变更成本高
+      </div>
+      <div class="claim-card">
+        <strong>ys-powers</strong><br/>
+        优点：极简（纯 Markdown + Python 脚本），变更成本低<br/>
+        缺点：无测试覆盖，缺乏自动化验证
+      </div>
+    </div>
+
+    <h3>2.8 总结矩阵</h3>
+    <table class="fact-table">
+      <thead>
+        <tr><th>能力</th><th>GSD 优势</th><th>ys-powers 优势</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>项目初始化</td><td>完整脚手架 + 深度上下文收集</td><td>更灵活，不绑架项目结构</td></tr>
+        <tr><td>规划深度</td><td>研究 + 规划 + 验证循环</td><td>轻量快速，不阻塞</td></tr>
+        <tr><td>执行自动化</td><td>Wave 并行 + 子 Agent</td><td>简单直接</td></tr>
+        <tr><td>质量保障</td><td>多层强制门</td><td>/ship fan-out 足够实用</td></tr>
+        <tr><td>上下文管理</td><td>STATE.md 持久化</td><td>无负担</td></tr>
+        <tr><td>多运行时</td><td>15 个运行时兼容</td><td>聚焦 Claude Code，体验更好</td></tr>
+        <tr><td>可维护性</td><td>工程化强但复杂</td><td>极简但缺乏验证</td></tr>
+        <tr><td>中文支持</td><td>有但非优先</td><td>原生中文体验</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Part 3: Takeaways -->
+  <section class="body-section" id="takeaways">
+    <h2>三、可借鉴点与实施建议</h2>
+    <p>从 GSD 的 86+ 命令、34 个 Agent、多层质量门中，筛选出<strong>适合 ys-powers 轻量定位</strong>的借鉴点。</p>
+    <div class="pull-quote">
+      原则：吸收思想，不复制复杂度。保持 ys-powers「纯配置、无运行时、中文优先」的定位。
+    </div>
+
+    <h3>3.1 借鉴点优先级总览</h3>
+    <table class="fact-table">
+      <thead>
+        <tr><th>优先级</th><th>借鉴点</th><th>实施成本</th><th>预期收益</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="priority-tag priority-p0">P0 高</span></td>
+          <td>Namespace Meta-Skills 路由</td>
+          <td>低</td>
+          <td>显著降低技能列表 token 消耗</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag priority-p0">P0 高</span></td>
+          <td>TDD Gate / 测试强制检查</td>
+          <td>低</td>
+          <td>提升代码质量</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag priority-p1">P1 中</span></td>
+          <td>模糊度评分机制</td>
+          <td>中</td>
+          <td>提升 spec 质量</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag priority-p1">P1 中</span></td>
+          <td>更丰富的 Agent 角色</td>
+          <td>中</td>
+          <td>提升 /ship 和专项任务质量</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag priority-p1">P1 中</span></td>
+          <td>文档模板系统</td>
+          <td>低</td>
+          <td>规范项目初始化</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag priority-p2">P2 低</span></td>
+          <td>Cross-AI Peer Review</td>
+          <td>高</td>
+          <td>多视角质量保障</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag priority-p2">P2 低</span></td>
+          <td>Context Window 监控</td>
+          <td>中</td>
+          <td>缓解 context rot</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag" style="background: var(--surface-container-high); color: var(--fg-muted);">不借鉴</span></td>
+          <td>.planning 状态系统</td>
+          <td>—</td>
+          <td>与轻量定位冲突</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag" style="background: var(--surface-container-high); color: var(--fg-muted);">不借鉴</span></td>
+          <td>SDK/CLI 运行时</td>
+          <td>—</td>
+          <td>与纯配置定位冲突</td>
+        </tr>
+        <tr>
+          <td><span class="priority-tag" style="background: var(--surface-container-high); color: var(--fg-muted);">不借鉴</span></td>
+          <td>15 运行时兼容</td>
+          <td>—</td>
+          <td>与聚焦 Claude Code 冲突</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 P0 高优先级</h3>
+
+    <h4>1. Namespace Meta-Skills 路由</h4>
+    <p><strong>GSD 方案</strong>：6 个命名空间路由器（workflow/project/quality/context/manage/ideate），降低 2,150 → 120 tokens</p>
+    <p><strong>ys-powers 适配方案</strong>：将现有 20 个命令按功能分组为 4-5 个命名空间命令：</p>
+    <pre><code>/ys-workflow    → spec, plan, build, test, ship
+/ys-code        → ys-review, code-simplify, refactor, html
+/ys-info        → scout, doc-codebase, easy-analysis, teach-code
+/ys-git         → gc, local-commit, s2m
+/ys-manage      → alias, wskill, sop-add</code></pre>
+    <p><strong>实施方式</strong>：</p>
+    <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
+      <li>在 <code>commands/</code> 下新增 5 个命名空间命令文件</li>
+      <li>每个文件作为「一级路由」，内容简短（列出子命令 + 描述）</li>
+      <li>原有命令保持不变，仍然可直接调用</li>
+      <li>安装时同时安装命名空间和原子命令</li>
+    </ul>
+    <p><strong>收益</strong>：降低模型选择命令时的 token 消耗；保持现有命令的向后兼容；不改变任何现有行为。</p>
+
+    <h4>2. TDD Gate / 测试强制检查</h4>
+    <p><strong>GSD 方案</strong>：MVP+TDD Gate 强制要求行为添加任务先提交 failing test</p>
+    <p><strong>ys-powers 适配方案</strong>：在 <code>/build</code> 命令中增加可选的 <code>--tdd</code> 模式：</p>
+    <div class="evidence-margin">
+      <strong>TDD Mode（可选）</strong><br/>
+      当用户运行 <code>/build --tdd</code> 时：<br/>
+      1. 读取当前任务的 acceptance criteria<br/>
+      2. 先写 failing test（RED）<br/>
+      3. 确认 test 失败后，才继续实现（GREEN）<br/>
+      4. 提交时必须包含 test 文件<br/><br/>
+      如果跳过 failing test 步骤，中断并提示用户。
+    </div>
+    <p><strong>实施方式</strong>：修改 <code>commands/build.md</code>；增加 <code>--tdd</code> flag 处理逻辑；在 incremental-implementation skill 中增加 TDD 分支。</p>
+    <p><strong>收益</strong>：不强制所有人使用 TDD（默认关闭）；需要时提供结构化引导；与现有 workflow 无缝集成。</p>
+
+    <h3>3.3 P1 中优先级</h3>
+
+    <h4>3. 模糊度评分机制（Ambiguity Scoring）</h4>
+    <p><strong>GSD 方案</strong>：spec-phase 在 Socratic 问答后，对 4 个维度进行 0-1 评分，≤0.20 才能写 SPEC.md</p>
+    <p><strong>ys-powers 适配方案</strong>：在 <code>/spec</code> 命令的 Phase 1（Explore and Clarify）中，增加可选的模糊度自检：</p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>维度</th><th>评分（0-1，越低越好）</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>目标清晰度</td><td>0.15</td><td>用户想要什么很明确</td></tr>
+        <tr><td>范围边界</td><td>0.30</td><td>边界有些模糊，需要澄清</td></tr>
+        <tr><td>验收标准</td><td>0.10</td><td>成功标准已明确</td></tr>
+        <tr><td>技术约束</td><td>0.25</td><td>部分约束待确认</td></tr>
+      </tbody>
+    </table>
+    <div class="evidence-margin">
+      <strong>综合模糊度：0.20</strong><br/>
+      如果综合模糊度 > 0.30，建议继续澄清后再写 spec。
+    </div>
+    <p><strong>实施方式</strong>：修改 <code>commands/spec.md</code>；在 Phase 1 末尾增加自检步骤；不自检也可以继续（保持轻量）。</p>
+    <p><strong>收益</strong>：提升 spec 质量，减少返工；不增加用户负担（可选步骤）。</p>
+
+    <h4>4. 更丰富的 Agent 角色</h4>
+    <p><strong>GSD 方案</strong>：34 个专门化 Agent，覆盖规划、执行、验证、研究、UI、文档等</p>
+    <p><strong>ys-powers 适配方案</strong>：在现有 3 个 Agent（code-reviewer, security-auditor, test-engineer）基础上，新增 3-5 个轻量 Agent：</p>
+    <table class="fact-table">
+      <thead>
+        <tr><th>Agent</th><th>用途</th><th>触发场景</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>plan-checker</code></td><td>验证 plan 的可执行性</td><td><code>/plan</code> 完成后自动执行</td></tr>
+        <tr><td><code>spec-reviewer</code></td><td>评审 spec 的完整性</td><td><code>/spec</code> 完成后可选执行</td></tr>
+        <tr><td><code>debugger</code></td><td>系统化的调试流程</td><td><code>/build</code> 失败时自动触发</td></tr>
+        <tr><td><code>context-engineer</code></td><td>优化上下文加载</td><td>大项目操作时建议</td></tr>
+      </tbody>
+    </table>
+    <p><strong>实施方式</strong>：在 <code>.claude/agents/</code> 或 <code>skills/</code> 下新增 Agent 定义；保持轻量（单文件，无复杂 frontmatter）；由相关命令按需调用。</p>
+    <p><strong>收益</strong>：<code>/ship</code> 的 fan-out 可以更丰富；专项任务有专门支持；不增加日常使用复杂度。</p>
+
+    <h4>5. 文档模板系统</h4>
+    <p><strong>GSD 方案</strong>：<code>templates/</code> 目录下有 PROJECT.md、REQUIREMENTS.md、ROADMAP.md 等模板</p>
+    <p><strong>ys-powers 适配方案</strong>：在 <code>commands/spec.md</code> 中增加「生成 CLAUDE.md 模板」的功能：</p>
+    <div class="evidence-margin">
+      <strong>生成项目模板（可选）</strong><br/>
+      如果当前项目缺少 CLAUDE.md，在 spec 完成后询问用户：<br/>
+      「需要基于本 spec 生成 CLAUDE.md 项目规范吗？」<br/><br/>
+      生成内容包含：项目概述、目录结构、代码风格、测试策略、常用命令
+    </div>
+    <p><strong>实施方式</strong>：修改 <code>commands/spec.md</code>；增加 CLAUDE.md 生成步骤；使用现有 spec 内容填充模板。</p>
+    <p><strong>收益</strong>：降低新项目初始化成本；与现有 workflow 自然衔接；不引入新的状态系统。</p>
+
+    <h3>3.4 P2 低优先级</h3>
+
+    <h4>6. Cross-AI Peer Review</h4>
+    <p><strong>GSD 方案</strong>：<code>/gsd-review --gemini --claude --codex</code> 调用外部 AI CLI 独立评审</p>
+    <p><strong>ys-powers 适配方案</strong>：新增 <code>/cross-review</code> 命令（实验性）：</p>
+    <div class="evidence-margin">
+      <strong>Cross-AI Review（实验性）</strong><br/>
+      调用其他 AI 工具对当前 plan 或代码进行独立评审。<br/><br/>
+      支持：Gemini CLI（如果已安装）、Codex CLI（如果已安装）<br/>
+      输出：REVIEWS.md，可被 <code>/plan --reviews</code> 消费
+    </div>
+    <p><strong>实施方式</strong>：新建 <code>commands/cross-review.md</code>；检测外部 CLI 可用性；生成标准化评审报告格式。</p>
+    <p><strong>收益</strong>：多视角发现盲点。<strong>但</strong>：需要用户安装多个 CLI，使用门槛高。</p>
+
+    <h4>7. Context Window 监控</h4>
+    <p><strong>GSD 方案</strong>：Context-Window-Aware Prompt Thinning、Utilization Guard</p>
+    <p><strong>ys-powers 适配方案</strong>：在 <code>rules/code.md</code> 或新增 skill 中增加上下文管理建议：</p>
+    <div class="evidence-margin">
+      <strong>Context 管理自检</strong><br/>
+      当会话超过 30 轮或检测到性能下降时：<br/>
+      1. 检查是否有无关的旧上下文<br/>
+      2. 建议用户 <code>/clear</code> 或开启新会话<br/>
+      3. 提示加载 plan 文件以恢复上下文
+    </div>
+    <p><strong>实施方式</strong>：新增 <code>skills/context-management/SKILL.md</code> 或修改 <code>skills/context-engineering/SKILL.md</code>。</p>
+    <p><strong>收益</strong>：缓解 context rot。<strong>但</strong>：Claude Code 已有自动 compaction，收益有限。</p>
+
+    <h3>3.5 明确不借鉴的点</h3>
+
+    <h4>1. .planning 状态系统</h4>
+    <p><strong>原因</strong>：与 ys-powers「无状态、纯配置」的定位根本冲突；引入 <code>.planning/</code> 意味着绑架项目结构；维护成本高（STATE.md 解析、staleness 检测、workstream 管理）。</p>
+    <p><strong>替代方案</strong>：继续使用 <code>docs/ys-powers/specs/</code> 和 <code>docs/ys-powers/plans/</code> 保存文档；状态由 git 提交历史和 GitHub Issues 管理；用户自行选择项目管理工具。</p>
+
+    <h4>2. SDK / CLI 运行时</h4>
+    <p><strong>原因</strong>：ys-powers 是纯 Markdown + Python 配置系统；引入 Node.js/TypeScript SDK 会大幅增加复杂度；需要处理安装、版本兼容、运行时错误等问题。</p>
+    <p><strong>替代方案</strong>：继续使用 <code>install/local-install.py</code> 做文件级安装；命令和技能由 Claude Code 直接解析执行；无中间运行时层。</p>
+
+    <h4>3. 15 运行时兼容</h4>
+    <p><strong>原因</strong>：ys-powers 明确聚焦 Claude Code；多运行时兼容需要大量的格式转换和适配层；维护 15 个运行时的测试矩阵不现实。</p>
+    <p><strong>替代方案</strong>：专注优化 Claude Code 体验；如果未来需要支持其他运行时，再考虑轻量适配。</p>
+
+    <h4>4. 86 个命令的完整覆盖</h4>
+    <p><strong>原因</strong>：命令数量多 ≠ 好用；ys-powers 的 20 个命令已经覆盖核心场景；增加过多命令会提高认知负担。</p>
+    <p><strong>替代方案</strong>：通过 Namespace Meta-Skills 组织现有命令；只新增高 ROI 的命令（如 plan-checker、debugger Agent）；保持「每个命令都有明确价值」的门槛。</p>
+  </section>
+
+  <!-- Part 4: Roadmap -->
+  <section class="body-section" id="roadmap">
+    <h2>四、实施路线图建议</h2>
+
+    <h3>Phase 1（立即）</h3>
+    <div class="source-spread">
+      <div class="claim-card">
+        <span class="priority-tag priority-p0">P0</span>
+        <strong>实现 Namespace Meta-Skills</strong><br/>
+        5 个命名空间命令（ys-workflow, ys-code, ys-info, ys-git, ys-manage）
+      </div>
+      <div class="claim-card">
+        <span class="priority-tag priority-p0">P0</span>
+        <strong>在 /build 中增加 TDD Mode</strong><br/>
+        <code>--tdd</code> flag，可选的 RED→GREEN→REFACTOR 引导
+      </div>
+    </div>
+
+    <h3>Phase 2（近期）</h3>
+    <div class="source-spread">
+      <div class="claim-card">
+        <span class="priority-tag priority-p1">P1</span>
+        <strong>新增 plan-checker 和 spec-reviewer Agent</strong><br/>
+        轻量单文件 Agent，由 /plan 和 /spec 命令按需调用
+      </div>
+      <div class="claim-card">
+        <span class="priority-tag priority-p1">P1</span>
+        <strong>在 /spec 中增加模糊度自检</strong><br/>
+        可选的 4 维度评分，综合模糊度 > 0.30 时建议继续澄清
+      </div>
+      <div class="claim-card">
+        <span class="priority-tag priority-p1">P1</span>
+        <strong>/spec 支持生成 CLAUDE.md 模板</strong><br/>
+        基于 spec 内容自动生成项目规范文档
+      </div>
+    </div>
+
+    <h3>Phase 3（远期）</h3>
+    <div class="source-spread">
+      <div class="claim-card">
+        <span class="priority-tag priority-p2">P2</span>
+        <strong>实验性 Cross-AI Review 命令</strong><br/>
+        检测 Gemini/Codex CLI 可用性，生成标准化评审报告
+      </div>
+      <div class="claim-card">
+        <span class="priority-tag priority-p2">P2</span>
+        <strong>Context Management skill</strong><br/>
+        会话超过 30 轮时提示清理上下文，建议加载 plan 文件恢复
+      </div>
+    </div>
+
+    <div class="caveat-box">
+      <strong>原则重申：</strong>吸收思想，不复制复杂度；保持 ys-powers「纯配置、无运行时、中文优先」的定位。每个借鉴点都必须回答一个问题：「这是否增加了用户的心智负担？」如果答案是肯定的，要么做成可选，要么不实施。
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="text-align:center; padding: var(--space-3xl) 0; color: var(--fg-muted); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: var(--space-4xl);">
+    get-shit-done 架构分析与借鉴指南 &nbsp;&middot;&nbsp; ys-powers 参考文档 &nbsp;&middot;&nbsp; 2026-06-01
+  </footer>
+
+</div>
+
+<script>
+  // Initialize Mermaid
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#f5ece9',
+      primaryTextColor: '#1e1b19',
+      primaryBorderColor: '#a03b00',
+      lineColor: '#8d7166',
+      secondaryColor: '#fbf2ef',
+      tertiaryColor: '#fff8f6',
+      fontFamily: 'Plus Jakarta Sans, ui-sans-serif, system-ui, sans-serif'
+    },
+    flowchart: {
+      useMaxWidth: false,
+      htmlLabels: true,
+      curve: 'basis'
+    },
+    graph: {
+      useMaxWidth: false
+    }
+  });
+
+  // Zoom controls for mermaid diagrams
+  function zoomMermaid(btn, delta) {
+    const wrapper = btn.closest('.mermaid-wrapper');
+    const container = wrapper.querySelector('.mermaid-container');
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    let currentScale = parseFloat(svg.dataset.scale) || 1;
+    currentScale += delta;
+    currentScale = Math.max(0.5, Math.min(3.0, currentScale));
+    svg.dataset.scale = currentScale;
+    svg.style.transform = 'scale(' + currentScale + ')';
+    svg.style.transformOrigin = 'top left';
+  }
+
+  function resetMermaid(btn) {
+    const wrapper = btn.closest('.mermaid-wrapper');
+    const container = wrapper.querySelector('.mermaid-container');
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    svg.dataset.scale = 1;
+    svg.style.transform = 'scale(1)';
+  }
+
+  // Add scale tracking after mermaid renders
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.querySelectorAll('.mermaid-container svg').forEach(function(svg) {
+        svg.dataset.scale = 1;
+      });
+    }, 1000);
+  });
+</script>
+</body>
+</html>

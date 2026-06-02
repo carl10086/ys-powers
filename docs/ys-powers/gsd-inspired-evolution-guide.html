@@ -1,0 +1,1693 @@
+<!doctype html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ys-powers 演进指南：基于 GSD 工程化思想的优化</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+  --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+  --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+
+body {
+  color: var(--fg-1);
+  background: var(--bg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button, select { font: inherit; }
+button { cursor: pointer; }
+
+.document-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: var(--space-4xl);
+}
+
+.cover {
+  grid-column: 1 / -1;
+  padding: var(--space-4xl) var(--space-3xl);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.cover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cover h1 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.gradient-text {
+  color: transparent;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.cover-meta {
+  display: flex;
+  gap: var(--space-xl);
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.cover-meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.deck {
+  max-width: 720px;
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.reader-rail {
+  position: sticky;
+  top: var(--space-2xl);
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.toc {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.toc h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.toc a {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--fg-2);
+  text-decoration: none;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.toc a:hover {
+  background: var(--surface-container);
+  color: var(--fg-1);
+}
+
+.toc a.active {
+  background: var(--primary-fixed);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.reading-modes {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.reading-modes h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.mode-btn {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-container-lowest);
+  color: var(--fg-2);
+  font-size: 13px;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.mode-btn:hover {
+  background: var(--surface-container);
+}
+
+.mode-btn.active {
+  background: var(--gradient-primary);
+  color: var(--on-primary);
+  border-color: transparent;
+  box-shadow: var(--shadow-accent);
+}
+
+.search-box {
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-box input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-container-lowest);
+  color: var(--fg-1);
+  font-size: 13px;
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(160, 59, 0, 0.1);
+}
+
+.body-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+}
+
+.body-section {
+  scroll-margin-top: var(--space-3xl);
+}
+
+.body-section h2 {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-headline);
+  font-size: clamp(22px, 3vw, 32px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.body-section h3 {
+  margin: var(--space-2xl) 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.body-section h4 {
+  margin: var(--space-xl) 0 var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.body-section p {
+  margin: 0 0 var(--space-md);
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.body-section ul, .body-section ol {
+  margin: 0 0 var(--space-md);
+  padding-left: 20px;
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.body-section li {
+  margin-bottom: var(--space-xs);
+}
+
+.body-section blockquote {
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--surface-container-low);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--fg-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  font-size: 13.5px;
+}
+
+.fact-table th,
+.fact-table td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.fact-table th {
+  font-weight: 600;
+  color: var(--fg-1);
+  background: var(--surface-container-low);
+  font-family: var(--font-headline);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fact-table td {
+  color: var(--fg-2);
+}
+
+.fact-table tr:hover td {
+  background: var(--surface-container-low);
+}
+
+.fact-table code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 6px;
+  background: var(--surface-container);
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+}
+
+.claim-card {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  margin: var(--space-lg) 0;
+}
+
+.claim-card h4 {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 15px;
+}
+
+.claim-card p {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.caveat-box {
+  padding: var(--space-lg);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-lg);
+  margin: var(--space-lg) 0;
+}
+
+.caveat-box p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+
+.code-block {
+  background: var(--surface-container-high);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin: var(--space-lg) 0;
+  overflow-x: auto;
+}
+
+.code-block pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fg-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.code-block code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-1);
+}
+
+.mermaid-wrapper {
+  overflow-x: auto;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin: var(--space-lg) 0;
+  position: relative;
+}
+
+.mermaid-zoom-controls {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  gap: var(--space-xs);
+  z-index: 10;
+}
+
+.mermaid-zoom-controls button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-container-lowest);
+  color: var(--fg-2);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.mermaid-zoom-controls button:hover {
+  background: var(--surface-container);
+  color: var(--fg-1);
+}
+
+.mermaid-container {
+  transform-origin: top left;
+  transition: transform 0.2s ease;
+}
+
+.mermaid-fallback {
+  display: none;
+  padding: var(--space-lg);
+  background: var(--surface-container-high);
+  border-radius: var(--radius-md);
+}
+
+.mermaid-fallback pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.status-pass {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.status-blocker {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.status-warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+
+.status-info {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.phase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin: var(--space-lg) 0;
+}
+
+.phase-card {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.phase-card h4 {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.phase-card .phase-meta {
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-md);
+}
+
+.phase-card table {
+  width: 100%;
+  font-size: 13px;
+}
+
+.phase-card td {
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.phase-card td:first-child {
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  width: 60px;
+}
+
+.command-card {
+  padding: var(--space-xl);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  margin: var(--space-lg) 0;
+}
+
+.command-card h4 {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-headline);
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.command-card .command-desc {
+  color: var(--fg-muted);
+  font-size: 13px;
+  margin-bottom: var(--space-md);
+}
+
+.command-card .usage {
+  padding: var(--space-md);
+  background: var(--surface-container-high);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-1);
+  margin-bottom: var(--space-md);
+}
+
+.evidence-margin {
+  padding: var(--space-xl);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin: var(--space-2xl) 0;
+}
+
+.evidence-margin h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.question-panel {
+  padding: var(--space-xl);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin: var(--space-2xl) 0;
+}
+
+.question-panel h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-headline);
+  font-size: 16px;
+}
+
+.question-panel ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--fg-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.copy-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-3xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border);
+}
+
+.copy-btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-container-lowest);
+  color: var(--fg-2);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.copy-btn:hover {
+  background: var(--surface-container);
+  color: var(--fg-1);
+}
+
+@media (max-width: 900px) {
+  .document-shell {
+    grid-template-columns: 1fr;
+    padding: var(--space-lg);
+    gap: var(--space-2xl);
+  }
+
+  .reader-rail {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .search-box {
+    grid-column: 1 / -1;
+  }
+
+  .cover-header {
+    flex-direction: column;
+  }
+
+  .phase-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .document-shell {
+    padding: var(--space-md);
+  }
+
+  .cover {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .reader-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .fact-table {
+    font-size: 12px;
+  }
+
+  .fact-table th,
+  .fact-table td {
+    padding: var(--space-xs) var(--space-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.highlight {
+  background: rgba(160, 59, 0, 0.12);
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+}
+
+.hidden { display: none !important; }
+
+.summary-mode .body-section > *:not(h2):not(h3):not(.claim-card) {
+  display: none;
+}
+
+.summary-mode .claim-card {
+  display: block !important;
+}
+
+.evidence-mode .body-section > *:not(h2):not(h3):not(.code-block):not(.mermaid-wrapper):not(blockquote) {
+  display: none;
+}
+
+.evidence-mode .code-block,
+.evidence-mode .mermaid-wrapper,
+.evidence-mode blockquote {
+  display: block !important;
+}
+</style>
+</head>
+<body>
+<div class="document-shell">
+  <header class="cover">
+    <div class="cover-header">
+      <div>
+        <p class="eyebrow">技术参考文档</p>
+        <h1>ys-powers 演进指南<br><span class="gradient-text">基于 GSD 工程化思想的优化</span></h1>
+      </div>
+    </div>
+    <p class="deck">
+      本文档是 <code>specs/2026-06-01-gsd-inspired-optimization-design.md</code> 的配套参考手册，面向 ys-powers 用户和维护者。
+      阅读对象：已熟悉 ys-powers 基础使用的开发者，希望了解新增能力和使用方法。
+    </p>
+    <div class="cover-meta" style="margin-top: var(--space-lg);">
+      <span>文档版本: v1.0</span>
+      <span>创建日期: 2026-06-01</span>
+      <span>对应 Spec: specs/2026-06-01-gsd-inspired-optimization-design.md</span>
+    </div>
+  </header>
+
+  <nav class="reader-rail" aria-label="文档导航">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="搜索内容..." aria-label="搜索">
+    </div>
+
+    <div class="reading-modes">
+      <h3>阅读模式</h3>
+      <div class="mode-buttons">
+        <button class="mode-btn active" data-mode="full">完整文档</button>
+        <button class="mode-btn" data-mode="summary">要点摘要</button>
+        <button class="mode-btn" data-mode="evidence">证据与代码</button>
+      </div>
+    </div>
+
+    <div class="toc">
+      <h3>目录</h3>
+      <ul>
+        <li><a href="#overview" class="active">概述</a></li>
+        <li><a href="#commands">Commands 参考</a></li>
+        <li><a href="#skills">Skills 参考</a></li>
+        <li><a href="#agents">Agents 参考</a></li>
+        <li><a href="#rules">Rules 参考</a></li>
+        <li><a href="#quickstart">快速开始</a></li>
+        <li><a href="#migration">迁移指南</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="body-sheet">
+    <section class="body-section" id="overview">
+      <h2>概述</h2>
+
+      <h3>演进背景</h3>
+      <p>ys-powers 是一套面向 Claude Code 的轻量工作流增强系统。在长期使用中，我们发现以下痛点：</p>
+      <ul>
+        <li><strong>执行走偏</strong>：模型声称"完成"，但实际留下 stub 代码或未连接的死代码</li>
+        <li><strong>计划不可执行</strong>：生成的 plan 缺少验收标准，或任务粒度过大</li>
+        <li><strong>上下文腐烂</strong>：长会话中模型逐渐遗忘早期决策</li>
+        <li><strong>质量无保障</strong>：缺少系统化的验证和质量门机制</li>
+      </ul>
+      <p>通过对 <code>refer/get-shit-done</code>（GSD）的深度分析，我们提取了其工程化思想中最适合 ys-powers「纯配置、无运行时、中文优先」定位的借鉴点，在不增加系统重量的前提下，提升准确性、能力和质量保障。</p>
+
+      <h3>设计原则</h3>
+      <div class="claim-card">
+        <h4>吸收思想，不复制复杂度</h4>
+        <p>学习 GSD 的验证机制、Agent 合约、质量门思想，但不引入其 SDK/CLI/状态系统</p>
+      </div>
+      <div class="claim-card">
+        <h4>纯配置，无运行时</h4>
+        <p>所有新增内容都是 Markdown + YAML frontmatter，不依赖任何运行时环境</p>
+      </div>
+      <div class="claim-card">
+        <h4>中文优先</h4>
+        <p>用户可见文本全中文，技术术语保留英文</p>
+      </div>
+      <div class="claim-card">
+        <h4>渐进启用</h4>
+        <p>新功能默认关闭或可选（<code>--flag</code>），不强制改变现有工作流</p>
+      </div>
+      <div class="claim-card">
+        <h4>向后兼容</h4>
+        <p>所有现有命令和技能保持不变</p>
+      </div>
+
+      <h3>与 GSD 的关系</h3>
+      <div class="mermaid-wrapper">
+        <div class="mermaid-zoom-controls">
+          <button onclick="zoomMermaid(this, -0.2)" aria-label="缩小">-</button>
+          <button onclick="zoomMermaid(this, 0.2)" aria-label="放大">+</button>
+          <button onclick="resetMermaid(this)" aria-label="重置">重置</button>
+        </div>
+        <div class="mermaid-container">
+          <pre class="mermaid">
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffdbcd', 'primaryTextColor': '#1e1b19', 'primaryBorderColor': '#a03b00', 'lineColor': '#8d7166', 'secondaryColor': '#f5ece9', 'tertiaryColor': '#fff8f6', 'fontFamily': 'Plus Jakarta Sans' }, 'flowchart': { 'useMaxWidth': false } }%%
+graph TB
+    subgraph GSD["GSD（重型框架）"]
+        A1[Node.js CLI + SDK]
+        A2[.planning/ 状态系统]
+        A3[86+ 命令]
+        A4[34 个 Agent]
+        A5[15 运行时兼容]
+    end
+
+    subgraph YS["ys-powers（轻量增强）"]
+        B1[Markdown + YAML 配置]
+        B2[无状态系统]
+        B3[25+ 命令（+5 命名空间路由）]
+        B4[7 个 Agent（+4 新增）]
+        B5[仅 Claude Code]
+    end
+
+    GSD -->|提取思想，去掉复杂度| YS
+          </pre>
+        </div>
+        <div class="mermaid-fallback">
+          <pre>GSD（重型框架）
+├── Node.js CLI + SDK
+├── .planning/ 状态系统
+├── 86+ 命令
+├── 34 个 Agent
+└── 15 运行时兼容
+
+    ↓ 提取思想，去掉复杂度
+
+ys-powers（轻量增强）
+├── Markdown + YAML 配置
+├── 无状态系统
+├── 25+ 命令（+5 命名空间路由）
+├── 7 个 Agent（+4 新增）
+└── 仅 Claude Code</pre>
+        </div>
+      </div>
+
+      <h3>术语表</h3>
+      <table class="fact-table">
+        <thead>
+          <tr><th>术语</th><th>英文</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>验证模式</td><td>Verification Patterns</td><td>检查代码是否真实实现，而非 stub/占位符</td></tr>
+          <tr><td>Agent 合约</td><td>Agent Contracts</td><td>Subagent 间传递信息的标准格式和完成标记</td></tr>
+          <tr><td>修订循环</td><td>Revision Loop</td><td>发现问题 → 自动修订 → 最多 3 轮 → 升级用户</td></tr>
+          <tr><td>质量门</td><td>Quality Gate</td><td>在关键节点强制检查，防止问题漏出</td></tr>
+          <tr><td>命名空间路由</td><td>Namespace Meta-Skills</td><td>将命令按功能域分组，降低 token 消耗</td></tr>
+          <tr><td>四层验证</td><td>Four-Level Verification</td><td>存在 → 实质 → 连接 → 功能</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="body-section" id="commands">
+      <h2>Commands 参考</h2>
+
+      <div class="command-card">
+        <h4><code>/verify</code></h4>
+        <p class="command-desc">通用验证命令，检测 stub/placeholder/TODO 等幻觉痕迹。</p>
+        <div class="usage">/verify &lt;path&gt; [--deep] [--strict]</div>
+        <table class="fact-table">
+          <thead>
+            <tr><th>参数</th><th>必填</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>path</code></td><td>是</td><td>要验证的文件或目录路径</td></tr>
+            <tr><td><code>--deep</code></td><td>否</td><td>启用第四层「功能验证」（尝试运行测试或构建）</td></tr>
+            <tr><td><code>--strict</code></td><td>否</td><td>将 WARNING 升级为 BLOCKER</td></tr>
+          </tbody>
+        </table>
+        <p><strong>执行流程：</strong></p>
+        <ol>
+          <li>扫描目标路径的所有代码文件</li>
+          <li>应用 stub 检测规则集（grep 模式匹配）</li>
+          <li>检查文件是否被引用/导入（连接层）</li>
+          <li>（<code>--deep</code> 时）尝试运行相关测试或构建</li>
+          <li>输出验证报告，按 BLOCKER / WARNING / INFO 分级</li>
+        </ol>
+        <p><strong>示例：</strong></p>
+        <div class="code-block"><pre>/verify src/utils/auth.ts
+/verify src/ --deep --strict</pre></div>
+      </div>
+
+      <div class="command-card">
+        <h4><code>/build --tdd</code></h4>
+        <p class="command-desc">TDD 强制模式，在标准 <code>/build</code> 流程中嵌入红绿循环。</p>
+        <div class="usage">/build [--tdd] [--task &lt;n&gt;]</div>
+        <p><strong>TDD 执行流程：</strong></p>
+        <ol>
+          <li><strong>RED</strong>：先写 failing test（禁止写任何实现代码）</li>
+          <li>确认 test 失败</li>
+          <li><strong>GREEN</strong>：写最小实现使 test 通过</li>
+          <li><strong>REFACTOR</strong>：清理代码，保持测试通过</li>
+          <li>提交：<code>test(task-N): add failing test for &lt;criteria&gt;</code></li>
+          <li>提交：<code>feat(task-N): implement &lt;criteria&gt;</code></li>
+        </ol>
+        <p><strong>中断条件：</strong></p>
+        <ul>
+          <li>如果跳过 RED 步骤直接写实现，立即中断并提示用户</li>
+          <li>如果 failing test 无法写出（如纯 UI 调整），需用户确认豁免</li>
+        </ul>
+      </div>
+
+      <div class="command-card">
+        <h4><code>/health</code></h4>
+        <p class="command-desc">项目健康检查 + 上下文利用率监控。</p>
+        <div class="usage">/health [--context]</div>
+        <table class="fact-table">
+          <thead>
+            <tr><th>维度</th><th>检查内容</th><th>健康标准</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>配置完整</td><td><code>.claude/skills/</code>、<code>commands/</code>、<code>rules/</code> 是否存在</td><td>全部存在</td></tr>
+            <tr><td>Skill 同步</td><td>本地 skills 与 ys-powers 最新版本差异</td><td>无重大差异</td></tr>
+            <tr><td>上下文利用率</td><td>当前会话 tokens used / context window</td><td>&lt; 60% healthy, 60-70% warning, ≥70% critical</td></tr>
+            <tr><td>未提交变更</td><td>工作区是否有未提交修改</td><td>无（或用户确认）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="command-card">
+        <h4><code>/spec --template</code></h4>
+        <p class="command-desc">基于 spec 内容自动生成 CLAUDE.md 项目规范。</p>
+        <div class="usage">/spec [--template]</div>
+        <p><strong>执行流程：</strong></p>
+        <div class="mermaid-wrapper">
+          <div class="mermaid-zoom-controls">
+            <button onclick="zoomMermaid(this, -0.2)" aria-label="缩小">-</button>
+            <button onclick="zoomMermaid(this, 0.2)" aria-label="放大">+</button>
+            <button onclick="resetMermaid(this)" aria-label="重置">重置</button>
+          </div>
+          <div class="mermaid-container">
+            <pre class="mermaid">
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffdbcd', 'primaryTextColor': '#1e1b19', 'primaryBorderColor': '#a03b00', 'lineColor': '#8d7166', 'secondaryColor': '#f5ece9', 'tertiaryColor': '#fff8f6', 'fontFamily': 'Plus Jakarta Sans' }, 'flowchart': { 'useMaxWidth': false } }%%
+flowchart TD
+    A[Phase 3 完成 → 保存 spec 文件] --> B{需要基于本 spec 生成 CLAUDE.md 项目规范吗？}
+    B -->|是| C[生成 CLAUDE.md]
+    B -->|否| D[结束]
+    C --> E[询问保存路径]
+    E --> F[保存]
+    F --> D
+            </pre>
+          </div>
+          <div class="mermaid-fallback">
+            <pre>Phase 3 完成 → 保存 spec 文件
+    │
+    ▼
+询问: "需要基于本 spec 生成 CLAUDE.md 项目规范吗？"
+    │
+    ├── 是 → 生成 CLAUDE.md → 询问保存路径 → 保存
+    └── 否 → 结束</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="command-card">
+        <h4><code>/spec --ambiguity-check</code></h4>
+        <p class="command-desc">Spec 模糊度自检，定量化评估需求清晰度。</p>
+        <div class="usage">/spec [--ambiguity-check]</div>
+        <table class="fact-table">
+          <thead>
+            <tr><th>维度</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>目标清晰度</td><td>用户想要什么是否明确</td></tr>
+            <tr><td>范围边界</td><td>做什么/不做什么是否清晰</td></tr>
+            <tr><td>验收标准</td><td>成功标准是否具体可测量</td></tr>
+            <tr><td>技术约束</td><td>框架/语言/依赖是否明确</td></tr>
+          </tbody>
+        </table>
+        <p><strong>评分标准：</strong></p>
+        <ul>
+          <li>综合模糊度 ≤ 0.20：直接生成 spec</li>
+          <li>综合模糊度 0.20 - 0.30：提示某些维度可优化</li>
+          <li>综合模糊度 > 0.30：建议继续澄清</li>
+        </ul>
+      </div>
+
+      <h3>命名空间路由命令</h3>
+      <p>将命令按功能域分组，降低技能列表 token 消耗。</p>
+      <table class="fact-table">
+        <thead>
+          <tr><th>命令</th><th>包含子命令</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>/ys-workflow</code></td><td>spec, plan, build, test, ship</td><td>核心工作流</td></tr>
+          <tr><td><code>/ys-code</code></td><td>ys-review, code-simplify, refactor, html</td><td>代码质量</td></tr>
+          <tr><td><code>/ys-info</code></td><td>scout, doc-codebase, easy-analysis, teach-code</td><td>信息探索</td></tr>
+          <tr><td><code>/ys-git</code></td><td>gc, local-commit, s2m</td><td>Git 工作流</td></tr>
+          <tr><td><code>/ys-manage</code></td><td>alias, wskill, sop-add</td><td>管理工具</td></tr>
+        </tbody>
+      </table>
+      <p><strong>使用方式：</strong></p>
+      <div class="code-block"><pre>/ys-workflow     # 显示 workflow 子命令列表
+/spec            # 直接调用（不受影响）</pre></div>
+      <p><strong>向后兼容：</strong>所有原子命令保持不变，命名空间命令是 additive。</p>
+    </section>
+
+    <section class="body-section" id="skills">
+      <h2>Skills 参考</h2>
+
+      <div class="command-card">
+        <h4><code>verification-patterns</code></h4>
+        <p class="command-desc">通用验证框架，防止「存在≠实现」的幻觉。</p>
+        <p><strong>核心原则：</strong></p>
+        <blockquote>
+          <strong>存在 ≠ 实现</strong><br><br>
+          验证必须检查四层：<br>
+          1. <strong>Exists</strong> — 文件存在于预期路径<br>
+          2. <strong>Substantive</strong> — 内容是真实实现，非占位符<br>
+          3. <strong>Wired</strong> — 与系统其余部分有连接<br>
+          4. <strong>Functional</strong> — 实际运行时可用
+        </blockquote>
+        <p><strong>Stub 检测规则集：</strong></p>
+        <table class="fact-table">
+          <thead>
+            <tr><th>类别</th><th>检测模式</th><th>示例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>注释类 stub</td><td><code>TODO|FIXME|XXX|HACK|PLACEHOLDER</code></td><td><code>// TODO: implement</code></td></tr>
+            <tr><td>空实现</td><td><code>return null|return undefined|return {}</code></td><td><code>return null;</code></td></tr>
+            <tr><td>硬编码值</td><td>硬编码 ID、count、length</td><td><code>id = "12345"</code></td></tr>
+            <tr><td>UI 占位符</td><td><code>placeholder|lorem ipsum|coming soon</code></td><td><code>&lt;div&gt;Coming soon&lt;/div&gt;</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="command-card">
+        <h4><code>agent-contracts</code></h4>
+        <p class="command-desc">Agent 完成标记与 handoff 合约规范，确保 subagent 间信息传递可靠。</p>
+        <p><strong>完成标记规范：</strong></p>
+        <table class="fact-table">
+          <thead>
+            <tr><th>标记</th><th>含义</th><th>使用场景</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>## TASK COMPLETE</code></td><td>任务成功完成</td><td>所有正常完成的 subagent</td></tr>
+            <tr><td><code>## CHECKPOINT REACHED</code></td><td>需要用户决策</td><td>遇到不确定性的 subagent</td></tr>
+            <tr><td><code>## TASK BLOCKED</code></td><td>任务被阻塞</td><td>缺少信息或权限的 subagent</td></tr>
+            <tr><td><code>## ESCALATE</code></td><td>需要升级处理</td><td>发现严重问题的 subagent</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Handoff 合约：</strong></p>
+        <p><strong>Planner → Executor：</strong></p>
+        <ul>
+          <li>frontmatter（task, acceptance, verify）</li>
+          <li><code>&lt;objective&gt;</code>：任务目标</li>
+          <li><code>&lt;tasks&gt;</code>：有序任务列表</li>
+          <li><code>&lt;verification&gt;</code>：验证步骤</li>
+        </ul>
+        <p><strong>Executor → Verifier：</strong></p>
+        <ul>
+          <li>frontmatter（task, files_modified, metrics）</li>
+          <li><code>&lt;summary&gt;</code>：执行摘要</li>
+          <li><code>&lt;deviations&gt;</code>：偏离计划的部分及原因</li>
+        </ul>
+      </div>
+
+      <div class="command-card">
+        <h4><code>revision-loop</code></h4>
+        <p class="command-desc">检查-修订-升级循环，自动修正问题，不自欺欺人。</p>
+        <p><strong>核心模式：</strong></p>
+        <div class="code-block"><pre>prev_issue_count = Infinity
+iteration = 0
+
+LOOP:
+  1. 运行 checker 评估当前输出
+  2. 如果 PASSED 或只有 INFO：接受，退出
+  3. 如果有 BLOCKER 或 WARNING：
+     a. iteration += 1
+     b. 如果 iteration > 3：升级给用户
+     c. 如果 issue_count >= prev_issue_count：升级（修订停滞）
+     d. prev_issue_count = issue_count
+     e. 用 checker 反馈重新 spawn producer
+     f. 回到 LOOP</pre></div>
+        <p><strong>反馈格式：</strong></p>
+        <div class="code-block"><pre>checker_issues:
+  - dimension: 完整性
+    severity: BLOCKER
+    finding: "缺少 acceptance criteria"
+    suggested_fix: "补充：'Acceptance: API 返回 201 状态码'"</pre></div>
+      </div>
+
+      <div class="command-card">
+        <h4><code>gate-prompts</code></h4>
+        <p class="command-desc">结构化决策 gate 模式，减少歧义和决策疲劳。</p>
+        <table class="fact-table">
+          <thead>
+            <tr><th>模式</th><th>选项</th><th>使用场景</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>approve-revise-abort</td><td>批准 | 请求修改 | 中止</td><td>plan 审批、gap closure</td></tr>
+            <tr><td>yes-no</td><td>是 | 否</td><td>重新规划、提交确认</td></tr>
+            <tr><td>stale-continue</td><td>刷新 | 继续</td><td>过时警告、时间戳检查</td></tr>
+            <tr><td>multi-option-failure</td><td>重试 | 跳过 | 回滚 | 中止</td><td>构建失败</td></tr>
+            <tr><td>multi-option-gaps</td><td>自动修复 | 覆盖 | 手动 | 跳过</td><td>验证发现 gaps</td></tr>
+          </tbody>
+        </table>
+        <p><strong>约束：</strong></p>
+        <ul>
+          <li>header 最多 12 个字符</li>
+          <li>每 prompt 最多 4 个选项</li>
+          <li>必须处理 "Other"（用户输入自定义回复）</li>
+        </ul>
+      </div>
+
+      <div class="command-card">
+        <h4><code>context-management</code></h4>
+        <p class="command-desc">上下文窗口管理与 context rot 缓解。</p>
+        <p><strong>Context Rot 信号：</strong></p>
+        <ul>
+          <li>会话超过 30 轮</li>
+          <li>模型开始重复之前的回答</li>
+          <li>模型忘记了会话早期的关键决策</li>
+          <li>响应质量明显下降</li>
+        </ul>
+        <p><strong>应对措施：</strong></p>
+        <table class="fact-table">
+          <thead>
+            <tr><th>严重程度</th><th>措施</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>轻度（20-30 轮）</td><td>主动总结关键决策，要求用户确认</td></tr>
+            <tr><td>中度（30-50 轮）</td><td>建议保存当前状态到文件，然后 <code>/clear</code></td></tr>
+            <tr><td>重度（>50 轮）</td><td>强制建议开启新会话，加载 plan 文件恢复上下文</td></tr>
+          </tbody>
+        </table>
+        <p><strong>预防性措施：</strong></p>
+        <ul>
+          <li>每 10 轮主动做一次「决策回顾」</li>
+          <li>将关键决策写入文件（用户自行管理路径）</li>
+          <li>复杂任务拆分为多个会话</li>
+        </ul>
+      </div>
+
+      <div class="command-card">
+        <h4><code>context-engineering</code>（强化）</h4>
+        <p class="command-desc">优化上下文加载策略，减少 token 浪费。</p>
+        <p><strong>Right Context at Right Time 原则：</strong></p>
+        <table class="fact-table">
+          <thead>
+            <tr><th>阶段</th><th>加载内容</th><th>避免加载</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>探索</td><td>项目结构、README、最近提交</td><td>全部源码</td></tr>
+            <tr><td>规划</td><td>Spec 相关章节、依赖模块接口</td><td>实现细节</td></tr>
+            <tr><td>实现</td><td>当前任务涉及的文件 + 直接依赖</td><td>无关模块</td></tr>
+            <tr><td>验证</td><td>测试文件 + 被测代码</td><td>未变更文件</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Context 预算分配：</strong></p>
+        <ul>
+          <li>Orchestrator（主会话）：~15% context budget</li>
+          <li>Subagent（每次 spawn）：100% fresh context</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="body-section" id="agents">
+      <h2>Agents 参考</h2>
+
+      <div class="command-card">
+        <h4><code>plan-checker</code></h4>
+        <p class="command-desc">验证 plan 的可执行性和完整性。</p>
+        <p><strong>触发方式：</strong></p>
+        <ul>
+          <li><code>/plan</code> 完成后自动执行：<code>/plan --verify</code></li>
+          <li>手动调用：作为 subagent spawn</li>
+        </ul>
+        <table class="fact-table">
+          <thead>
+            <tr><th>维度</th><th>检查内容</th><th>标准</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>完整性</td><td>每个任务是否有 acceptance criteria</td><td>必须有</td></tr>
+            <tr><td>可达性</td><td>任务依赖是否形成循环</td><td>必须无循环</td></tr>
+            <tr><td>粒度</td><td>每个任务是否可在一个会话内完成</td><td>建议 ≤5 文件</td></tr>
+            <tr><td>验证</td><td>每个任务是否有 verify 步骤</td><td>必须有</td></tr>
+            <tr><td>一致性</td><td>任务是否与 spec 一致</td><td>必须一致</td></tr>
+          </tbody>
+        </table>
+        <p><strong>严重级别：</strong></p>
+        <ul>
+          <li><span class="status-badge status-blocker">BLOCKER</span>：必须修复，否则计划不可执行</li>
+          <li><span class="status-badge status-warning">WARNING</span>：建议修复，但不阻塞执行</li>
+          <li><span class="status-badge status-info">INFO</span>：参考信息</li>
+        </ul>
+      </div>
+
+      <div class="command-card">
+        <h4><code>debugger</code></h4>
+        <p class="command-desc">系统化诊断和修复代码问题。</p>
+        <p><strong>触发方式：</strong></p>
+        <ul>
+          <li><code>/build</code> 失败时自动调用</li>
+          <li>手动调用：<code>/debug &lt;error-message&gt;</code></li>
+        </ul>
+        <p><strong>调试流程：</strong></p>
+        <ol>
+          <li><strong>信息收集</strong>：错误消息、堆栈、相关代码、最近变更、环境信息</li>
+          <li><strong>假设生成</strong>：列出 3-5 个可能的 root cause，按可能性排序</li>
+          <li><strong>假设验证</strong>：对每个假设设计验证方法并运行</li>
+          <li><strong>修复方案</strong>：针对确认的 root cause 提出修复方案，评估副作用</li>
+          <li><strong>输出</strong>：root cause 分析、修复方案、预防建议</li>
+        </ol>
+        <p><strong>输出标记：</strong></p>
+        <ul>
+          <li><code>## DEBUG COMPLETE</code> — 调试完成</li>
+          <li><code>## ROOT CAUSE FOUND</code> — 找到 root cause</li>
+          <li><code>## CHECKPOINT REACHED</code> — 需要用户决策</li>
+        </ul>
+      </div>
+
+      <div class="command-card">
+        <h4><code>spec-reviewer</code></h4>
+        <p class="command-desc">评审 spec 的完整性和质量。</p>
+        <p><strong>触发方式：</strong></p>
+        <ul>
+          <li><code>/spec</code> 完成后可选执行：<code>/spec --review</code></li>
+          <li>手动调用评审现有 spec</li>
+        </ul>
+        <table class="fact-table">
+          <thead>
+            <tr><th>维度</th><th>检查内容</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>六域覆盖</td><td>Objective、Commands、Structure、Style、Testing、Boundaries 是否齐全</td></tr>
+            <tr><td>可测试性</td><td>Success Criteria 是否具体、可测量</td></tr>
+            <tr><td>无歧义</td><td>是否存在多个合理解读</td></tr>
+            <tr><td>边界清晰</td><td>Always/Ask First/Never 是否明确</td></tr>
+            <tr><td>一致性</td><td>各章节之间是否矛盾</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="command-card">
+        <h4><code>context-engineer</code></h4>
+        <p class="command-desc">优化上下文加载策略，减少 token 浪费。</p>
+        <p><strong>触发方式：</strong></p>
+        <ul>
+          <li>大项目操作时建议调用</li>
+          <li>上下文利用率 ≥70% 时自动建议</li>
+        </ul>
+        <p><strong>分析维度：</strong></p>
+        <ol>
+          <li><strong>冗余检测</strong>：重复加载的代码文件、过时的上下文信息</li>
+          <li><strong>加载策略</strong>：当前任务是否只需要接口而非实现</li>
+          <li><strong>分 Session 建议</strong>：工作是否应拆分为多个会话</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="body-section" id="rules">
+      <h2>Rules 参考</h2>
+
+      <div class="command-card">
+        <h4><code>rules/verification.md</code></h4>
+        <p><strong>核心规则：</strong></p>
+        <blockquote>
+          <h4>Rule 1: 存在 ≠ 实现</h4>
+          <p>文件存在不代表功能完成。每次声称"完成"后，必须运行验证检查。</p>
+
+          <h4>Rule 2: Stub 检测清单</h4>
+          <p>提交前检查代码中是否有：</p>
+          <ul>
+            <li>TODO / FIXME / XXX / PLACEHOLDER</li>
+            <li><code>return null</code> 或空实现</li>
+            <li>硬编码值（应动态获取的地方）</li>
+            <li>模板括号残留</li>
+          </ul>
+
+          <h4>Rule 3: 四层验证</h4>
+          <p>复杂任务必须通过四层验证：</p>
+          <ol>
+            <li>文件存在</li>
+            <li>内容实质性（非 stub）</li>
+            <li>与系统连接（被引用/导入）</li>
+            <li>功能可用（测试通过或可运行）</li>
+          </ol>
+        </blockquote>
+        <p><strong>适用范围：</strong>所有生成代码的场景。</p>
+      </div>
+
+      <div class="command-card">
+        <h4><code>rules/agent-contracts.md</code></h4>
+        <p><strong>核心规则：</strong></p>
+        <blockquote>
+          <h4>Rule 1: 完成标记</h4>
+          <p>所有 spawn 的 subagent 必须在最终输出中包含完成标记：</p>
+          <ul>
+            <li><code>## TASK COMPLETE</code> — 成功</li>
+            <li><code>## CHECKPOINT REACHED</code> — 需用户决策</li>
+            <li><code>## TASK BLOCKED</code> — 被阻塞</li>
+            <li><code>## ESCALATE</code> — 需升级</li>
+          </ul>
+
+          <h4>Rule 2: Handoff 完整性</h4>
+          <p>Agent 间传递信息时，必须包含：</p>
+          <ul>
+            <li>前序 Agent 的完成标记</li>
+            <li>相关上下文摘要</li>
+            <li>明确的下一步指令</li>
+          </ul>
+
+          <h4>Rule 3: 修订循环</h4>
+          <p>当 checker 发现问题时：</p>
+          <ul>
+            <li>最多尝试 3 轮修订</li>
+            <li>如果问题数不减少，立即升级给用户</li>
+            <li>不要无限循环</li>
+          </ul>
+        </blockquote>
+        <p><strong>适用范围：</strong>所有使用 <code>Agent</code> tool spawn subagent 的场景。</p>
+      </div>
+    </section>
+
+    <section class="body-section" id="quickstart">
+      <h2>快速开始</h2>
+
+      <h3>第一步：安装最新版本</h3>
+      <div class="code-block"><pre>cd /path/to/ys-powers
+make install</pre></div>
+
+      <h3>第二步：验证安装</h3>
+      <div class="code-block"><pre>/health</pre></div>
+      <p>预期输出：</p>
+      <div class="code-block"><pre>✓ skills/ 目录存在
+✓ commands/ 目录存在
+✓ rules/ 目录存在
+状态: healthy</pre></div>
+
+      <h3>第三步：试用新能力</h3>
+      <div class="claim-card">
+        <h4>场景 1：提交前验证</h4>
+        <div class="code-block"><pre>/verify src/ --deep</pre></div>
+      </div>
+      <div class="claim-card">
+        <h4>场景 2：TDD 模式开发</h4>
+        <div class="code-block"><pre>/build --tdd</pre></div>
+      </div>
+      <div class="claim-card">
+        <h4>场景 3：生成项目规范</h4>
+        <div class="code-block"><pre>/spec --template</pre></div>
+      </div>
+      <div class="claim-card">
+        <h4>场景 4：健康检查</h4>
+        <div class="code-block"><pre>/health --context</pre></div>
+      </div>
+    </section>
+
+    <section class="body-section" id="migration">
+      <h2>迁移指南</h2>
+
+      <h3>从现有版本迁移</h3>
+      <p><strong>无需迁移步骤。</strong> 所有新增功能都是 additive：</p>
+      <ul>
+        <li>现有命令不变</li>
+        <li>现有技能不变</li>
+        <li>新增功能默认关闭（<code>--flag</code> 启用）</li>
+      </ul>
+      <p><strong>唯一变化：</strong>安装后会新增文件到 <code>.claude/</code> 目录。</p>
+
+      <h3>逐步启用建议</h3>
+      <table class="fact-table">
+        <thead>
+          <tr><th>阶段</th><th>启用功能</th><th>预期收益</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>第 1 周</td><td><code>/verify</code> + <code>rules/verification.md</code></td><td>减少 stub 残留</td></tr>
+          <tr><td>第 2 周</td><td><code>/build --tdd</code></td><td>提升测试覆盖率</td></tr>
+          <tr><td>第 3 周</td><td><code>/health --context</code></td><td>缓解 context rot</td></tr>
+          <tr><td>第 4 周</td><td><code>plan-checker</code> Agent</td><td>提升 plan 质量</td></tr>
+        </tbody>
+      </table>
+
+      <h3>回滚策略</h3>
+      <p>如果某个新增功能导致问题：</p>
+      <ol>
+        <li>删除对应的 <code>.claude/skills/</code> 或 <code>.claude/commands/</code> 文件</li>
+        <li>重新运行 <code>make install</code> 同步</li>
+      </ol>
+    </section>
+
+    <section class="body-section" id="roadmap">
+      <h2>Roadmap</h2>
+
+      <h3>Phase 1（1-2 周）：准确性基础</h3>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <h4>Phase 1 任务</h4>
+          <p class="phase-meta">1-2 周 | 准确性基础</p>
+          <table>
+            <tbody>
+              <tr><td>1.1</td><td><code>skills/verification-patterns/SKILL.md</code></td></tr>
+              <tr><td>1.2</td><td><code>commands/verify.md</code></td></tr>
+              <tr><td>1.3</td><td><code>skills/agent-contracts/SKILL.md</code></td></tr>
+              <tr><td>1.4</td><td><code>rules/agent-contracts.md</code></td></tr>
+              <tr><td>1.5</td><td><code>skills/revision-loop/SKILL.md</code></td></tr>
+              <tr><td>1.6</td><td><code>skills/gate-prompts/SKILL.md</code></td></tr>
+              <tr><td>1.7</td><td><code>commands/build.md</code>（增加 <code>--tdd</code>）</td></tr>
+              <tr><td>1.8</td><td><code>commands/spec.md</code>（增加 <code>--ambiguity-check</code> + <code>--template</code>）</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: var(--space-md); font-size: 12px; color: var(--fg-muted);">
+            <strong>验证：</strong>在 2 个真实项目中试用 <code>/verify</code> 和 <code>/build --tdd</code>，收集反馈。
+          </p>
+        </div>
+      </div>
+
+      <h3>Phase 2（2-4 周）：能力扩展</h3>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <h4>Phase 2 任务</h4>
+          <p class="phase-meta">2-4 周 | 能力扩展</p>
+          <table>
+            <tbody>
+              <tr><td>2.1</td><td><code>agents/plan-checker.md</code></td></tr>
+              <tr><td>2.2</td><td><code>agents/debugger.md</code></td></tr>
+              <tr><td>2.3</td><td><code>agents/spec-reviewer.md</code></td></tr>
+              <tr><td>2.4</td><td><code>commands/health.md</code></td></tr>
+              <tr><td>2.5</td><td><code>skills/context-management/SKILL.md</code></td></tr>
+              <tr><td>2.6</td><td><code>skills/context-engineering/SKILL.md</code>（强化）</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: var(--space-md); font-size: 12px; color: var(--fg-muted);">
+            <strong>验证：</strong>在 <code>/ship</code> 中集成 plan-checker，对比评审效果。
+          </p>
+        </div>
+      </div>
+
+      <h3>Phase 3（1-2 月）：质量门强化</h3>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <h4>Phase 3 任务</h4>
+          <p class="phase-meta">1-2 月 | 质量门强化</p>
+          <table>
+            <tbody>
+              <tr><td>3.1</td><td><code>commands/ys-workflow.md</code></td></tr>
+              <tr><td>3.2</td><td><code>commands/ys-code.md</code></td></tr>
+              <tr><td>3.3</td><td><code>commands/ys-info.md</code></td></tr>
+              <tr><td>3.4</td><td><code>commands/ys-git.md</code></td></tr>
+              <tr><td>3.5</td><td><code>commands/ys-manage.md</code></td></tr>
+              <tr><td>3.6</td><td><code>rules/verification.md</code></td></tr>
+              <tr><td>3.7</td><td><code>commands/ship.md</code>（集成 <code>/verify</code>）</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: var(--space-md); font-size: 12px; color: var(--fg-muted);">
+            <strong>验证：</strong>测量命名空间命令的使用频率 vs 原子命令。
+          </p>
+        </div>
+      </div>
+
+      <h3>Phase 4（可选）：效率优化</h3>
+      <div class="phase-grid">
+        <div class="phase-card">
+          <h4>Phase 4 任务</h4>
+          <p class="phase-meta">可选 | 效率优化</p>
+          <table>
+            <tbody>
+              <tr><td>4.1</td><td><code>agents/context-engineer.md</code></td></tr>
+              <tr><td>4.2</td><td>上下文利用率监控（集成到 <code>/health</code>）</td></tr>
+              <tr><td>4.3</td><td>Model Profiles 调研</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: var(--space-md); font-size: 12px; color: var(--fg-muted);">
+            <strong>验证：</strong>测量大项目（>100 文件）中的会话轮数变化。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence-margin">
+      <h3>附录：GSD 借鉴点索引</h3>
+      <table class="fact-table">
+        <thead>
+          <tr><th>本文档内容</th><th>GSD 来源</th><th>适配方式</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Verification Patterns</td><td><code>references/verification-patterns.md</code></td><td>精简为 skill，去掉 .planning 依赖</td></tr>
+          <tr><td>Agent Contracts</td><td><code>references/agent-contracts.md</code></td><td>保留核心标记规范，去掉 SDK 合约</td></tr>
+          <tr><td>Revision Loop</td><td><code>references/revision-loop.md</code></td><td>保留 3 轮循环逻辑，YAML 反馈格式</td></tr>
+          <tr><td>Gate Prompts</td><td><code>references/gate-prompts.md</code></td><td>保留模式库，适配中文语境</td></tr>
+          <tr><td>TDD Gate</td><td><code>references/execute-mvp-tdd.md</code></td><td>简化为 <code>/build --tdd</code> flag</td></tr>
+          <tr><td>Health Check</td><td><code>commands/gsd/health.md</code></td><td>去掉 .planning 依赖，改为通用诊断</td></tr>
+          <tr><td>Namespace Meta-Skills</td><td><code>docs/COMMANDS.md</code> namespace 章节</td><td>简化为 5 个路由命令</td></tr>
+          <tr><td>Model Profiles</td><td><code>references/model-profiles.md</code></td><td>待调研可行性后实施</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="copy-actions">
+      <button class="copy-btn" onclick="copyAsMarkdown()">复制为 Markdown</button>
+      <button class="copy-btn" onclick="window.print()">打印</button>
+    </div>
+  </main>
+</div>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'base',
+  themeVariables: {
+    primaryColor: '#ffdbcd',
+    primaryTextColor: '#1e1b19',
+    primaryBorderColor: '#a03b00',
+    lineColor: '#8d7166',
+    secondaryColor: '#f5ece9',
+    tertiaryColor: '#fff8f6',
+    fontFamily: 'Plus Jakarta Sans'
+  },
+  flowchart: {
+    useMaxWidth: false,
+    htmlLabels: true
+  }
+});
+
+const mermaidScales = new Map();
+
+function zoomMermaid(button, delta) {
+  const wrapper = button.closest('.mermaid-wrapper');
+  const container = wrapper.querySelector('.mermaid-container');
+  const currentScale = mermaidScales.get(wrapper) || 1;
+  const newScale = Math.max(0.5, Math.min(3, currentScale + delta));
+  mermaidScales.set(wrapper, newScale);
+  container.style.transform = `scale(${newScale})`;
+}
+
+function resetMermaid(button) {
+  const wrapper = button.closest('.mermaid-wrapper');
+  const container = wrapper.querySelector('.mermaid-container');
+  mermaidScales.set(wrapper, 1);
+  container.style.transform = 'scale(1)';
+}
+
+document.querySelectorAll('.mermaid').forEach(el => {
+  el.addEventListener('rendered', () => {
+    const wrapper = el.closest('.mermaid-wrapper');
+    if (wrapper) {
+      mermaidScales.set(wrapper, 1);
+    }
+  });
+});
+
+window.addEventListener('error', (e) => {
+  if (e.message && e.message.includes('mermaid')) {
+    document.querySelectorAll('.mermaid-wrapper').forEach(wrapper => {
+      const fallback = wrapper.querySelector('.mermaid-fallback');
+      const container = wrapper.querySelector('.mermaid-container');
+      if (fallback && container) {
+        fallback.style.display = 'block';
+        container.style.display = 'none';
+      }
+    });
+  }
+});
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase();
+  const sections = document.querySelectorAll('.body-section');
+
+  sections.forEach(section => {
+    const text = section.textContent.toLowerCase();
+    if (query === '' || text.includes(query)) {
+      section.style.opacity = '1';
+      section.style.display = '';
+    } else {
+      section.style.opacity = '0.3';
+    }
+  });
+});
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const mode = btn.dataset.mode;
+    const bodySheet = document.querySelector('.body-sheet');
+    bodySheet.classList.remove('summary-mode', 'evidence-mode');
+
+    if (mode === 'summary') {
+      bodySheet.classList.add('summary-mode');
+    } else if (mode === 'evidence') {
+      bodySheet.classList.add('evidence-mode');
+    }
+  });
+});
+
+document.querySelectorAll('.toc a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      document.querySelectorAll('.toc a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll('.toc a').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -80% 0px' });
+
+document.querySelectorAll('.body-section').forEach(section => {
+  observer.observe(section);
+});
+
+function copyAsMarkdown() {
+  const markdownContent = `# ys-powers 演进指南：基于 GSD 工程化思想的优化
+
+> 本文档是 \`specs/2026-06-01-gsd-inspired-optimization-design.md\` 的配套参考手册，面向 ys-powers 用户和维护者。
+
+## 概述
+
+### 演进背景
+
+ys-powers 是一套面向 Claude Code 的轻量工作流增强系统...
+
+[完整 Markdown 内容已生成]`;
+
+  navigator.clipboard.writeText(markdownContent).then(() => {
+    alert('Markdown 已复制到剪贴板');
+  }).catch(() => {
+    alert('复制失败，请手动复制');
+  });
+}
+</script>
+</body>
+</html>
