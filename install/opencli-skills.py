@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """
 opencli skills 本地安装脚本
 
@@ -22,12 +24,18 @@ def get_project_root() -> Path:
     return Path(__file__).resolve().parent.parent
 
 
-def do_install(project_root: Path, target_project: Path) -> bool:
-    """安装 opencli skills 到目标项目。"""
+def _get_source_dir(project_root: Path) -> Path | None:
+    """检查 opencli skills 源目录是否存在。"""
     source_dir = project_root / "external/opencli/skills"
-
     if not source_dir.exists():
         print(f"✗ opencli skills 源目录不存在: {source_dir}", file=sys.stderr)
+        return None
+    return source_dir
+
+
+def do_install(project_root: Path, target_project: Path) -> bool:
+    """安装 opencli skills 到目标项目。"""
+    if _get_source_dir(project_root) is None:
         return False
 
     target_claude = target_project / ".claude"
@@ -42,10 +50,7 @@ def do_install(project_root: Path, target_project: Path) -> bool:
 
 def do_uninstall(project_root: Path, target_project: Path) -> bool:
     """从目标项目卸载 opencli skills。"""
-    source_dir = project_root / "external/opencli/skills"
-
-    if not source_dir.exists():
-        print(f"✗ opencli skills 源目录不存在: {source_dir}", file=sys.stderr)
+    if _get_source_dir(project_root) is None:
         return False
 
     target_claude = target_project / ".claude"
@@ -75,7 +80,7 @@ def main() -> int:
     args = parser.parse_args()
 
     project_root = get_project_root()
-    target_project = args.project_dir.resolve()
+    target_project = args.project_dir.absolute()
 
     # 守卫：目标项目目录必须存在
     if not target_project.exists():
