@@ -65,8 +65,8 @@
 | shipping-and-launch | — | 同名 | 缺 analysis |
 | source-driven-development | — | 同名 | 缺 analysis |
 | using-agent-skills | — | 同名 | 缺 analysis |
-| interview-me | — | 未建 | refer 新增 skill |
-| doubt-driven-development | — | 未建 | refer 新增 skill |
+| interview-me | 08 | 同名 | refer 新增 skill |
+| doubt-driven-development | 09 | 同名 | refer 新增 skill |
 
 ---
 
