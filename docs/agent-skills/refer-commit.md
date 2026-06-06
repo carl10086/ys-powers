@@ -8,15 +8,15 @@
 
 - Remote:      https://github.com/addyosmani/agent-skills.git
 - Branch:      main
-- Commit:      f504276d8e074912f4763e6163b436a4ffc74d0d
-- Short:       f504276
-- Author Date: 2026-05-02 19:23:40 -0700
-- Subject:     Merge pull request #108 from devmarkpro/main
+- Commit:      2e0dfbfb436ef3307bbe8ba172f14996de980784
+- Short:       2e0dfbf
+- Author Date: 2026-06-05 18:00:13 -0700
+- Subject:     Merge pull request #215 from addyosmani/addyosmani/fix-marketplace-schema
 - Worktree:    clean
-- 快照时间:    2026-05-03
-- ys-powers 同期 commit: 42eb12e5ebb0e8377c2b4de2367d4c7f85d621a5
+- 快照时间:    2026-06-07
+- ys-powers 同期 commit: d71481c01b7b81f57aaedf5c212730ad1afbd90e
 
-## 当前 skills 清单（21 个）
+## 当前 skills 清单（23 个）
 
 - api-and-interface-design
 - browser-testing-with-devtools
@@ -65,10 +65,81 @@
 | shipping-and-launch | — | 同名 | 缺 analysis |
 | source-driven-development | — | 同名 | 缺 analysis |
 | using-agent-skills | — | 同名 | 缺 analysis |
+| interview-me | — | 未建 | refer 新增 skill |
+| doubt-driven-development | — | 未建 | refer 新增 skill |
 
 ---
 
 ## 更新历史
+
+### 2026-06-07: f504276..2e0dfbf
+
+**摘要**：本次为大规模方法论扩展。新增 `interview-me`（Define 阶段前置）和 `doubt-driven-development`（Build 阶段对抗性审查）两个核心 skill；`using-agent-skills` 决策树从 11 步扩展为 15 步生命周期；多个既有 skill 新增"避免无意义重复验证"反模式；编排层 `plugin.json` 引入 skills/agents 数组声明。
+
+**上下游**：
+- 起点: f504276 (Merge pull request #108 from devmarkpro/main)
+- 终点: 2e0dfbf (Merge pull request #215 from addyosmani/addyosmani/fix-marketplace-schema)
+- 期间提交数: 41
+- ys-powers 同期 commit: d71481c
+
+#### 4 维度变更
+
+**1. 方法论修订**（既有 SKILL.md 内容变化）
+- `using-agent-skills/SKILL.md`：重大更新——决策树新增 `interview-me`（Define 阶段入口）、`doubt-driven-development`（Build 阶段审查）、`code-simplification`（Review 阶段）、`deprecation-and-migration`（Ship 阶段）；生命周期序列从 11 步扩展为 15 步；Quick Reference 表格同步扩展
+- `incremental-implementation/SKILL.md`：新增"避免无意义重复验证"条款——成功运行后不要在未改代码的情况下重复执行 build/test 命令
+- `test-driven-development/SKILL.md`：同上，新增"避免重复运行测试"的反模式说明与 verification note
+- `browser-testing-with-devtools/SKILL.md`：frontmatter 微调——description 增加 "Requires the chrome-devtools MCP server"
+- `idea-refine/SKILL.md`：frontmatter 微调——description 更具体化触发词（"ideate", "refine this idea", "stress-test my plan"）
+- `spec-driven-development/SKILL.md`：内联引用路径从裸 skill 名改为 `skills/<name>/SKILL.md` 格式
+
+**2. 新增**（skills / commands / agents / hooks / references 出现新文件）
+- `skills/doubt-driven-development/SKILL.md`：全新 skill，用于"在飞行中"对非平凡决策进行对抗性审查（区别于 `/review` 的事后 verdict）。使用场景：分支逻辑、跨模块边界、类型系统无法验证的断言（线程安全、幂等性）、不可逆操作前。
+- `skills/interview-me/SKILL.md`：全新 skill，Define 阶段前置步骤。通过逐题提问（附最佳猜测）挖掘用户真实意图，直到 ~95% 置信度。用于请求欠指定时（"build me X" 但没有 who/why/success/constraint）。
+- `scripts/validate-skills.js`：CI 验证器，检查 SKILL.md frontmatter 合规性（长度、必填字段、YAML 语法）。
+- `hooks/session-start-test.sh`：session-start hook 的回归测试脚本，覆盖 JSON 转义场景。
+
+**3. 删除/合并**
+- 无。
+
+**4. 编排层变化**（commands ⇄ agents ⇄ hooks 组合关系）
+- `.claude-plugin/plugin.json`：移除 `version` 字段；新增 `skills`（目录形式，支持 auto-discover）和 `agents`（文件数组）声明。format 从对象改为数组再改为目录形式，最终稳定为 `"skills": "./skills"`。
+- `.claude-plugin/marketplace.json`：适配显式 GitHub source 格式、relative path source，修复 install bug。
+- `README.md`：skill 数量从 21 更新为 23+；新增 `interview-me` 和 `doubt-driven-development` 的引用；`using-agent-skills` 作为元 skill 被显式列出。
+- `AGENTS.md`：agents 文件命名规范改为 `*.agent.md` 扩展名。
+- `docs/skill-anatomy.md`：新增 frontmatter 规范条款（description 长度限制、触发词写法）。
+- `docs/cursor-setup.md`：移除已废弃的 Option 3 (Notepads)。
+- `.github/workflows/test-plugin-install.yml`：新增 marketplace install 测试。
+
+#### 同步决策
+
+- **要同步**：
+  - `using-agent-skills` 决策树和生命周期序列的扩展 → `ys-powers/skills/using-agent-skills/SKILL.md` 需要更新以反映 15 步生命周期和 4 个新增 skill 入口
+  - `incremental-implementation` 和 `test-driven-development` 的"避免重复验证"反模式 → 对应 skill 文件可能需要补充
+  - `interview-me` 和 `doubt-driven-development` → 评估是否需要在 `ys-powers/skills/` 下新建同名 skill
+
+- **暂不同步**：
+  - `.claude-plugin/marketplace.json` / `plugin.json` —— 仅与 agent-skills 的 marketplace 插件分发相关，ys-powers 不走此分发渠道
+  - `scripts/validate-skills.js` —— CI 工具，ys-powers 的 skill 数量/结构不同，但可参考其 frontmatter 校验逻辑用于自身质量门
+  - `docs/copilot-setup.md` / `docs/cursor-setup.md` —— 第三方 IDE 配置文档，不相关
+  - `AGENTS.md` 的 `*.agent.md` 扩展名 —— ys-powers 没有 agents 目录
+  - `.gemini/commands/*.toml` 变更 —— Gemini CLI 生态，不相关，不展开
+
+- **已确认同步**：
+  - `spec-driven-development` 的内联路径写法（`skills/<name>/SKILL.md`）—— ys-powers 的同名 skill 需核对是否已采用
+  - `browser-testing-with-devtools` / `idea-refine` 的 frontmatter 收紧 —— 若 ys-powers 已同步同一条 description 调整，则无需再动
+  - `hooks/session-start.sh` 的 jq-based JSON 转义模式 —— 已在 2026-05-03 update entry 中标记为"要同步"，如已处理则此处为已确认
+
+- **待定**：
+  - `interview-me` 和 `doubt-driven-development` 是否纳入 ys-powers skill 集——需用户决策。两者均为高质量方法论 skill，但需评估是否与当前 workflow 重叠。
+
+#### TODO（已完成）
+
+- [x] 更新 `ys-powers/skills/using-agent-skills/SKILL.md` 的决策树和生命周期序列（15 步）
+- [x] 检查并同步 `incremental-implementation` 和 `test-driven-development` 的"避免重复验证"反模式
+- [x] 将 `interview-me` 和 `doubt-driven-development` 纳入 `ys-powers/skills/`
+- [x] 核对并同步 `spec-driven-development` / `browser-testing-with-devtools` / `idea-refine` 的 frontmatter 调整
+
+---
 
 ### 2026-05-03: 44b9e37..f504276
 
