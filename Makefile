@@ -3,7 +3,7 @@
 YS_POWERS_ROOT := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PYTHON := uv run --python 3.12 python
 
-.PHONY: help sync-html global-install local-install update-global update-local uninstall-global uninstall-local
+.PHONY: help sync-html global-install local-install update-global update-local uninstall-global uninstall-local opencli-install opencli-uninstall
 
 help:
 	@echo "ys-powers Makefile"
@@ -19,6 +19,10 @@ help:
 	@echo "  make uninstall-global  卸载全局安装"
 	@echo "  make uninstall-local   卸载本地安装"
 	@echo "  make sync-html         同步 html-anything 上游更新"
+	@echo "  make opencli-install   安装 opencli skills 到当前项目"
+	@echo "  make opencli-install project-dir=/path/to/project"
+	@echo "                         安装 opencli skills 到指定项目"
+	@echo "  make opencli-uninstall 卸载 opencli skills"
 	@echo ""
 	@echo "快捷变量："
 	@echo "  project-dir= 或 p=     指定目标项目目录（local 范围）"
@@ -69,4 +73,22 @@ uninstall-local:
 		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall local --target $(p); \
 	else \
 		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall local; \
+	fi
+
+opencli-install:
+	@if [ -n "$(project-dir)" ]; then \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py install $(project-dir); \
+	elif [ -n "$(p)" ]; then \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py install $(p); \
+	else \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py install .; \
+	fi
+
+opencli-uninstall:
+	@if [ -n "$(project-dir)" ]; then \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py uninstall $(project-dir); \
+	elif [ -n "$(p)" ]; then \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py uninstall $(p); \
+	else \
+		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py uninstall .; \
 	fi
