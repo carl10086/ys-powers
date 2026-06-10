@@ -3,12 +3,12 @@
 ys-powers unified installer
 
 Usage:
-    python install/install.py install global
-    python install/install.py install local [--target <path>]
-    python install/install.py update global
-    python install/install.py update local [--target <path>]
-    python install/install.py uninstall global
-    python install/install.py uninstall local [--target <path>]
+    python install/install.py install global [--with-hooks]
+    python install/install.py install local [--target <path>] [--with-hooks]
+    python install/install.py update global [--with-hooks]
+    python install/install.py update local [--target <path>] [--with-hooks]
+    python install/install.py uninstall global [--with-hooks]
+    python install/install.py uninstall local [--target <path>] [--with-hooks]
 """
 
 import sys
@@ -96,7 +96,7 @@ def _validate_uninstall(target_dir: Path, scope: str) -> bool:
     return True
 
 
-def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
+def do_install(project_root: Path, target_dir: Path, scope: str, with_hooks: bool) -> bool:
     """执行安装或更新。"""
     all_ok = True
 
@@ -104,13 +104,14 @@ def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
         if not install_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
-    if not inject_hooks(project_root, target_dir, scope):
-        all_ok = False
+    if with_hooks:
+        if not inject_hooks(project_root, target_dir, scope):
+            all_ok = False
 
     return all_ok
 
 
-def do_uninstall(project_root: Path, target_dir: Path, scope: str) -> bool:
+def do_uninstall(project_root: Path, target_dir: Path, scope: str, with_hooks: bool) -> bool:
     """执行卸载。"""
     all_ok = True
 
@@ -118,8 +119,9 @@ def do_uninstall(project_root: Path, target_dir: Path, scope: str) -> bool:
         if not uninstall_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
-    if not remove_hooks(project_root, target_dir, scope):
-        all_ok = False
+    if with_hooks:
+        if not remove_hooks(project_root, target_dir, scope):
+            all_ok = False
 
     return all_ok
 
@@ -132,6 +134,8 @@ def main() -> int:
                         help="global (~/.claude/) or local (./.claude/)")
     parser.add_argument("-p", "--target", type=Path, default=None,
                         help="target project directory (local scope only)")
+    parser.add_argument("--with-hooks", action="store_true", default=False,
+                        help="also inject/remove hooks configuration (default: False)")
     args = parser.parse_args()
 
     project_root = get_project_root()
@@ -160,11 +164,11 @@ def main() -> int:
     print()
 
     if args.action in ("install", "update"):
-        success = do_install(project_root, target_dir, args.scope)
+        success = do_install(project_root, target_dir, args.scope, args.with_hooks)
     elif args.action == "uninstall":
         if not _validate_uninstall(target_dir, args.scope):
             return 1
-        success = do_uninstall(project_root, target_dir, args.scope)
+        success = do_uninstall(project_root, target_dir, args.scope, args.with_hooks)
     else:
         # argparse 已限制 choices，此处不会到达
         parser.print_help()
