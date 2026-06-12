@@ -5,7 +5,7 @@ description: Write a new command — run explore-then-ask to clarify requirement
 <IMPORTANT>
 - Write all command content in Chinese; keep technical terms, code identifiers, file paths, and command names in English
 - Save the command to `commands/<command-name>.md` where `<command-name>` is kebab-case
-- Use TodoWrite to track progress through each phase
+- Use TodoWrite to create todos for EACH checklist item below
 - Before drafting, read `references/anthropic-best-practices.md` for prompt authoring constraints
 </IMPORTANT>
 
@@ -25,6 +25,11 @@ Follow explore-then-ask's full flow: search historical SOPs, explore project con
 **Before writing, you MUST read `references/anthropic-best-practices.md` for prompt authoring constraints.**
 
 Also read `CLAUDE.md` for project-level command conventions and skim existing `commands/*.md` for style patterns.
+
+Identify the command type to focus your RED/GREEN verification:
+- **Workflow command** (e.g., `gc`, `ship`): orchestrates a sequence of steps. Verify step completeness and order.
+- **Discipline command** (e.g., `wcommand` itself): enforces a rule or process. Verify the agent cannot bypass it.
+- **Utility command** (e.g., `html`): invokes a tool or script. Verify input/output and error handling.
 
 Run the RED-GREEN-REFACTOR cycle for command creation:
 
@@ -46,6 +51,8 @@ argument-hint: [optional-commit-message]
 ```
 
 ### RED — Baseline: Run Without Command
+
+**Iron Law for command creation: NO COMMAND WITHOUT A FAILING BASELINE FIRST.**
 
 Run at least **2 scenarios** before writing the command:
 - **Primary scenario**: the most common happy path
@@ -76,8 +83,8 @@ Use the first table to capture the full execution sequence; use the second table
 
 ### GREEN — Write Minimal Command and Trial Run
 
-1. Write the minimal command addressing the friction points. Do not add extra content for hypothetical cases.
-2. **Trial run**: Load the command and run it against **every scenario documented in RED** (primary + boundary)
+1. Write the minimal command addressing the **specific baseline failures** documented in RED. Do not add extra content for hypothetical cases.
+2. **Trial run**: Load the command and run **the same scenarios** against it (primary + boundary)
 3. Verify:
    - [ ] Flow reaches the end without getting stuck
    - [ ] No missing steps
@@ -105,6 +112,14 @@ If the trial run reveals new friction, fix and re-run. Do not stop at the first 
 | Overlap with existing command | Narrow scope or merge |
 | Stuck execution | Check referenced skill / file paths |
 
+Build and update a rationalization table from all test iterations:
+
+| Rationalization observed | Why it fails | Counter added to command |
+|--------------------------|--------------|--------------------------|
+| "This is too simple to need a trial run" | Untested commands break in production | Added Iron Law + trial run requirement |
+| "I'll add this just in case" | Scope creep, bloat | "Do not add extra content for hypothetical cases" |
+| "The user can figure out this step" | Missing step, friction | Added explicit step |
+
 Loop: Fix → re-run → until the command produces consistent results across all documented scenarios.
 
 ### Anti-Patterns
@@ -123,6 +138,17 @@ Do not reference skills, tools, or files that do not exist. Verify every referen
 #### No trial run
 A command without a trial run is a draft, not a finished command.
 
+## STOP: Before Finishing
+
+**After writing ANY command, you MUST STOP and complete the verification process.**
+
+**Do NOT:**
+- Create multiple commands in batch without verifying each
+- Move to the next command before the current one passes all trial runs
+- Skip trial runs because "batching is more efficient"
+
+Deploying untested commands = deploying untested prompts. It is a violation of quality standards.
+
 ## Phase 3: Verify Checklist
 
 Before finishing, confirm every item below.
@@ -133,7 +159,7 @@ Before finishing, confirm every item below.
 - [ ] Friction points categorized and traced to specific baseline steps
 
 ### GREEN Phase
-- [ ] Minimal command addresses the documented friction points
+- [ ] Minimal command addresses the specific baseline failures documented in RED
 - [ ] Trial run reaches end without getting stuck
 - [ ] Trial run covers every RED scenario
 - [ ] User's original request is fully resolved
@@ -143,6 +169,7 @@ Before finishing, confirm every item below.
 - [ ] New friction points found during trial run are fixed
 - [ ] Re-run passes after each fix
 - [ ] Command produces consistent results across scenarios
+- [ ] Rationalization table updated with newly observed excuses and counters
 
 ### Quality Checks
 - [ ] `references/anthropic-best-practices.md` has been read; key constraints applied (concise, CSO description, consistent terminology, appropriate degree of freedom)
