@@ -2,6 +2,16 @@
 description: Implement the next task incrementally — build, test, verify, commit
 ---
 
+<HARD-RULE name="build-must-register-tasks-first">
+- Before doing any implementation work, you MUST complete a pre-flight:
+  1. Read the plan and parse every `## Task N:` section
+  2. For each task, call TaskCreate (subject=title, description=full task body)
+  3. For each task's `**Dependencies:**` field, set blockedBy on that task
+- These steps run ONCE at the start of /build, not per task.
+- They are not optional. Do not skip them, even if TaskList already has entries
+  from a prior run.
+</HARD-RULE>
+
 Invoke the incremental-implementation skill alongside test-driven-development.
 
 Read the plan for this feature. If a plan was generated earlier in this session, use that file path. Otherwise, check `docs/ys-powers/plans/` for the most recent plan file, or ask the user for the plan path if ambiguous. Then pick the next pending task. For each task:
