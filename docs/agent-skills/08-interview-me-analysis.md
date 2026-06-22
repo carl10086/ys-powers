@@ -224,7 +224,7 @@ Yes / no / refine?
 ### 已同步内容
 - `skills/interview-me/SKILL.md` — 完整搬运，已加入 ys-powers skill 集
 - `skills/using-agent-skills/SKILL.md` — 决策树已新增 interview-me 入口
-- 路径本地化：`docs/intent/` → `docs/ys-powers/intent/`
+- 路径本地化已移除：不再固定到 `docs/ys-powers/intent/`，意图文档按用户指定位置保存
 
 ### 与现有 workflow 的衔接建议
 

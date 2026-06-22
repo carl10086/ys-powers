@@ -785,13 +785,13 @@ a:hover {
 
         <h4>执行步骤</h4>
         <ol>
-          <li><strong>读取 spec</strong>：优先使用本会话已生成的 spec；否则到 <code>docs/ys-powers/specs/</code> 找最新 spec；再否则询问用户</li>
+          <li><strong>读取 spec</strong>：优先使用本会话已生成的 spec；否则到 <code>docs/superpowers/specs/</code> 找最新 spec；再否则询问用户</li>
           <li><strong>进入 plan mode</strong>：只读，不修改代码。在此模式下分析代码库，识别组件间的依赖图</li>
           <li><strong>垂直切片</strong>：按"薄垂直切片"原则拆任务：每个任务应覆盖一个<strong>完整用户路径</strong>的端到端实现，而不是按水平分层（先全部 DAO，再全部 Service）</li>
           <li><strong>编写任务</strong>：每个任务必须包含：清晰的任务描述、验收标准（acceptance criteria）、验证步骤（how to verify）、与前后任务的依赖关系</li>
           <li><strong>阶段间加 checkpoint</strong>：在关键节点设置 checkpoint，确保 task 之间有过渡验证点</li>
           <li><strong>人工 review</strong>：把 plan 呈现给用户确认，而不是直接保存</li>
-          <li><strong>保存 plan</strong>：确认后保存到 <code>docs/ys-powers/plans/YYYY-MM-DD-&lt;feature-name&gt;.md</code></li>
+          <li><strong>保存 plan</strong>：确认后保存到 <code>docs/superpowers/plans/YYYY-MM-DD-&lt;feature-name&gt;.md</code></li>
         </ol>
       </section>
 

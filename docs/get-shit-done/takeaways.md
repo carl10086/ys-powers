@@ -258,7 +258,7 @@
 - 维护成本高（STATE.md 解析、 staleness 检测、workstream 管理）
 
 **替代方案**：
-- 继续使用 `docs/ys-powers/specs/` 和 `docs/ys-powers/plans/` 保存文档
+- 继续使用 `docs/superpowers/specs/` 和 `docs/superpowers/plans/` 保存文档
 - 状态由 git 提交历史和 GitHub Issues 管理
 - 用户自行选择项目管理工具
 

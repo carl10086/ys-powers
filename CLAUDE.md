@@ -16,12 +16,15 @@
 
 按主题划分子目录，每个子目录聚焦一个话题：
 
-- `docs/codebase/` — 本仓库自身的架构文档（`ARCHITECTURE.md`）
+- `docs/codebase/` — 本仓库自身的架构文档（`ARCHITECTURE.md`、`power-dependencies.md`）
 - `docs/agent-skills/` — `refer/agent-skills` 项目的中文索引/笔记（`overview.md`）
-- `docs/superpowers/` — `refer/superpowers` 项目的 skill 分析与实施 specs（specs 子目录）
-- `docs/systematic-debugging/` — systematic-debugging 主题专栏
-- `docs/ys-powers/` — ys-powers 自身 skill / command 的分析笔记
-- 顶层散文件（如 `claude-prompt-design-paradigms.md`）— 跨主题的零散研究
+- `docs/awesome-claude-skills/` — `refer/awesome-claude-skills/` 项目的中文索引/笔记
+- `docs/superpowers/` — `refer/superpowers` 项目的 skill 分析与实施 specs（`specs/` 子目录）
+- `docs/get-shit-done/` — `refer/get-shit-done/` 项目的对照笔记
+- `docs/html-anything/` — `refer/html-anything/` 项目的对照笔记
+- `docs/gstack/` — gstack 项目的能力借鉴与集成分析
+- `docs/opencode/` — OpenCode 配置参考
+- `docs/share/` — ys-powers 整体介绍与分享文档
 
 约定：与 `refer/<X>/` 同名的 `docs/<X>/` 是该参考项目的对照笔记；spec 类设计文档放在 `docs/superpowers/specs/`。
 

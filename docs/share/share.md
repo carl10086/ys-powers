@@ -112,7 +112,7 @@ flowchart LR
 `/plan` (`invokes` → `planning-and-task-breakdown`) 的核心任务是把 spec 拆成**小且可验证**的增量任务, 并建立依赖顺序.
 
 **Step 1 — 读取 spec**
-优先使用本会话已生成的 spec; 否则到 `docs/ys-powers/specs/` 找最新 spec; 再否则询问用户.
+优先使用本会话已生成的 spec; 否则到 `docs/superpowers/specs/` 找最新 spec; 再否则询问用户.
 
 **Step 2 — 进入 plan mode**
 只读, 不修改代码. 在此模式下分析代码库, 识别组件间的依赖图.
@@ -134,7 +134,7 @@ flowchart LR
 把 plan 呈现给用户确认, 而不是直接保存.
 
 **Step 7 — 保存 plan**
-确认后保存到 `docs/ys-powers/plans/YYYY-MM-DD-<feature-name>.md`, `<feature-name>` 从 plan 标题派生为 kebab-case.
+确认后保存到 `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`, `<feature-name>` 从 plan 标题派生为 kebab-case.
 
 #### `/build` — 构建阶段
 

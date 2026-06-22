@@ -878,7 +878,7 @@ flowchart LR
     <p>ys-powers 是<strong>无状态系统</strong>：</p>
     <ul style="color: var(--fg-2); margin-bottom: var(--space-lg);">
       <li>不管理项目级状态文件</li>
-      <li>Spec 和 Plan 保存在 <code>docs/ys-powers/specs/</code> 和 <code>docs/ys-powers/plans/</code></li>
+      <li>Spec 和 Plan 保存在 <code>docs/superpowers/specs/</code> 和 <code>docs/superpowers/plans/</code></li>
       <li>状态由用户自行管理（git 提交、GitHub Issues 等）</li>
       <li>无 <code>.planning/</code> 目录要求</li>
     </ul>
@@ -1204,7 +1204,7 @@ flowchart LR
 
     <h4>1. .planning 状态系统</h4>
     <p><strong>原因</strong>：与 ys-powers「无状态、纯配置」的定位根本冲突；引入 <code>.planning/</code> 意味着绑架项目结构；维护成本高（STATE.md 解析、staleness 检测、workstream 管理）。</p>
-    <p><strong>替代方案</strong>：继续使用 <code>docs/ys-powers/specs/</code> 和 <code>docs/ys-powers/plans/</code> 保存文档；状态由 git 提交历史和 GitHub Issues 管理；用户自行选择项目管理工具。</p>
+    <p><strong>替代方案</strong>：继续使用 <code>docs/superpowers/specs/</code> 和 <code>docs/superpowers/plans/</code> 保存文档；状态由 git 提交历史和 GitHub Issues 管理；用户自行选择项目管理工具。</p>
 
     <h4>2. SDK / CLI 运行时</h4>
     <p><strong>原因</strong>：ys-powers 是纯 Markdown + Python 配置系统；引入 Node.js/TypeScript SDK 会大幅增加复杂度；需要处理安装、版本兼容、运行时错误等问题。</p>
