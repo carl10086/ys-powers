@@ -32,7 +32,7 @@ fix(order): 修复订单页面白屏问题
 - [ ] 2. 分析变更，确定分支前缀 → verify: 前缀匹配变更类型
 - [ ] 3. 创建并切换分支 → verify: 分支名符合 {前缀}{描述-月日}
 - [ ] 4. 暂存并提交 → verify: commit message 格式正确
-- [ ] 5. 推送并打开 PR → verify: push 成功，PR 页面已打开
+- [ ] 5. 推送并输出 PR/MR 链接 → verify: push 成功，PR/MR 链接已输出
 ```
 
 ### 1. 预检工作区
@@ -83,16 +83,33 @@ git add .
 git commit -m "type(scope): 简短描述"
 ```
 
-### 5. 推送并打开 PR
+### 5. 推送并输出 PR/MR 链接
 
 ```bash
 git push -u origin HEAD
 ```
 
-推送成功后打开 PR 页面：
+推送成功后，根据 remote URL 输出对应平台的创建链接：
 
-```javascript
-mcp__chrome-devtools__new_page("https://github.com/carl10086/{repo}/pull/new/{branch}")
+```bash
+remote_url=$(git remote get-url origin)
+branch=$(git branch --show-current)
+
+case "$remote_url" in
+  *github.com*|*gitlab*)
+    base_url=$(echo "$remote_url" | sed -E 's|git@([^:]+):|https://\1/|; s|\.git$||')
+    if [[ "$remote_url" == *gitlab* ]]; then
+      echo "${base_url}/merge_requests/new?merge_request[source_branch]=${branch}"
+    else
+      echo "${base_url}/pull/new/${branch}"
+    fi
+    ;;
+  *)
+    echo "Branch: ${branch}"
+    echo "Remote: ${remote_url}"
+    echo "请手动创建 PR/MR。"
+    ;;
+esac
 ```
 
 ## 执行后自检
@@ -101,6 +118,7 @@ mcp__chrome-devtools__new_page("https://github.com/carl10086/{repo}/pull/new/{br
 - [ ] commit message 格式正确
 - [ ] 没有 secrets/keys/tokens 泄露
 - [ ] push 到远程成功
+- [ ] PR/MR 链接已输出（或已提示手动创建）
 - [ ] 未提交变更已妥善处理（如适用）
 
 ## 异常情况处理
