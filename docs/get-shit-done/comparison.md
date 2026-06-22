@@ -146,7 +146,7 @@ GSD 是**有状态框架**，项目状态集中管理：
 ys-powers 是**无状态系统**：
 
 - 不管理项目级状态文件
-- Spec 和 Plan 保存在 `docs/ys-powers/specs/` 和 `docs/ys-powers/plans/`
+- Spec 和 Plan 保存在 `docs/superpowers/specs/` 和 `docs/superpowers/plans/`
 - 状态由用户自行管理（git 提交、GitHub Issues 等）
 - 无 `.planning/` 目录要求
 

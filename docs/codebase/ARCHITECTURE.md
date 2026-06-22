@@ -119,7 +119,6 @@ skills/<skill-name>/
 - `docs/codebase/` — Architecture documentation (this file)
 - `docs/superpowers/specs/` — Design specifications, named `YYYY-MM-DD-<topic>-design.md`
 - `docs/superpowers/plans/` — Implementation plans, named `YYYY-MM-DD-<feature-name>.md`
-- `docs/ys-powers/` — Project-specific analysis documents
 
 **Where to add new documentation:**
 - Design specs go to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`

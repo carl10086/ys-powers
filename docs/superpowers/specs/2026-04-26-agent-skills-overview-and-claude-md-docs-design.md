@@ -85,7 +85,7 @@
 - `docs/agent-skills/` — refer/agent-skills 项目的中文索引/笔记
 - `docs/superpowers/` — refer/superpowers 项目的 skill 分析及实施 specs（specs/ 子目录）
 - `docs/systematic-debugging/` — systematic-debugging 主题专栏
-- `docs/ys-powers/` — ys-powers 自身 skill / command 的分析笔记
+- `docs/ys-powers/` — ~~ys-powers 自身 skill / command 的分析笔记~~（已清理删除）
 - 顶层散文件（如 `claude-prompt-design-paradigms.md`）— 跨主题的零散研究
 
 约定：与 `refer/<X>/` 同名的 `docs/<X>/` 是该参考项目的对照笔记；spec 类设计文档放在 `docs/superpowers/specs/`。
