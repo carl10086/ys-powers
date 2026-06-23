@@ -1,6 +1,6 @@
 ---
 name: explore-then-ask
-description: Explore project context and clarify requirements through structured dialogue. A self-contained behavioral skill for context-first design clarification — no docs, no browser, no handoff.
+description: Explore project context and clarify requirements through structured dialogue. A self-contained behavioral skill for context-first design clarification — primarily dialogue; no browser, no implementation handoff. May write to a user-specified document path.
 ---
 
 # Explore Then Ask
@@ -11,10 +11,12 @@ Turn vague ideas into clarified designs through natural collaborative dialogue.
 
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present 2-3 approaches with trade-offs, then present the design in sections and get user approval.
 
-This skill does NOT write documents, invoke other skills, or hand off to implementation. It ends when the user approves the design direction.
+This skill is primarily dialogue-based. It does NOT invoke other skills or hand off to implementation. It ends when the user approves the design direction. Writing to a user-specified document path is the only allowed file-writing case.
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Do NOT save files or write design docs. This is a dialogue-only skill.
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. This is a primarily dialogue-based skill.
+
+**Exception — user-specified document path**: if the user explicitly tells you where to write (a concrete file path), you MAY write the agreed-upon design there. Do not invent paths on your own; if unclear, confirm before writing.
 </HARD-GATE>
 
 <IMPORTANT>
@@ -59,7 +61,8 @@ Present design sections (get approval per section)
 User approves design? ---no--> revise
         | yes
         v
-   DONE (no handoff, no doc, no skill invocation)
+   DONE (no handoff, no skill invocation)
+   [user-specified doc path? -> write there, else just confirm]
 ```
 
 ## The Process
@@ -130,13 +133,14 @@ Present the design in sections scaled to complexity.
 
 ## Terminal State
 
-When the user approves the design, the skill is complete. Do NOT:
-- Write a design document
-- Save any file
+When the user approves the design, the skill is complete.
+
+- **Default**: simply confirm the agreed-upon direction and wait for the user's next instruction.
+- **User-specified path**: if the user has explicitly named a target document path during the dialogue, write the agreed design to that path before concluding. Do not pick paths yourself.
+
+In all cases, do NOT:
 - Invoke any other skill
 - Start implementation
-
-Simply confirm the agreed-upon direction and wait for the user's next instruction.
 
 ## Key Principles
 
