@@ -17,7 +17,7 @@
 按主题划分子目录，每个子目录聚焦一个话题：
 
 - `docs/codebase/` — 本仓库自身的架构文档（`ARCHITECTURE.md`、`power-dependencies.md`）
-- `docs/agent-skills/` — `refer/agent-skills` 项目的中文索引/笔记（`overview.md`）
+- `docs/agent-skills/` — agent-skills 与 refer/skills 项目的中文索引/笔记；含 `overview.md`、`domain-modeling-notes.md`
 - `docs/awesome-claude-skills/` — `refer/awesome-claude-skills/` 项目的中文索引/笔记
 - `docs/superpowers/` — `refer/superpowers` 项目的 skill 分析与实施 specs（`specs/` 子目录）
 - `docs/get-shit-done/` — `refer/get-shit-done/` 项目的对照笔记
@@ -49,6 +49,12 @@ Jesse Vincent 的完整软件开发方法论，强调真正的 red/green TDD、s
 轻量元提示与 spec 驱动开发系统，目标是缓解 context rot，跨多家 CLI 兼容（Claude Code / Codex / Cursor / Windsurf 等）。
 
 **适用查阅**：想看更轻量的、跨平台的 spec-driven 设计时。
+
+### skills/
+
+Matt Pocock 的工程级技能集，分 `engineering/`、`productivity/`、`misc/` 等桶。核心 idea 是领域驱动上下文：`CONTEXT.md` 维护通用语言词典，`docs/adr/` 记录架构决策，所有 skill 共享这块知识基板。
+
+**适用查阅**：找领域建模（`domain-modeling`）、架构词汇（`codebase-design`）、TDD/调试（`tdd`、`diagnosing-bugs`）、工作流（`grill-with-docs`、`to-prd`、`implement`）时。ys-powers 的 `skills/domain-modeling/` 直接参考其 `engineering/domain-modeling/`，由 `skills/explore-then-ask/` 在 grilling 阶段触发。
 
 ### html-anything/
 
