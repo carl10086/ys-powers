@@ -3,6 +3,32 @@ description: 先读项目上下文，再调用 interview-me 澄清真实意图�
 argument-hint: [topic]
 ---
 
+## 本命令在整体工作流中的位置
+
+`/clarify-intent` 是 ys-powers 开发流程的起点，只负责**确认真实意图**，不写代码、不做设计。
+
+```
+CLARIFY ──→ SPECIFY ──→ [REVIEW] ──→ [PLAN] ──→ BUILD ──→ [TEST] ──→ REVIEW ──→ SHIP
+   │           │            │            │          │          │          │         │
+   ▼           ▼            ▼            ▼          ▼          ▼          ▼         ▼
+ Human      Human        Human        Human      Human      Human      Human     Human
+ confirms   writes       reviews      reviews    implements explicit   reviews    decides
+ intent     spec         spec         plan       + tests    TDD /      code       ship
+                                                  per task   bug
+                                                             repro
+```
+
+- **CLARIFY**（本命令）：产出确认的 intent 陈述。
+- **SPECIFY**：`/spec`，写结构化设计文档。
+- **[REVIEW]**：可选 `/review-spec`，对 spec 做六维度质量审查。
+- **[PLAN]**：可选 `/plan`，把 spec 拆成可执行任务。小改动可在 spec 中直接带过。
+- **BUILD**：`/build`，按任务逐个实现；每个任务内部已经走「写测试 → 实现 → 跑全量测试」的循环。
+- **[TEST]**：可选 `/test`，仅在以下情况单独调用：修 bug 时先写失败测试（Prove-It 模式）、需要专门补全边界/异常/并发测试、用户明确要求显式 TDD。
+- **REVIEW**：`/ys-review`，五维度代码审查。
+- **SHIP**：`/ship`，交付前检查与 go/no-go 决策。
+
+**本命令出口标准**：用户明确确认 intent 陈述（明确的 "yes"，不是 "sounds good"）。
+
 <HARD-RULE name="clarify-intent-no-implementation">
 
 - 本命令只读 + 只产出确认的意图陈述
