@@ -64,7 +64,8 @@ Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项�
 
 | 我在做什么 | 推荐入手 |
 |-----------|---------|
-| 有一个模糊想法，想梳理成需求 | `/spec` → `explore-then-ask`、`spec-driven-development` |
+| 意图还不清楚，想先聊明白 | `/clarify-intent` |
+| 有一个模糊想法，想梳理成设计 | `/spec` → `explore-then-ask`、`spec-driven-development` |
 | 需求已明确，要拆任务 | `/plan` |
 | 写代码/改逻辑 | `/build`（增量实现）或 `/refactor`（重构） |
 | 写 UI/前端 | `frontend-ui-engineering` [skill] 自动触发 |
@@ -81,21 +82,23 @@ Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项�
 
 ```mermaid
 flowchart LR
-    A[/spec<br/>构思/] --> B[/plan<br/>规划/]
-    B --> C[/build<br/>构建/]
-    C --> D[/test<br/>验证/]
+    A[/clarify-intent<br/>澄清/] --> B[/spec<br/>构思/]
+    B --> C[/plan<br/>规划/]
+    C --> D[/build<br/>构建/]
     D --> E[/ys-review<br/>审查/]
     E --> F[/ship<br/>交付/]
 
-    C -.异常调试.-> G[debugging]
-    C -.查文档实现.-> H[source-driven]
-    C -.优化上下文.-> I[context-eng]
+    D -.异常调试.-> G[debugging]
+    D -.查文档实现.-> H[source-driven]
+    D -.优化上下文.-> I[context-eng]
     E -.随时提交.-> J[/gc/]
     F -.记录经验.-> K[/sop-add/]
 ```
 
-**主线**（实线）：构思 → 规划 → 构建 → 验证 → 审查 → 交付  
+**主线**（实线）：澄清 → 构思 → 规划 → 构建 → 审查 → 交付  
 **支撑**（虚线）：构建、审查、交付阶段按需触发的横向能力，非强制步骤
+
+**可选步骤**：`/review-spec`（spec 质量审查）、`/plan`（小改动可跳过）、`/test`（bug 修复或显式 TDD 时单独调用）详见 `commands/clarify-intent.md`。
 
 ## 简化依赖关系
 
@@ -104,6 +107,7 @@ README 只展示使用者需要的入口关系：command 是你输入的入口�
 ```mermaid
 flowchart LR
     subgraph Commands["显式 commands"]
+        clarify["/clarify-intent"]
         spec["/spec"]
         plan["/plan"]
         build["/build"]
@@ -118,6 +122,7 @@ flowchart LR
     end
 
     subgraph Skills["核心 skills"]
+        interview["interview-me"]
         explore["explore-then-ask"]
         specdev["spec-driven-development"]
         planning["planning-and-task-breakdown"]
@@ -132,6 +137,7 @@ flowchart LR
         debug["debugging-and-error-recovery"]
     end
 
+    clarify --> interview
     spec --> explore
     spec --> specdev
     plan --> planning
@@ -155,7 +161,7 @@ flowchart LR
 
 | 类型 | 数量 | 调用方式 | 核心代表 |
 |------|------|----------|----------|
-| 显式命令 | 16 | 直接输入 `/command` | `/spec` `/plan` `/build` |
+| 显式命令 | 25 | 直接输入 `/command` | `/clarify-intent` `/spec` `/plan` `/build` |
 | 行为技能 | 25 | 场景自动触发 | `idea-refine` `test-driven-development` |
 | 子智能体 | 3 | 自动指派 | `code-reviewer` |
 | 编码规范 | 1 | 自动生效 | `code.md` |
@@ -166,6 +172,7 @@ flowchart LR
 
 | 阶段 | 命令 |
 |------|------|
+| 意图澄清 | `/clarify-intent` |
 | 构思与规划 | `/spec` `/plan` |
 | 构建与验证 | `/build` `/test` |
 | 审查与优化 | `/ys-review` `/refactor` `/code-simplify` |
@@ -204,8 +211,8 @@ flowchart LR
 
 ```
 ys-powers/
-├── skills/      # 25 个场景化行为技能
-├── commands/    # 16 个显式调用命令
+├── skills/      # 30 个场景化行为技能
+├── commands/    # 25 个显式调用命令
 ├── agents/      # 3 个专用子智能体
 ├── rules/       # 编码规范与行为约束
 ├── install/     # 安装到任意项目 .claude/ 的脚本
@@ -217,16 +224,19 @@ ys-powers/
 开发新功能时，通常按此顺序调用：
 
 ```bash
+# 0. 意图还不清楚时先澄清（可选）
+/clarify-intent
+
 # 1. 先写 spec
 /spec
 
-# 2. 拆任务
+# 2. 拆任务（小改动可跳过）
 /plan
 
 # 3. 逐个实现
 /build
 
-# 4. 补测试
+# 4. 补测试或修 bug（可选，/build 已覆盖日常测试）
 /test
 
 # 5. 审查
