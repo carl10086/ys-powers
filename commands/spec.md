@@ -6,7 +6,11 @@ description: Start spec-driven development — explore context, clarify requirem
 
 <HARD-RULE name="spec-no-code-changes">
 
-- Read only — no code changes。仅本命令产物 `docs/ys-powers/specs/YYYY-MM-DD-<feature-name>-design.md` 可写。
+- Read only — no code changes。
+- 可写产物：
+  - `docs/ys-powers/specs/YYYY-MM-DD-<feature-name>-design.md`（Phase 3 结构化 spec）
+  - `CONTEXT.md` / `CONTEXT-MAP.md` 及相关 per-context `CONTEXT.md`（Phase 1.5 由 `domain-modeling` 更新）
+  - `docs/adr/NNNN-*.md`（Phase 1.5 由 `domain-modeling` 提议并创建）
 
 </HARD-RULE>
 
@@ -20,6 +24,22 @@ Invoke the **explore-then-ask** skill to ask clarifying questions one at a time 
 4. Known boundaries (what to always do, ask first about, and never do)
 
 Continue through explore-then-ask's full dialogue flow: surface assumptions, propose 2-3 approaches with trade-offs, present design sections, and get user approval.
+
+## Phase 1.5: Domain Modeling Checkpoint
+
+Before preparing the workspace, check whether Phase 1 produced domain assets that need recording.
+
+If `CONTEXT.md` exists, read it first (and `CONTEXT-MAP.md` if present, plus any relevant per-context `CONTEXT.md` files). Scan `docs/adr/` for decisions related to this feature.
+
+Check whether any of the following is true:
+
+- [ ] New or sharpened domain terms should go into `CONTEXT.md`
+- [ ] Phase 1 language conflicts with an existing `CONTEXT.md` definition
+- [ ] A design decision meets all three ADR criteria (hard to reverse, surprising without context, result of a real trade-off)
+
+If any checkbox is true, **invoke the `domain-modeling` skill now** to update `CONTEXT.md` inline and offer ADRs. Otherwise skip this step.
+
+After the checkpoint, briefly report what changed, then proceed to Phase 2.
 
 ## Phase 2: Prepare Workspace
 
