@@ -17,8 +17,6 @@ This skill is primarily dialogue-based. It does NOT invoke other skills or hand 
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. This is a primarily dialogue-based skill.
 
 **Exception — user-specified document path**: if the user explicitly tells you where to write (a concrete file path), you MAY write the agreed-upon design there. Do not invent paths on your own; if unclear, confirm before writing.
-
-**Exception — domain modeling artifacts**: invoking the `domain-modeling` skill to incrementally write `CONTEXT.md` (project root) and `docs/adr/NNNN-*.md` during grilling is permitted. These are glossary + decision records, not implementation. Do not write code, scaffold, or take any other implementation action.
 </HARD-GATE>
 
 <IMPORTANT>
@@ -41,11 +39,9 @@ Complete these in order:
    - If `CONTEXT.md` exists at the project root, read it for established domain terminology
    - If `docs/adr/` exists, scan recent ADRs to respect prior architectural decisions
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-   - Invoke the `domain-modeling` skill when terms start crystallizing: challenge fuzzy language, invent edge-case scenarios, and update `CONTEXT.md` inline as terms are resolved
+   - Challenge fuzzy language and invent edge-case scenarios as terms are discussed, but do not write files or invoke other skills
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-   - If a chosen approach is hard to reverse AND surprising AND the result of a real trade-off, offer to record it as an ADR (see `domain-modeling` ADR criteria)
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-   - Continue invoking `domain-modeling` as new terms emerge or decisions are made
 
 ## Process Flow
 
