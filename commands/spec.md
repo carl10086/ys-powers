@@ -27,57 +27,19 @@ Continue through explore-then-ask's full dialogue flow: surface assumptions, pro
 
 ## Phase 1.5: Domain Modeling Checkpoint
 
-After `explore-then-ask` completes and the user approves the design direction, run this checkpoint before preparing the workspace.
+Before preparing the workspace, check whether Phase 1 produced domain assets that need recording.
 
-<HARD-RULE name="spec-domain-modeling-checkpoint">
+If `CONTEXT.md` exists, read it first (and `CONTEXT-MAP.md` if present, plus any relevant per-context `CONTEXT.md` files). Scan `docs/adr/` for decisions related to this feature.
 
-- Read existing domain assets before deciding whether to invoke `domain-modeling`
-- Invoke `domain-modeling` if ANY of the following is true:
-  1. New domain terms were resolved during Phase 1
-  2. Existing `CONTEXT.md` terms conflict with Phase 1 discussion
-  3. A design decision meets all three ADR criteria (hard to reverse, surprising without context, result of a real trade-off)
-- Skip this phase only if none of the above apply
-- Do NOT skip just because `CONTEXT.md` does not exist yet
+Check whether any of the following is true:
 
-</HARD-RULE>
+- [ ] New or sharpened domain terms should go into `CONTEXT.md`
+- [ ] Phase 1 language conflicts with an existing `CONTEXT.md` definition
+- [ ] A design decision meets all three ADR criteria (hard to reverse, surprising without context, result of a real trade-off)
 
-### Step 1: Read existing domain assets
+If any checkbox is true, **invoke the `domain-modeling` skill now** to update `CONTEXT.md` inline and offer ADRs. Otherwise skip this step.
 
-Read the following silently (if they do not exist, note their absence and continue):
-
-- `CONTEXT.md` at the project root
-- `CONTEXT-MAP.md` at the project root — if it exists, read the relevant per-context `CONTEXT.md` files
-- `docs/adr/` files relevant to the feature area
-
-### Step 2: Detect domain modeling needs
-
-Compare the output of Phase 1 against the existing assets:
-
-- [ ] Did Phase 1 introduce a new domain term that should be in the glossary?
-- [ ] Did Phase 1 sharpen or redefine an existing term?
-- [ ] Does Phase 1 language conflict with an existing `CONTEXT.md` definition?
-- [ ] Did Phase 1 produce a decision that meets all three ADR criteria?
-
-### Step 3: Invoke `domain-modeling`
-
-If any checkbox above is true, **invoke the `domain-modeling` skill now**. Continue the current session with this focus:
-
-- Review the terms and decisions from Phase 1
-- Update `CONTEXT.md` inline for any resolved or sharpened terms
-- Offer ADRs only for decisions that meet the ADR criteria
-- Surface any conflicts between Phase 1 language and existing `CONTEXT.md`
-
-The `domain-modeling` skill decides how to update `CONTEXT.md` and whether to propose an ADR.
-
-### Step 4: Report checkpoint result
-
-After the checkpoint, briefly report:
-
-```text
-领域资产检查：CONTEXT.md [未更新/更新 X 项/新建并写入 X 项]，ADR [未创建/提议创建 NNNN-xxx（等待确认）/已创建 NNNN-xxx]。
-```
-
-Then proceed to Phase 2.
+After the checkpoint, briefly report what changed, then proceed to Phase 2.
 
 ## Phase 2: Prepare Workspace
 
