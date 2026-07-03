@@ -8,15 +8,16 @@
 
 - Remote:      https://github.com/addyosmani/agent-skills.git
 - Branch:      main
-- Commit:      2e0dfbfb436ef3307bbe8ba172f14996de980784
-- Short:       2e0dfbf
-- Author Date: 2026-06-05 18:00:13 -0700
-- Subject:     Merge pull request #215 from addyosmani/addyosmani/fix-marketplace-schema
+- Commit:      aba7c4e9695c363e65cb59effe926c7f1d1abe3d
+- Short:       aba7c4e
+- Author Date: 2026-06-28 11:11:20 -0700
+- Subject:     Merge pull request #323 from An-idd/feat/validate-naming-and-trigger
 - Worktree:    clean
-- 快照时间:    2026-06-07
-- ys-powers 同期 commit: d71481c01b7b81f57aaedf5c212730ad1afbd90e
+- 快照时间:    2026-07-03
+- ys-powers 同期 commit: 533b0fd96b8a7d3fa3cc3ad95f197562aa6b9dc2
+- 新增 tag:    0.6.2
 
-## 当前 skills 清单（23 个）
+## 当前 skills 清单（24 个）
 
 - api-and-interface-design
 - browser-testing-with-devtools
@@ -31,6 +32,7 @@
 - git-workflow-and-versioning
 - idea-refine
 - incremental-implementation
+- observability-and-instrumentation
 - performance-optimization
 - planning-and-task-breakdown
 - security-and-hardening
@@ -67,10 +69,95 @@
 | using-agent-skills | — | 同名 | 缺 analysis |
 | interview-me | 08 | 同名 | refer 新增 skill |
 | doubt-driven-development | 09 | 同名 | refer 新增 skill |
+| observability-and-instrumentation | — | 缺 | 新增 skill，ys-powers 未引入 |
 
 ---
 
 ## 更新历史
+
+### 2026-07-03: 2e0dfbf..aba7c4e
+
+**摘要**：本次为能力大幅扩展+编排重构。新增 `observability-and-instrumentation`（贯穿 Build/Review/Ship 阶段的可观测方法论）+ `web-performance-auditor` agent 与 `/webperf` command（Deep/Quick 双模式审计）；`security-and-hardening` 引入 STRIDE 威胁建模 + SSRF + supply-chain + OWASP LLM Top 10；`using-agent-skills` 决策树新增 observability 入口，生命周期从 15 步扩到 16 步；新增 `definition-of-done.md` 项目级交付清单。编排层：`.claude-plugin/plugin.json` 简化为 `plugin.json`，agents 注册机制稳定。
+
+**上下游**：
+- 起点: 2e0dfbf (Merge pull request #215 from addyosmani/addyosmani/fix-marketplace-schema)
+- 终点: aba7c4e (Merge pull request #323 from An-idd/feat/validate-naming-and-trigger)
+- 期间提交数: 60+
+- 新增 tag: 0.6.2
+- ys-powers 同期 commit: 533b0fd
+
+#### 4 维度变更
+
+**1. 方法论修订**（既有 SKILL.md 内容变化）
+- `security-and-hardening/SKILL.md`（+126 行）：新增"Threat Model First"前置流程（信任边界 → 资产 → STRIDE → 滥用用例）；新增 SSRF 章节（含 TOCTOU 警告）；新增 supply-chain hygiene 章节（`npm ci`、postinstall、typosquat）；OWASP LLM Top 10 映射（LLM03 Supply Chain）
+- `code-review-and-quality/SKILL.md`（+38 行）：新增 structural-depth lenses（结构性深度视角），统一"presumptive blockers"立场，与五维评审互补
+- `using-agent-skills/SKILL.md`（+21 行）：决策树新增 `observability-and-instrumentation` 入口；生命周期从 15 步扩到 16 步（observability 与 7-9 并行）；新增 DoD（Definition of Done）项目级交付清单交叉引用
+- `browser-testing-with-devtools/SKILL.md`（+23 行）：默认 isolated profile 配置，demote autoConnect（避免隐式行为）
+- `incremental-implementation/SKILL.md`（+4 行）：小修订
+- `planning-and-task-breakdown/SKILL.md`（+4 行）：spec 阶段显式指明该 skill 的优先级
+- `spec-driven-development/SKILL.md`（+4 行）：Plan/Tasks 阶段指向 `planning-and-task-breakdown`
+- `debugging-and-error-recovery/SKILL.md`：step range 修正（4-10 → 4-6）
+- `idea-refine/SKILL.md`（+2 行）：脚本可执行位修复
+- `shipping-and-launch/SKILL.md`（+1 行）：小修订
+
+**2. 新增**（skills / commands / agents / hooks / references 出现新文件）
+- `skills/observability-and-instrumentation/SKILL.md`：全新 skill。覆盖结构化日志、RED/USE 指标、分布式追踪、症状驱动告警；强调"先写 on-call 问题再写 instrumentation"
+- `agents/web-performance-auditor.md`：全新 agent（184 行），提供 Lighthouse / CrUX / DevTools trace 三类深度审计能力
+- `.claude/commands/webperf.md`：新增 Claude command（32 行），Deep/Quick 双模式路由
+- `references/definition-of-done.md`：新增 DoD 清单（67 行），区分"acceptance criteria"vs"DoD"，5 大类（Correctness / Quality / Integration / Documentation / Ship-readiness）checklist
+- `references/observability-checklist.md`：新增配套 checklist（91 行）
+- `references/security-checklist.md`：新增配套 checklist（45 行）
+- `.claude/rules/skills-contributing.md`：新增贡献规则（15 行）
+- `docs/comparison.md`：新增与同类工具对比文档（82 行），警告"避免堆叠多个 router"
+- `docs/antigravity-setup.md`：新增 Antigravity CLI 配置指南（123 行）
+- `commands/*.toml`（8 个）+ `.gemini/commands/build.toml` 等：新增 Antigravity CLI 与 Gemini CLI 的命令适配文件
+- `scripts/validate-commands.js`：新增 commands 描述跨 CLI 同步校验器（172 行）
+
+**3. 删除/合并**
+- `agents/README.md` → 重命名为 `docs/agents.md`（消除 harness 警告）
+- `.claude-plugin/plugin.json` → 简化为 `plugin.json`（移到根目录）
+
+**4. 编排层变化**（commands ⇄ agents ⇄ hooks 组合关系）
+- `plugin.json`：新增 `web-performance-auditor` agent 注册
+- `hooks/hooks.json`：增加手动安装场景的 path fallback
+- `/build auto`：新增"单次 plan + implement"快捷模式（`feat(build): add /build auto for one-pass plan + implement`）
+- `using-agent-skills` → `web-performance-auditor` 路由：原决策树末尾新增分支
+- `AGENTS.md` 大幅精简（-107 行），skill 创作规范迁移到 `docs/skill-anatomy.md`
+
+#### 同步决策
+
+- **要同步**：
+  - `security-and-hardening` 的 STRIDE 威胁建模 + SSRF + supply-chain + OWASP LLM Top 10 → `ys-powers/skills/security-and-hardening/SKILL.md`（349 行）目前只有 OWASP Top 10 与 boundary 系统，缺这些高价值章节，应在 `writing-skills` 重写流程下扩充
+  - `using-agent-skills` 的 16 步生命周期 + observability 入口 + DoD 交叉引用 → `ys-powers/skills/using-agent-skills/SKILL.md`（186 行）需对齐
+  - `observability-and-instrumentation` 新 skill → 评估是否纳入 `ys-powers/skills/`（ys-powers 的 `references/` 已有 `testing-patterns.md` / `performance-checklist.md` 风格，可类比新增 `observability-checklist.md`）
+  - `definition-of-done.md` → 评估是否纳入 `ys-powers/references/`（与现有 `orchestration-patterns.md` 同性质）
+  - `webperf` command + `web-performance-auditor` agent → 评估是否纳入 `ys-powers/commands/` 与 `ys-powers/skills/`（ys-powers 无 `agents/` 子目录惯例，需评估是否新增）
+
+- **暂不同步**：
+  - `commands/*.toml` Antigravity CLI 命令 + `.gemini/commands/*.toml` → 第三/多方 CLI 适配，ys-powers 仅聚焦 Claude Code
+  - `docs/antigravity-setup.md` → Antigravity 平台特定，ys-powers 不支持
+  - `plugin.json` 重命名（`.claude-plugin/` → 根目录）→ 仅与 agent-skills 自身 marketplace 分发相关
+  - `scripts/validate-commands.js` → CI 工具，ys-powers 无 multi-CLI 适配场景
+  - `references/security-checklist.md` → 与 ys-powers 现有 `references/security-checklist.md` 已存在同名重复，ys-powers 优先自维护
+  - `AGENTS.md` 精简 → 与 ys-powers 无关
+
+- **已确认同步**：
+  - `incremental-implementation` / `test-driven-development` 的"避免重复验证"反模式 → 上次（2026-06-07）entry 已确认同步并勾选完成
+  - `idea-refine.sh` 可执行位 → 已在 refer commit `079913a` 中修复，ys-powers 同步对应文件即可（一次性 chmod）
+
+- **待定**：
+  - `observability-and-instrumentation` skill 是否引入 ys-powers → 需用户决策。引入会扩 ys-powers skill 数至 30+；不引入则依赖 `using-agent-skills` 决策树指向 refer 即可（与 `brainstorming` / `sop-search` / `writing-skills` 现状一致）
+  - `webperf` command + `web-performance-auditor` agent 是否引入 → 需用户决策。ys-powers 当前没有 agent 子目录惯例，需先决定是否建立 `agents/` 模式
+  - `definition-of-done.md` 引入位置 → `references/` 还是 `skills/`？前者更轻量、后者更易被 skill 触发发现
+
+#### TODO
+
+- [ ] 决策：是否在 `ys-powers/skills/` 下新建 `observability-and-instrumentation/` （参照 refer 结构，约 200 行 + 配套 checklist）
+- [ ] 决策：是否在 `ys-powers/commands/` 下新建 `webperf.md` + 在 `ys-powers/skills/` 或新建 `ys-powers/agents/web-performance-auditor.md`
+- [ ] 决策：是否在 `ys-powers/references/` 下新建 `definition-of-done.md`（中文版）
+- [ ] 同步 `security-and-hardening` 的 STRIDE / SSRF / supply-chain / OWASP LLM Top 10 章节（重写风格按 `writing-skills` 流程）
+- [ ] 同步 `using-agent-skills` 的 16 步生命周期 + observability 入口 + DoD 引用
+- [ ] `idea-refine.sh` 可执行位核对与 chmod（如 ys-powers 有对应文件）
 
 ### 2026-06-07: f504276..2e0dfbf
 
