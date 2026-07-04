@@ -50,13 +50,31 @@ The number forces honesty. If you wrote down a high number but can't actually pr
 
 When confidence is below ~70%, append a brief reason on the same line — what's still unresolved or missing. This tells the user exactly what the interview needs to surface, and prevents the number from being a vague signal.
 
+### Step 1.5: Check the codebase before you ask
+
+Before asking the next question, ask yourself: "Is there a fact in this project that would answer or bound this question?" If yes — go look first (read the file, query the schema, check the log), then come back with the fact and ask a sharper question.
+
+Codebase can answer: "Does the API already expose /users/:id?", "Is the migration additive by default?", "What does the test fixture look like?"
+Only the user can answer: "Why now?", "What does success look like?", "Where does this rank vs other priorities?"
+
 ### Step 2: Ask one question at a time, each with a guess attached
+
+> **Phase note.** Walk the design tree branch by branch. A question
+> "leaves debris" if its answer reshapes what other questions are
+> even valid — ask those first. Independent decisions can be asked
+> about in any order, but asking B before A locks in the wrong
+> framing for everything downstream. In pre-design (this skill's
+> typical case), branches are still forming — treat the rule as
+> "expose dependency-first decisions before letting the others
+> settle", not "follow a finished decision tree."
 
 Format:
 
 ```
 Q: <one focused question>
-GUESS: <your hypothesis for the answer, with the reasoning that produced it>
+RECOMMENDED ANSWER: <the answer you'd ship if the user had no preference>
+WHY: <1-2 句推理>
+TRADE-OFF: <替代选项长什么样>
 ```
 
 Wait for the user to react before asking the next question.

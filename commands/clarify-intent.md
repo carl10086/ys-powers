@@ -37,19 +37,25 @@ CLARIFY ──→ SPECIFY ──→ [REVIEW] ──→ [PLAN] ──→ BUILD �
 
 </HARD-RULE>
 
-## Phase 1: 读取项目上下文
+## Phase 1: 读取项目上下文（只读 3 项，避免深 explore）
 
 先快速扫描项目，建立足够提问的背景知识。不要读太深——目标是「避免愚蠢问题」，不是「提前做设计」。
 
 如果用户传了 `[topic]` 参数，优先读取与该 topic 相关的目录和文件。
 
-读取范围（按优先级）：
+读取范围（控制在 3 项直读，避免深 explore）：
 
-1. 项目根目录的 `README.md`、`CLAUDE.md`、`CONTEXT.md`
-2. `package.json`、类似 manifest 文件
-3. 最近的 5-10 条 git commit
-4. 目录结构（重点看与 `[topic]` 或需求可能相关的子目录）
-5. 如果项目有 `docs/adr/` 或 `docs/ys-powers/`，扫最近几条
+1. 项目根目录的 `README.md`、`CLAUDE.md`、`CONTEXT.md`（直接读，不作深 explore）
+2. 最近的 5-10 条 git commit message（不看 diff）
+3. 目录结构（只扫与 `[topic]` 直接相关的子目录树，不读文件）
+
+**Phase 1 不读 `docs/adr/` 与 `docs/ys-powers/intent/`，这是故意的。**
+
+读得太早会拿既有词汇束缚用户真实意图。三步时序分清：
+
+- Phase 1（这里）：冷启动，只防蠢问题
+- interview-me Step 1.5：访谈中遇到「该不该问」的项目事实再查
+- Phase 3：意图确认后，用 ADR / CONTEXT.md 做一次 consistency check
 
 读取后，用 3-5 句话向用户总结你读到的关键上下文：
 
@@ -96,6 +102,24 @@ docs/ys-powers/intent/<topic>.md
 ```
 
 其中 `<topic>` 优先使用用户传入的 `[topic]` 参数；若未传，则从确认意图中提炼 kebab-case 短名。仅当用户明确确认后才保存。
+
+## Phase 5: 沉淀到领域语言（可选追加）
+
+intent 文档保存之后，若意图满足以下任一条件，询问用户是否叠加 `/domain-modeling`：
+
+- 新引入概念 / 词汇
+- 跨模块语义变化
+- 架构选型决策
+
+`/domain-modeling` 产出的三选一：
+
+- 更新 `CONTEXT.md` 的 ubiquitous language
+- 新增 ADR 到 `docs/adr/`
+- 写 glossary entry
+
+仅当用户明确要求时执行。
+
+**澄清意图本身不写 `CONTEXT.md` / ADR**——那些 artefact 应该是意图**确认后**才留痕。`/domain-modeling` 是把意图**翻译**到领域语言，不是给 intent 加设计。
 
 ## Failure Modes
 

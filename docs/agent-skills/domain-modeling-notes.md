@@ -269,8 +269,15 @@ else:
 ```
 grill-with-docs
   ├─ 读 CONTEXT.md + ADR
-  ├─ 追问中调用 domain-modeling（更新 CONTEXT / ADR）
+  ├─ 追问中调用 domain-modeling（in-flight 更新 CONTEXT / ADR）
   └─ 输出 spec
+
+ys-powers /clarify-intent
+  ├─ 读 CONTEXT.md + ADR（仅在 Phase 3 consistency check 时）
+  ├─ 追问中调用 interview-me（挖掘真实意图）
+  └─ intent 确认后建议叠加 /domain-modeling（stable 写 ADR / glossary）
+     ├─ 新概念 / 跨模块语义 → 更新 CONTEXT.md
+     └─ 架构选型决策 → 创建 ADR
 
 to-prd
   ├─ 读 CONTEXT.md（用正确术语）
