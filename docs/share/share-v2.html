@@ -1,0 +1,1784 @@
+<!doctype html>
+<html lang="zh-CN" data-ha-style="document">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>ys-powers: AI Coding 工作流增强(v2) · 文档</title>
+<meta name="description" content="ys-powers v2 — 把 /clarify-intent 提到流程首位, /spec 不再承担澄清职责, /plan /test 改为可选, 新增 /review-spec, 补全 HTML vs Markdown." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+<style>
+:root {
+  /* Brand */
+  --primary: #a03b00;
+  --primary-container: #c94c00;
+  --primary-fixed: #ffdbcd;
+  --primary-fixed-dim: #ffb597;
+  --on-primary: #ffffff;
+  --accent-glow: #E8400D;
+
+  /* Secondary / tertiary */
+  --secondary: #d5baff;
+  --secondary-container: #7b40e0;
+  --tertiary: #4d44e3;
+  --accent-cyan: #00D4FF;
+
+  /* Surfaces */
+  --bg: #fff8f6;
+  --surface: #fff8f6;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #fbf2ef;
+  --surface-container: #f5ece9;
+  --surface-container-high: #efe6e3;
+
+  /* Text */
+  --fg-1: #1e1b19;
+  --fg-2: #594138;
+  --fg-muted: #8d7166;
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --outline-variant: #e1bfb2;
+
+  /* Status */
+  --green: #10b981;
+  --blue: #3b82f6;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+
+  /* Typography */
+  --font-headline: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', ui-monospace, monospace;
+
+  /* Spacing */
+  --space-xs: 4px; --space-sm: 8px; --space-md: 12px;
+  --space-lg: 16px; --space-xl: 20px; --space-2xl: 24px;
+  --space-3xl: 32px; --space-4xl: 48px; --space-5xl: 64px;
+
+  /* Radius */
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(30, 27, 25, 0.04);
+  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 25, 0.12);
+  --shadow-accent: 0 8px 24px rgba(160, 59, 0, 0.15);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #a03b00 0%, #c94c00 100%);
+  --gradient-hero: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+  --gradient-text: linear-gradient(135deg, #a03b00 0%, #7b40e0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #060B18;
+    --surface: #0B1426;
+    --surface-container-lowest: #101D35;
+    --surface-container-low: #101D35;
+    --surface-container: #162544;
+    --surface-container-high: #1c2d52;
+    --fg-1: #F8FAFC;
+    --fg-2: #CBD5E1;
+    --fg-muted: #64748B;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --primary: #FF6B35;
+    --accent-glow: #00D4FF;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg-1);
+  line-height: 1.6;
+  font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+}
+
+a { color: var(--primary); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s; }
+a:hover { border-bottom-color: var(--primary); }
+a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-headline);
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  color: var(--fg-1);
+  margin: 0;
+}
+
+p { margin: 0 0 var(--space-md); }
+ul, ol { padding-left: 1.4em; margin: 0 0 var(--space-md); }
+li { margin: 0 0 var(--space-xs); }
+
+hr { border: none; border-top: 1px solid var(--border); margin: var(--space-3xl) 0; }
+
+/* Document shell */
+.document-shell {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-2xl);
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--space-4xl);
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .document-shell { grid-template-columns: 1fr; gap: var(--space-3xl); padding: var(--space-2xl) var(--space-lg); }
+}
+
+/* Cover */
+.cover {
+  grid-column: 1 / -1;
+  padding: var(--space-5xl) var(--space-4xl);
+  background: var(--gradient-hero);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid transparent;
+}
+
+.cover::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cover .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  border: 1px solid var(--primary-fixed-dim);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-lg);
+}
+
+.cover .eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px rgba(160, 59, 0, 0.12);
+}
+
+.cover .eyebrow {
+  color: white;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.cover h1 {
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1.08;
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  color: white;
+}
+
+.cover .subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 720px;
+  margin-bottom: var(--space-2xl);
+  line-height: 1.55;
+}
+
+.cover .meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-2xl);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13.5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: var(--space-lg);
+}
+
+.cover .meta-row .label { font-family: var(--font-mono); color: rgba(255, 255, 255, 0.7); margin-right: var(--space-sm); text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+.cover .meta-row .value { color: rgba(255, 255, 255, 0.95); }
+
+/* TL;DR deck */
+.deck {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin-top: var(--space-2xl);
+}
+.deck h2 { font-size: 16px; color: var(--primary); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-md); }
+.deck p { font-size: 16px; line-height: 1.65; color: var(--fg-2); margin: 0; }
+
+/* Reader rail */
+.reader-rail {
+  position: sticky;
+  top: var(--space-3xl);
+  align-self: start;
+  max-height: calc(100vh - var(--space-4xl));
+  overflow-y: auto;
+  padding-right: var(--space-md);
+}
+@media (max-width: 960px) {
+  .reader-rail { position: static; max-height: none; }
+}
+
+.reader-rail .rail-section { margin-bottom: var(--space-2xl); }
+.reader-rail .rail-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+.reader-rail .mode-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm);
+}
+.reader-rail .mode-tabs button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-2);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.reader-rail .mode-tabs button:hover { background: var(--surface-container); color: var(--fg-1); }
+.reader-rail .mode-tabs button.active {
+  background: var(--gradient-primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+.reader-rail .mode-tabs button .ico { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; }
+
+.reader-rail .toc { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; }
+.reader-rail .toc li { margin: 0; }
+.reader-rail .toc a {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 6px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  color: var(--fg-2);
+  border-bottom: none;
+  line-height: 1.4;
+}
+.reader-rail .toc a:hover { background: var(--surface-container-low); color: var(--fg-1); }
+.reader-rail .toc a .num { font-family: var(--font-mono); color: var(--fg-muted); font-size: 11px; min-width: 22px; }
+.reader-rail .toc a .ttl { flex: 1; }
+.reader-rail .toc li.lvl-3 a { padding-left: 26px; font-size: 12.5px; color: var(--fg-muted); }
+
+.reader-rail .legend-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  font-size: 12.5px;
+  color: var(--fg-2);
+  line-height: 1.55;
+}
+.reader-rail .legend-card .row { display: flex; align-items: flex-start; gap: var(--space-sm); margin-bottom: 6px; }
+.reader-rail .legend-card .row:last-child { margin-bottom: 0; }
+.reader-rail .legend-card .swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+
+/* Body sheet */
+.body-sheet {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.body-section { margin-bottom: var(--space-5xl); }
+.body-section + .body-section { padding-top: var(--space-3xl); border-top: 1px solid var(--border); }
+
+.body-section .section-num {
+  font-family: var(--font-mono);
+  color: var(--primary);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+.body-section h2 {
+  font-size: 32px;
+  line-height: 1.18;
+  margin-bottom: var(--space-md);
+}
+
+.body-section h3 {
+  font-size: 22px;
+  line-height: 1.25;
+  margin-top: var(--space-3xl);
+  margin-bottom: var(--space-md);
+  position: relative;
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--primary);
+}
+
+.body-section h4 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: var(--space-2xl);
+  margin-bottom: var(--space-sm);
+  color: var(--fg-1);
+}
+
+.body-section p { color: var(--fg-2); font-size: 15.5px; line-height: 1.7; }
+.body-section ul li, .body-section ol li { color: var(--fg-2); font-size: 15.5px; line-height: 1.7; }
+.body-section strong { color: var(--fg-1); font-weight: 600; }
+.body-section em { font-style: normal; color: var(--fg-1); background: linear-gradient(transparent 60%, rgba(160, 59, 0, 0.18) 0); padding: 0 2px; }
+
+/* Pull quote */
+.pull-quote {
+  border-left: 3px solid var(--primary);
+  background: var(--surface-container-low);
+  padding: var(--space-lg) var(--space-xl);
+  margin: var(--space-2xl) 0;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  font-family: var(--font-headline);
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--fg-1);
+  font-weight: 500;
+}
+.pull-quote::before {
+  content: "“";
+  color: var(--primary);
+  font-size: 36px;
+  line-height: 0;
+  vertical-align: -0.3em;
+  margin-right: var(--space-xs);
+}
+
+/* Callout box */
+.callout {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-xl);
+  margin: var(--space-2xl) 0;
+  color: var(--fg-2);
+}
+.callout strong { color: var(--fg-1); }
+.callout.callout-info { border-left-color: var(--tertiary); }
+.callout.callout-warn { border-left-color: var(--yellow); }
+.callout.callout-success { border-left-color: var(--green); }
+
+/* Failure mode cards */
+.failure-card {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: var(--space-md) var(--space-lg);
+  align-items: start;
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-xl);
+  margin: var(--space-lg) 0;
+}
+.failure-card .badge {
+  font-family: var(--font-headline);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-fixed);
+  border-radius: var(--radius-sm);
+  padding: 6px 0;
+  text-align: center;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.failure-card h4 {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+.failure-card p {
+  margin: 0;
+  color: var(--fg-2);
+  line-height: 1.65;
+}
+.failure-card p + p { margin-top: var(--space-sm); }
+.callout .callout-title {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+/* Fact table */
+.fact-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: var(--space-2xl) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-container-lowest);
+  font-size: 14px;
+}
+.fact-table th {
+  text-align: left;
+  background: var(--surface-container);
+  color: var(--fg-1);
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: 13px;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-strong);
+  letter-spacing: 0.02em;
+}
+.fact-table td {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-2);
+  vertical-align: top;
+}
+.fact-table tbody tr:last-child td { border-bottom: none; }
+.fact-table tbody tr:hover { background: var(--surface-container-low); }
+.fact-table td code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--surface-container);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--primary);
+}
+.fact-table .col-signal { width: 26%; }
+.fact-table .col-threshold { width: 30%; }
+.fact-table .col-desc { width: 44%; }
+
+@media (max-width: 720px) {
+  .fact-table { font-size: 13px; }
+  .fact-table th, .fact-table td { padding: var(--space-sm) var(--space-md); }
+  .fact-table, .fact-table thead, .fact-table tbody, .fact-table tr, .fact-table td, .fact-table th { display: block; }
+  .fact-table thead { display: none; }
+  .fact-table tr { margin-bottom: var(--space-md); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-sm); }
+  .fact-table td { border: none; padding: 4px 8px; }
+  .fact-table td::before { content: attr(data-label); font-family: var(--font-mono); color: var(--fg-muted); font-size: 11px; text-transform: uppercase; margin-right: var(--space-sm); }
+  .fact-table .col-signal, .fact-table .col-threshold, .fact-table .col-desc { width: auto; }
+}
+
+/* Terminal output window */
+.terminal-window {
+  background: #14110f;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: var(--space-xl) 0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.terminal-window .terminal-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: #1f1a17;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #a08e83;
+}
+.terminal-window .terminal-head .dot { width: 10px; height: 10px; border-radius: 50%; }
+.terminal-window .terminal-head .dot.red { background: #ff5f57; }
+.terminal-window .terminal-head .dot.yel { background: #febc2e; }
+.terminal-window .terminal-head .dot.grn { background: #28c840; }
+.terminal-window .terminal-head .label { margin-left: var(--space-md); color: var(--fg-muted); }
+.terminal-window pre {
+  font-family: var(--font-mono);
+  margin: 0;
+  padding: var(--space-xl);
+  background: transparent;
+  color: #e9dfd6;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre;
+  word-break: normal;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+@media (max-width: 720px) {
+  .terminal-window pre { font-size: 11.5px; padding: var(--space-md); }
+}
+
+/* Key observation list ("关键看三点") */
+.observe-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-xl) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  counter-reset: observe;
+}
+.observe-list {
+  counter-reset: observe;
+}
+.observe-list > li {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+.observe-list .badge {
+  width: 28px; height: 28px;
+  background: var(--gradient-primary);
+  color: var(--on-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+}
+.observe-list .content { color: var(--fg-2); font-size: 14.5px; line-height: 1.65; }
+.observe-list .content strong { color: var(--fg-1); }
+
+/* Comparison grid */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin: var(--space-xl) 0;
+}
+@media (max-width: 720px) { .compare-grid { grid-template-columns: 1fr; } }
+.compare-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+.compare-card h5 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.compare-card ul { margin: 0; padding-left: 1.2em; }
+.compare-card li { font-size: 13.5px; color: var(--fg-2); }
+
+/* Mermaid stage */
+.mermaid-stage {
+  margin: var(--space-2xl) 0;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.mermaid-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  justify-content: flex-end;
+}
+.mermaid-controls .group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-container);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+}
+.mermaid-controls button {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--fg-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 var(--space-sm);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.mermaid-controls button:hover { background: var(--surface-container-high); color: var(--fg-1); }
+.mermaid-controls .scale-readout {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  min-width: 48px;
+  text-align: center;
+}
+
+.mermaid-stage .mermaid {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 0 0, rgba(160, 59, 0, 0.04), transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(123, 64, 224, 0.04), transparent 50%);
+  transform-origin: 0 0;
+  transition: transform .25s ease;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.mermaid-stage .mermaid.dragging { cursor: grabbing; transition: none; }
+.mermaid-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-right: auto;
+  padding-left: var(--space-sm);
+  letter-spacing: 0.04em;
+}
+.mermaid-stage .mermaid svg { max-width: 100% !important; height: auto !important; }
+.mermaid-stage .mermaid svg .nodeLabel,
+.mermaid-stage .mermaid svg .edgeLabel,
+.mermaid-stage .mermaid svg foreignObject div { font-size: 14px !important; }
+
+.mermaid-stage .mermaid-fallback {
+  display: none;
+  margin-top: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--fg-muted);
+}
+.mermaid-stage.render-failed .mermaid-fallback { display: block; }
+
+/* Inline code */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--surface-container);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+/* Evidence spread */
+.evidence-spread {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin: var(--space-3xl) 0;
+}
+.evidence-spread h3 {
+  font-size: 18px;
+  margin-bottom: var(--space-md);
+  border-left: none;
+  padding-left: 0;
+}
+
+/* Three-up grid for command cards */
+.cmd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+  margin: var(--space-xl) 0;
+}
+.cmd-card {
+  background: var(--surface-container-low);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: transform .2s, box-shadow .2s;
+}
+.cmd-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.cmd-card .cmd-name { font-family: var(--font-mono); font-size: 14px; color: var(--primary); font-weight: 600; }
+.cmd-card .cmd-desc { font-size: 13.5px; color: var(--fg-2); line-height: 1.55; }
+
+/* Reading mode visibility */
+body[data-reading-mode="summary"] main.body-sheet > section.body-section.deep { display: none; }
+body[data-reading-mode="summary"] main.body-sheet > section.body-section.summary-on { display: block; }
+body[data-reading-mode="evidence"] main.body-sheet > section.body-section:not(.evidence-on) { display: none; }
+body[data-reading-mode="full"] main.body-sheet > section.body-section { display: block; }
+
+/* Print: keep content readable */
+@media print {
+  .reader-rail, .mermaid-controls { display: none; }
+  body { background: white; }
+  .document-shell { display: block; }
+  .body-sheet { max-width: 100%; }
+}
+
+/* Accessibility: reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* Focus visible */
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+
+/* Footer */
+.doc-footer {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-2xl);
+  margin-top: var(--space-4xl);
+  color: var(--fg-muted);
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.doc-footer code { background: transparent; border: none; padding: 0; color: var(--fg-muted); }
+.doc-footer a { color: var(--fg-muted); border-bottom: 1px dotted var(--fg-muted); }
+.doc-footer a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+</style>
+</head>
+<body data-reading-mode="full">
+
+<div class="document-shell">
+
+  <!-- Cover -->
+  <header class="cover">
+    <span class="eyebrow"><span class="dot"></span>技术方法论 · v2 重写版</span>
+    <h1>ys-powers: AI Coding 工作流增强</h1>
+    <p class="subtitle">把 <code>/clarify-intent</code> 提到流程首位, <code>/spec</code> 不再承担澄清职责, <code>/plan</code> 与 <code>/test</code> 标注为可选, 新增 <code>/review-spec</code> 质量门, 补全 HTML vs Markdown 的讨论. 这一版讲清楚"为什么这样设计", 而不只是"该按什么顺序跑".</p>
+
+    <div class="meta-row">
+      <div><span class="label">项目</span><span class="value">ys-powers (spec-coding)</span></div>
+      <div><span class="label">定位</span><span class="value">Agent Harness / 工作流编排层</span></div>
+      <div><span class="label">核心抽象</span><span class="value">commands → skills → subagent → reference</span></div>
+      <div><span class="label">版本</span><span class="value">v2 (2026-07)</span></div>
+    </div>
+
+    <div class="deck">
+      <h2>TL;DR</h2>
+      <p>把传统工程化思想塞进 Agent 工作流, 把"写好一封邮件"的 Prompt Engineering 升级为"设计跨会话 Harness 系统"的 Harness Engineering. 一条 8 节点工作流, 5 个主干 (<code>/clarify-intent</code> · <code>/spec</code> · <code>/build</code> · <code>/ys-review</code> · <code>/ship</code>) + 3 个按需触发的可选节点 (<code>/review-spec</code> · <code>/plan</code> · <code>/test</code>). 不是某个 skill 能修的细节, 是 Harness 层的工程化约束.</p>
+    </div>
+  </header>
+
+  <!-- Reader rail -->
+  <aside class="reader-rail" aria-label="阅读导航">
+    <div class="rail-section">
+      <span class="rail-label">阅读模式</span>
+      <div class="mode-tabs" role="tablist">
+        <button class="active" data-mode="full" role="tab"><span class="ico">◐</span>完整阅读</button>
+        <button data-mode="summary" role="tab"><span class="ico">◷</span>5 分钟速览</button>
+        <button data-mode="evidence" role="tab"><span class="ico">◈</span>证据与样例</button>
+      </div>
+    </div>
+
+    <div class="rail-section">
+      <span class="rail-label">目录</span>
+      <ul class="toc">
+        <li><a href="#sec-1"><span class="num">01</span><span class="ttl">介绍</span></a></li>
+        <li><a href="#sec-1-1"><span class="num">·</span><span class="ttl">1.1 三阶段演进</span></a></li>
+        <li><a href="#sec-1-2"><span class="num">·</span><span class="ttl">1.2 四类典型问题</span></a></li>
+        <li><a href="#sec-2"><span class="num">02</span><span class="ttl">实现思路</span></a></li>
+        <li><a href="#sec-2-1"><span class="num">·</span><span class="ttl">2.1 三层抽象</span></a></li>
+        <li><a href="#sec-2-2"><span class="num">·</span><span class="ttl">2.2 8 节点总览</span></a></li>
+        <li><a href="#sec-2-3"><span class="num">·</span><span class="ttl">2.3 /clarify-intent</span></a></li>
+        <li><a href="#sec-2-4"><span class="num">·</span><span class="ttl">2.4 /spec</span></a></li>
+        <li><a href="#sec-2-5"><span class="num">·</span><span class="ttl">2.5 可选节点</span></a></li>
+        <li><a href="#sec-2-6"><span class="num">·</span><span class="ttl">2.6 主干三连</span></a></li>
+        <li><a href="#sec-2-7"><span class="num">·</span><span class="ttl">2.7 HTML vs Markdown</span></a></li>
+        <li><a href="#sec-refs"><span class="num">03</span><span class="ttl">参考资料</span></a></li>
+      </ul>
+    </div>
+
+    <div class="rail-section">
+      <span class="rail-label">图例</span>
+      <div class="legend-card">
+        <div class="row"><span class="swatch" style="background:#a03b00"></span><span>实线主干 · 必须走</span></div>
+        <div class="row"><span class="swatch" style="background:#7b40e0"></span><span>虚线支撑 · 按需触发</span></div>
+        <div class="row"><span class="swatch" style="background:#8d7166"></span><span>方括号节点 · 可选阶段</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Body sheet -->
+  <main class="body-sheet">
+
+    <!-- 1. 介绍 -->
+    <section id="sec-1" class="body-section summary-on evidence-on">
+      <span class="section-num">01 / 介绍</span>
+      <h2>从 Prompt 到 Harness: AI Coding 走到了哪一步</h2>
+
+      <p>先把时代背景摆出来. 这一节讲的是: <em>为什么 ys-powers 是 Harness 层的工作, 而不是某一个 skill 的工作</em>.</p>
+
+      <h3 id="sec-1-1">1.1 AI Coding 的三阶段演进</h3>
+
+      <p><strong>Prompt Engineering (2022–2024)</strong> 关注<strong>单次交互</strong>的优化 — 通过 Few-shot Learning, Chain-of-Thought, 角色设定等技巧, 让模型在一次对话中给出更好的回答. 它的核心隐喻是"写好一封邮件".</p>
+
+      <p><strong>Context Engineering (2025)</strong> 向前迈了一步, 关注的是"<strong>给 Agent 看什么</strong>" — 动态构建的上下文窗口中应该填充哪些文档, 对话历史, 工具定义和 RAG (检索增强生成) 检索结果. Shopify CEO Tobi Lütke 将其类比为"给邮件附上所有正确的附件". 这一阶段的核心突破是认识到: <strong>模型的表现上限取决于上下文的质量, 而非 prompt 的措辞</strong>.</p>
+
+      <div class="pull-quote">Agents aren't hard; the Harness is hard. — Ryan Lopopolo, OpenAI</div>
+
+      <p><strong>Harness Engineering (2026)</strong> 则站在更高的抽象层次, 不再只关注"一次对话"或"一次上下文窗口", 而是设计跨越多个会话, 多个 Agent 角色, 多个执行阶段的<strong>完整系统架构</strong>.</p>
+
+      <!-- Mermaid: 三阶段演进 -->
+      <div class="mermaid-stage" id="mermaid-stage-evolution">
+        <div class="mermaid-controls" role="toolbar" aria-label="图表缩放">
+          <div class="group" role="group">
+            <button data-zoom="-0.2" aria-label="缩小">−</button>
+            <span class="scale-readout">100%</span>
+            <button data-zoom="0.2" aria-label="放大">+</button>
+            <button data-zoom="0" aria-label="重置">⟲</button>
+          </div>
+        </div>
+        <div class="mermaid" id="evolution-diagram">flowchart LR
+    A["Prompt Engineering<br/>2022-2024"] -->|关注点跃迁| B["Context Engineering<br/>2025"]
+    B -->|系统级抽象| C["Harness Engineering<br/>2026"]
+    A -.->|信件隐喻| A1["写好一封邮件"]
+    B -.->|附件隐喻| B1["附上正确附件"]
+    C -.->|工程隐喻| C1["设计完整系统"]</div>
+        <div class="mermaid-fallback">图表渲染失败, 显示原始代码.</div>
+      </div>
+
+      <h3 id="sec-1-2">1.2 Coding Agent 的四类典型问题</h3>
+
+      <p>讲完了演进, 必须先把"为什么需要 Harness"摆出来. 这是 ys-powers 整套设计要对付的敌人.</p>
+
+      <div class="failure-card">
+        <span class="badge">F1</span>
+        <div>
+          <h4>One-shot Syndrome — 试图一步到位</h4>
+          <p>Agent 拿到复杂需求后, 倾向于在单个上下文窗口内完成全部工作. 实现到一半时上下文已被消耗大半, 模型开始出现幻觉, 循环输出, 格式错误的 Tool Call. Anthropic 的经验数据表明, 上下文窗口的 Sweet Spot 在 <strong>40% 以下填充率</strong>; 超过此阈值, 输出质量快速衰退.</p>
+        </div>
+      </div>
+
+      <div class="failure-card">
+        <span class="badge">F2</span>
+        <div>
+          <h4>Premature Victory Declaration — 过早宣布胜利</h4>
+          <p>Agent 完成部分工作就宣布任务结束, 核心功能尚未实现或验证. 这在实践中极为常见 — Agent 输出"编码完成", 但实际上<strong>编译都过不了</strong>.</p>
+        </div>
+      </div>
+
+      <div class="failure-card">
+        <span class="badge">F3</span>
+        <div>
+          <h4>Premature Feature Completion — 过早标记功能完成</h4>
+          <p>Agent 认为功能已实现, 但未做端到端测试验证, 部署后才发现关键路径不通. Anthropic 的解决方案是引入 Browser Automation (Puppeteer MCP, Model Context Protocol) 做自动化的端到端验证截图.</p>
+        </div>
+      </div>
+
+      <div class="failure-card">
+        <span class="badge">F4</span>
+        <div>
+          <h4>Cold Start Problem — 环境启动困难</h4>
+          <p>多次会话间缺乏持久化记忆, 每次新会话都要花大量 Token 重新理解项目结构, 真正用于编码的 Token Budget 被严重挤压.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-title">核心判断</span>
+        这四类问题不是某个 skill 能修的, <strong>必须靠 Harness 层的工程化约束</strong>. 这是后面整套命令体系的出发点.
+      </div>
+    </section>
+
+    <!-- 2. 实现思路 -->
+    <section id="sec-2" class="body-section summary-on evidence-on">
+      <span class="section-num">02 / 实现思路</span>
+      <h2>三层抽象, 八节点流程, 五主干三可选</h2>
+
+      <p>Spec 编程的本质, 是把<strong>传统工程的编程思想</strong>和<strong>个人操作习惯</strong>结合起来以提升效率. 无论是 <code>super-powers</code>, <code>gsd</code>, <code>gstack</code>, <code>agent-skills</code>, 还是后面层出不穷的新方法论, 底层思路相通.</p>
+
+      <h3 id="sec-2-1">2.1 三层抽象</h3>
+
+      <ul>
+        <li><strong><code>commands</code></strong>: 把你自己对工作流的理解, 用 workflow 的方式组织起来, 编排多个 skill 与 subagent 协作</li>
+        <li><strong><code>skills</code></strong>: 可复用的工程最佳实践, <strong>无状态</strong></li>
+        <li><strong><code>subagents</code></strong>: 隔离主上下文, 防止污染的关键工具, 在大型任务中非常有用</li>
+      </ul>
+
+      <!-- Mermaid: 三层抽象 -->
+      <div class="mermaid-stage" id="mermaid-stage-layers">
+        <div class="mermaid-controls" role="toolbar" aria-label="图表缩放">
+          <div class="group" role="group">
+            <button data-zoom="-0.2" aria-label="缩小">−</button>
+            <span class="scale-readout">100%</span>
+            <button data-zoom="0.2" aria-label="放大">+</button>
+            <button data-zoom="0" aria-label="重置">⟲</button>
+          </div>
+        </div>
+        <div class="mermaid" id="layers-diagram">flowchart TB
+    subgraph L1["L1 · 工作流编排"]
+        C1["/clarify-intent"]
+        C2["/spec"]
+        C3["/build"]
+        C4["/ys-review"]
+    end
+    subgraph L2["L2 · 工程最佳实践"]
+        S1["interview-me"]
+        S2["explore-then-ask"]
+        S3["test-driven-development"]
+    end
+    subgraph L3["L3 · 上下文隔离"]
+        A1["html-generator"]
+        A2["code-reviewer"]
+    end
+    REF["L4 · reference"]
+    C1 --> S1
+    C2 --> S2
+    C3 --> S3
+    C4 --> S3
+    C4 --> A2
+    S1 -.-> REF
+    S2 -.-> REF
+    S3 -.-> REF</div>
+        <div class="mermaid-fallback">图表渲染失败, 显示原始代码.</div>
+      </div>
+
+      <h3 id="sec-2-2">2.2 开发全阶段总览 (v2 重画)</h3>
+
+      <p><code>ys-powers</code> 把一个完整的开发周期切成 <strong>8 个节点</strong>, 其中 <code>CLARIFY</code> / <code>SPECIFY</code> / <code>BUILD</code> / <code>REVIEW</code> / <code>SHIP</code> 是 5 个<strong>主干</strong>节点 (必须走), 其余 3 个 <code>[REVIEW]</code> <code>[PLAN]</code> <code>[TEST]</code> 是<strong>可选</strong>节点 (按需触发).</p>
+
+      <!-- Mermaid diagram -->
+      <div class="mermaid-stage" id="mermaid-stage-flow">
+        <div class="mermaid-controls" role="toolbar" aria-label="图表缩放">
+          <div class="group" role="group">
+            <button data-zoom="-0.2" aria-label="缩小">−</button>
+            <span class="scale-readout">100%</span>
+            <button data-zoom="0.2" aria-label="放大">+</button>
+            <button data-zoom="0" aria-label="重置">⟲</button>
+          </div>
+        </div>
+        <div class="mermaid" id="flow-diagram">flowchart LR
+    A["/clarify-intent"] --> B["/spec"]
+    B --> C["/review-spec"]
+    C --> D["/plan"]
+    D --> E["/build"]
+    E --> F["/ys-review"]
+    F --> G["/ship"]
+
+    E -.bug 复现.-> H["/test"]
+    E -.异常调试.-> I["debugging"]
+    E -.查文档.-> J["source-driven"]
+    E -.上下文优化.-> K["context-eng"]
+    F -.随时提交.-> L["/gc"]
+    G -.沉淀经验.-> M["/sop-add"]</div>
+        <div class="mermaid-fallback">图表渲染失败, 显示原始代码.</div>
+      </div>
+
+      <ul>
+        <li><strong>实线主干</strong>: 澄清 → 构思 → spec 审查 → 拆任务 → 构建 → 审查 → 交付. v2 把澄清从 <code>/spec</code> 拆出来, 因为这两件事的关注点完全不同</li>
+        <li><strong>方括号节点</strong> (<code>/review-spec</code> <code>/plan</code> <code>/test</code>): 不是必经路径. 小改动直接在 spec 里带过就行; bug 修复或显式 TDD 才单独跑 <code>/test</code></li>
+        <li><strong>虚线支撑</strong>: 主干任一节点按需触发的横向能力</li>
+      </ul>
+
+      <h3 id="sec-2-3">2.3 /clarify-intent — 流程的真正起点 (v2 新增)</h3>
+
+      <p>为什么单独成节? 因为 v1 把澄清职责塞在 <code>/spec</code> 里, 结果 spec 阶段又被问需求又被写文档, 角色打架. v2 把"聊明白"独立出来.</p>
+
+      <!-- Mermaid: clarify-intent 流程 -->
+      <div class="mermaid-stage" id="mermaid-stage-clarify">
+        <div class="mermaid-controls" role="toolbar" aria-label="图表缩放">
+          <div class="group" role="group">
+            <button data-zoom="-0.2" aria-label="缩小">−</button>
+            <span class="scale-readout">100%</span>
+            <button data-zoom="0.2" aria-label="放大">+</button>
+            <button data-zoom="0" aria-label="重置">⟲</button>
+          </div>
+        </div>
+        <div class="mermaid" id="clarify-diagram">flowchart TD
+    S["用户提出模糊需求"] --> Q1["一次一问"]
+    Q1 --> R{"置信度达标?"}
+    R -->|否| Q1
+    R -->|是| CONF["重述 intent"]
+    CONF --> C{"用户确认?"}
+    C -->|否| Q1
+    C -->|是| OUT["输出:确认的 intent"]
+    OUT --> NEXT["移交 /spec"]</div>
+        <div class="mermaid-fallback">图表渲染失败, 显示原始代码.</div>
+      </div>
+
+      <div class="callout callout-info">
+        <span class="callout-title">核心职责</span>
+        <p>通过结构化访谈确认真实意图, 产出<strong>确认的 intent 陈述</strong> (不是设计, 不是 spec).</p>
+      </div>
+
+      <p><strong>背后 skill</strong>: <code>interview-me</code>. 一次一问, 附带猜测, 直到 95% 置信度才重述并请你确认.</p>
+
+      <p><strong>为什么不让 <code>/spec</code> 干这事</strong>: spec 阶段一旦进入"准备 workspace + 写文档"的状态, 上下文已被工程化细节占满, 再回头澄清会被既有词汇绑架. <em>澄清必须发生在读 spec 模板之前</em>.</p>
+
+      <p><strong>典型场景</strong>:</p>
+      <ul>
+        <li>用户说"加个 dashboard", 你不知道是扩展 <code>/app/metrics</code> 还是新建视图</li>
+        <li>用户说"性能优化", 你不知道是数据库慢查询还是前端渲染瓶颈</li>
+        <li>用户说"支持多租户", 你不知道是数据隔离还是 UI 切换</li>
+      </ul>
+      <p>这些场景里, <code>/clarify-intent</code> 用 3-5 个问题收敛意图, 然后 <code>/spec</code> 拿到的输入才是干净的.</p>
+
+      <h3 id="sec-2-4">2.4 /spec — 把澄清结果写成设计文档 (v2 重构)</h3>
+
+      <p><code>/spec</code> 的职责现在很纯: <strong>把澄清完的意图落到结构化设计文档上</strong>. 不再承担澄清.</p>
+
+      <h4>Phase 1 — <code>explore-then-ask</code> 追问</h4>
+      <p>读项目上下文 (README / CLAUDE.md / 相关源码), 用 <code>explore-then-ask</code> skill 把意图里没问清的细节补完 — 目标用户, 验收标准, 技术栈, Always/Ask/Never 边界.</p>
+
+      <h4>Phase 1.5 — <code>domain-modeling</code> checkpoint</h4>
+      <p>如果意图引入了新概念 / 跟 <code>CONTEXT.md</code> 冲突 / 满足 ADR 三条标准 (难逆转, 不写下来会忘, 来自真实权衡), 调 <code>domain-modeling</code> 落地. 这一步是 v2 新增的, 防止"spec 写完发现术语跟项目其他地方对不上".</p>
+
+      <h4>Phase 2 — <code>prepare-workspace</code></h4>
+      <p>按改动规模分三档:</p>
+      <ul>
+        <li><strong>worktree</strong>: 大改动, 完全隔离</li>
+        <li><strong>feature branch</strong>: 常规改动</li>
+        <li><strong>当前分支</strong>: 单文件 / 配置类小改</li>
+      </ul>
+
+      <h4>Phase 3 — <code>spec-driven-development</code> skill</h4>
+      <p>从 6 个维度产出 spec: 目标 / 命令 / 项目结构 / 代码风格 / 测试策略 / 边界. 写到 <code>docs/ys-powers/specs/YYYY-MM-DD-&lt;feature&gt;-design.md</code>.</p>
+
+      <h4>(可选) Phase 4 — <code>html-generator</code> subagent</h4>
+      <p>生成"人类自包含, 易阅读"的 HTML 版 spec. <strong>必须用 subagent</strong>, 避免长 HTML 污染主上下文. 这一步只在需要对外分享 spec 时调用.</p>
+
+      <h3 id="sec-2-5">2.5 可选节点: /review-spec · /plan · /test</h3>
+
+      <p>v1 把 <code>/test</code> 画在主干上, v2 改为可选. 原因是 <code>/build</code> 里每个 task 已经走"写测试 → 实现 → 跑全量", 单独再调 <code>/test</code> 大多是冗余. 真正需要单独调 <code>/test</code> 的场景:</p>
+
+      <ul>
+        <li><strong>修 bug</strong>: 用 Prove-It pattern — 先写一个能重现 bug 的失败测试, 再修</li>
+        <li><strong>补全边界 / 异常 / 并发测试</strong>: <code>/build</code> 写的是 happy path, 这些用例值得专项补</li>
+        <li><strong>用户明确要求显式 TDD</strong></li>
+      </ul>
+
+      <p><code>/plan</code> 同理: 小改动直接在 spec 里列 acceptance criteria 就行, 单独拆 task 反而冗余. 大特性 (spec 涉及多模块, 跨多人) 才走 <code>/plan</code>.</p>
+
+      <h4>/plan 自动触发条件</h4>
+
+      <p><code>/plan</code> 标注为"可选"不等于"随便跳过". 下面是建议<strong>自动</strong>触发它的判断条件 (任一命中即建议跑):</p>
+
+      <div class="evidence-spread">
+        <table class="fact-table" aria-label="/plan 自动触发条件">
+          <thead>
+            <tr>
+              <th class="col-signal">信号</th>
+              <th class="col-threshold">阈值</th>
+              <th class="col-desc">说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="信号">改动模块数</td>
+              <td data-label="阈值">≥ 3</td>
+              <td data-label="说明">跨模块改动需要明确依赖顺序</td>
+            </tr>
+            <tr>
+              <td data-label="信号">spec 涉及 phase 数</td>
+              <td data-label="阈值">≥ 3</td>
+              <td data-label="说明">多阶段工作必须显式编排</td>
+            </tr>
+            <tr>
+              <td data-label="信号">跨人协作</td>
+              <td data-label="阈值">≥ 2 人</td>
+              <td data-label="说明">任务分配与 ownership 需要清晰</td>
+            </tr>
+            <tr>
+              <td data-label="信号">引入新依赖</td>
+              <td data-label="阈值">vcpkg / npm / pip 任何新增</td>
+              <td data-label="说明">需要单独 task 跑通依赖链</td>
+            </tr>
+            <tr>
+              <td data-label="信号">引入新外部服务</td>
+              <td data-label="阈值">数据库 / 队列 / 第三方 API 任一</td>
+              <td data-label="说明">需要早期探活 + smoke test</td>
+            </tr>
+            <tr>
+              <td data-label="信号">用户显式请求</td>
+              <td data-label="阈值">任意</td>
+              <td data-label="说明">优先级最高, 直接跑</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>为什么不自动强制跑</strong>: 单文件或单模块改动, 拆 task 是在给自己制造仪式感 — 真正需要的只是 acceptance criteria 已经写好. <em>让阶段数自己说话</em>.</p>
+
+      <h4>/plan 实际输出示例</h4>
+
+      <p>跑完后, 输出是这样:</p>
+
+      <div class="terminal-window">
+        <div class="terminal-head">
+          <span class="dot red"></span><span class="dot yel"></span><span class="dot grn"></span>
+          <span class="label">plan · /build pre-flight</span>
+        </div>
+<pre>⏺ Plan 已生成: docs/ys-powers/plans/2026-07-15-cvoice-implementation.md
+
+---
+Plan 摘要
+
+5 个阶段 / 13 个任务
+
+┌──────────────────────────────────┬───────────────┬──────────────────────────────────────────────────────────────┐
+│               阶段               │     任务      │                             内容                             │
+├──────────────────────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ Phase 1: 基础设施                │ T1, T2        │ vcpkg 依赖、clang-format / clang-tidy / cmake warnings       │
+├──────────────────────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ Phase 2: 扩展已有模块 + 视频     │ T3, T4, T5    │ AiBot 加视频、VideoPipeline、Config                          │
+├──────────────────────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ Phase 3: 单元测试                │ T6, T7        │ 4 个测试文件(audio/video pipeline + config + room_manager)  │
+├──────────────────────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ Phase 4: HTTP 控制面 + main 重构 │ T8, T9, T10   │ ControlHttp、控制面测试、main.cc 4 种模式                    │
+├──────────────────────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ Phase 5: 集成 + 远程验证         │ T11, T12, T13 │ smoke.sh、integration_test、远程服务器验证                   │
+└──────────────────────────────────┴───────────────┴──────────────────────────────────────────────────────────────┘
+
+4 个 Checkpoint 分布在每个 Phase 结束, 强制 git commit + 验证.
+
+风险已识别并缓解:
+
+- TRTC AppID/Key 阻塞 T12 → 用 GTEST_SKIP 跳过
+- 远程服务器网络 → T13 早期探活
+- cpp-httplib 兼容性 → T1 早期验证
+- L-size 任务(T7、T10)→ 标注了 a/b 拆分建议
+
+每个 task 包含:
+
+- Acceptance criteria(可勾选 checklist)
+- Verification(具体命令 + 期望输出)
+- Dependencies(前序 task)
+- Files likely touched
+- Estimated scope(S/M/L)
+
+---
+下一步
+
+按 ys-powers 工作流:
+
+- /build —— 按 plan 逐个 task 实现, 每个 task 内部已经走「写测试 → 实现 → 跑全量测试」循环
+- 或者你想先调整 plan 哪里?</pre>
+      </div>
+
+      <p><strong>关键看三点</strong>:</p>
+
+      <ol class="observe-list">
+        <li><span class="badge">1</span><span class="content"><strong>阶段切分不是水平分层</strong>: 注意 Phase 2 的 T3/T4/T5 是"扩 AiBot / 做 VideoPipeline / 做 Config" — 这是一个<strong>垂直切片</strong>, 不是"先把所有 DAO 写完, 再写所有 Service". 每个 phase 都有可演示的增量价值, 不是攒到最后才跑得起来.</span></li>
+        <li><span class="badge">2</span><span class="content"><strong>Checkpoint 而不是 task 级 git commit</strong>: 每个 Phase 结束才 commit + 验证, 不是每个 task 一次. 因为 task 间的代码可能互相依赖, 半成品 commit 污染历史. <strong>Phase 是真正的"原子交付单元"</strong>.</span></li>
+        <li><span class="badge">3</span><span class="content"><strong>风险前置</strong>: TRTC AppID/Key, 远程服务器, cpp-httplib 兼容性 这些是<strong>已知阻塞</strong>, 提前在 T1/T13 探活, 而不是等到 P5 才暴雷. 这就是 plan 与"边写边想"的本质区别.</span></li>
+      </ol>
+
+      <p><code>/review-spec</code> 是 v2 新加的环节: spec 写完后, 对 6 个维度 (Completeness / Clarity / Coherence / Coverage / Conciseness / Correctness) 打分, <em>平均 ≥ 7.0 且无维度 &lt; 5</em> 才算通过. 高风险特性建议跑一遍.</p>
+
+      <h4>/review-spec 自动触发条件</h4>
+
+      <p><code>/review-spec</code> 标注为"可选"不等于"随便跳过". 下面是建议<strong>自动</strong>触发它的判断条件 (任一命中即建议跑):</p>
+
+      <div class="evidence-spread">
+        <table class="fact-table" aria-label="/review-spec 自动触发条件">
+          <thead>
+            <tr>
+              <th class="col-signal">信号</th>
+              <th class="col-threshold">阈值</th>
+              <th class="col-desc">说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="信号">改动模块数</td>
+              <td data-label="阈值">≥ 3</td>
+              <td data-label="说明">跨模块改动容易漏边界</td>
+            </tr>
+            <tr>
+              <td data-label="信号">涉及敏感路径</td>
+              <td data-label="阈值"><code>auth</code> / <code>payment</code> / <code>data-migration</code> / <code>secret</code> 任一命中</td>
+              <td data-label="说明">一旦错, 修复成本高</td>
+            </tr>
+            <tr>
+              <td data-label="信号">spec 行数</td>
+              <td data-label="阈值">&gt; 200 行</td>
+              <td data-label="说明">复杂度高, 人眼自查容易漏</td>
+            </tr>
+            <tr>
+              <td data-label="信号">影响下游 consumer</td>
+              <td data-label="阈值">API breaking change / 数据库 schema 变更</td>
+              <td data-label="说明">错一处整条链路断</td>
+            </tr>
+            <tr>
+              <td data-label="信号">用户显式请求</td>
+              <td data-label="阈值">任意</td>
+              <td data-label="说明">优先级最高, 直接跑</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>为什么不自动强制跑</strong>: 小改动 (spec &lt; 100 行, 单文件, 单模块) 跑一次 6 维度 review 是过度消耗 — 它的 ROI 在低复杂度场景下急剧下降. <em>让信号自己说话, 比"为安全起见都跑"更工程化</em>.</p>
+
+      <h4>/ys-review vs /review-spec — 两个 review 的分工</h4>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h5>/review-spec</h5>
+          <ul>
+            <li><strong>触发时机</strong>: spec 写完后, build 之前</li>
+            <li><strong>审查对象</strong>: 设计文档 (6 维度)</li>
+            <li><strong>通过门槛</strong>: avg ≥ 7.0 且无维度 &lt; 5</li>
+            <li><strong>失败处理</strong>: 阻断 <code>/build</code>, 回到 spec 修订</li>
+            <li><strong>最大轮次</strong>: 3 轮, 强制收敛</li>
+          </ul>
+        </div>
+        <div class="compare-card">
+          <h5>/ys-review</h5>
+          <ul>
+            <li><strong>触发时机</strong>: 代码提交后, ship 之前</li>
+            <li><strong>审查对象</strong>: 代码变更 (5 轴)</li>
+            <li><strong>输出</strong>: Critical / Important / Suggestion 三级</li>
+            <li><strong>失败处理</strong>: 不阻断, 由用户决定</li>
+            <li><strong>最大轮次</strong>: 单轮, 可手动复跑</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>两者形成"spec 端 + 代码端"的双层 review, 任一独立工作. 同一个 spec 设计, 可能在 <code>/review-spec</code> 里过了 9 分, 但代码实现在 <code>/ys-review</code> 里发现 Security Critical — 这不是矛盾, 而是不同抽象层暴露的不同问题.</p>
+
+      <h4>/review-spec 实际输出示例</h4>
+
+      <p>Round 1 跑完后, 用户回答"yes"继续 Round 2, 输出收敛后是这样:</p>
+
+      <div class="terminal-window">
+        <div class="terminal-head">
+          <span class="dot red"></span><span class="dot yel"></span><span class="dot grn"></span>
+          <span class="label">review-spec · Round 2/3</span>
+        </div>
+<pre>SPEC REVIEW REPORT — Round 2/3
+═══════════════════════════════════════════════════
+Spec:     docs/ys-powers/specs/2026-07-15-cvoice-design.md
+Score:    54/60 (avg 9.0)  Gate: PASS
+Rounds:   2 (converged: yes, scores unchanged from R1)
+
+Dimension      R1   R2   Δ     Findings   Action
+─────────────  ───  ───  ───   ────────   ──────
+Completeness   9    9    —     1 fix      applied (dir state markers)
+Clarity        9    9    —     1 fix      applied (MVP mode table)
+Feasibility    9    9    —     0          pass
+Consistency    9    9    —     0          pass
+Testability    9    9    —     0          pass
+Simplicity     9    9    —     0          pass
+
+Auto-fixed:  2 items (R2)
+Ask items:   0 items
+
+✓ Quality converged at Round 2. No further improvements detected.
+
+═══════════════════════════════════════════════════
+VERDICT: Ready for build</pre>
+      </div>
+
+      <p><strong>关键看三点</strong>:</p>
+
+      <ol class="observe-list">
+        <li><span class="badge">1</span><span class="content"><strong>R1 vs R2 的 Δ 列</strong>: 加了什么, 改了什么一目了然. 如果 Δ 大量跳分, 说明 R1 没看清 — 不止是分数问题, 是发现过程的迭代.</span></li>
+        <li><span class="badge">2</span><span class="content"><strong><code>Auto-fixed</code> vs <code>Ask items</code></strong>: 机械修复 (格式, 漏字段) 自动落, 判断题 (scope, 架构) 抛回用户. 这是 spec review 与普通 lint 的本质区别.</span></li>
+        <li><span class="badge">3</span><span class="content"><strong><code>converged: yes</code></strong>: 两轮分数完全一致 → 没有新发现 → 强制停. 不让 review 变成无限打磨游戏.</span></li>
+      </ol>
+
+      <p>收敛后的 spec 状态会被 <code>/build</code> 直接读取, 不再二次校验 — 这是 6 维度质量门真正的价值: 把"spec 是否够好"的判断锁死在 <code>/build</code> 之前, 避免实现到一半才发现 spec 有结构性漏洞.</p>
+
+      <h3 id="sec-2-6">2.6 /build · /ys-review · /ship — 主干三连</h3>
+
+      <p>这三个主干节点 v1 描述得已经够细, v2 主要调整措辞, 把"为什么这样设计"补一句.</p>
+
+      <h4>/build — 构建阶段</h4>
+      <p><code>/build</code> 内部走 RED-GREEN-REFACTOR: 读 task → 读验收标准 → 写失败测试 → 最小实现 → 跑全量套件 → 编译 → 提交 → 标记完成 → 下一个. 任何步骤失败 → 自动转 <code>debugging-and-error-recovery</code> 找根因, 修完再回来.</p>
+
+      <p><strong>为什么 task 级 TDD 而不是全局 TDD</strong>: 单个 task 的反馈回路短 (分钟级), 全局测试等到最后才发现失败就太晚. task 内部再切 RED-GREEN-REFACTOR, 失败定位精确到单个断言.</p>
+
+      <h4>/build 自动依赖解析 (pre-flight)</h4>
+
+      <p><code>/build</code> 启动时不是直接跳到第一个 task, 而是先做一次 <strong>pre-flight</strong>: 读 plan, 解析每个 Task 的 dependencies, 注册到内部 TaskList, 标出哪些 task 现在 ready, 哪些被 blocked. 这一步是 <code>/build</code> 与"手动按顺序读 plan"的本质区别.</p>
+
+      <p>实际启动日志长这样:</p>
+
+      <div class="terminal-window">
+        <div class="terminal-head">
+          <span class="dot red"></span><span class="dot yel"></span><span class="dot grn"></span>
+          <span class="label">/build · pre-flight</span>
+        </div>
+<pre>⏺ 先做 pre-flight: 读取 plan, 解析每个 Task, 注册到 TaskList.
+
+⏺ Pre-flight 完成. 13 个 task 已注册, 依赖关系已设置.
+
+  ---
+  当前 Task 列表
+
+  T1 (vcpkg) ✅ ready
+  T2 (clang) 🔒 blocked by T1
+  T3 (AiBot video) 🔒 blocked by T1, T2
+  T4 (VideoPipeline) 🔒 blocked by T3
+  T5 (Config) 🔒 blocked by T1, T2
+  T6 (pipeline tests) 🔒 blocked by T4
+  T7 (RoomManager + tests) 🔒 blocked by T5
+  T8 (ControlHttp) 🔒 blocked by T7
+  T9 (ControlHttp tests + test.sh) 🔒 blocked by T8
+  T10 (main.cc refactor) 🔒 blocked by T9
+  T11 (smoke.sh + run_dev.sh) 🔒 blocked by T10
+  T12 (integration tests) 🔒 blocked by T11
+  T13 (remote verify) 🔒 blocked by T12
+
+  ---
+  开始 Task 1: vcpkg 依赖管理
+
+⏺ Skill(incremental-implementation)
+  ⎿  Successfully loaded skill
+
+· Registering Task 1… (46s · ↑ 2.0k tokens)
+  ⎿  ◼ Task 1: vcpkg dependency management
+     ◻ Task 2: clang-format / clang-tidy / cmake warnings › blocked by #27
+     ◻ Task 3: AiBot video support › blocked by #27, #28
+     ◻ Task 4: VideoPipeline (对称 AudioPipeline) › blocked by #29
+     ◻ Task 5: Config + YAML example › blocked by #27, #28
+      … +8 pending</pre>
+      </div>
+
+      <p><strong>关键看三点</strong>:</p>
+
+      <ol class="observe-list">
+        <li><span class="badge">1</span><span class="content"><strong>依赖图自动建</strong>: 注意 T3 和 T5 都是 <code>blocked by T1, T2</code> — 这两个 task 互相<strong>没有依赖</strong>, 它们是潜在的并行点. pre-flight 不是简单"按 plan 顺序排", 而是真正把 dependencies 字段解析成 DAG, 让你一眼看到"现在能并行做哪几个".</span></li>
+        <li><span class="badge">2</span><span class="content"><strong>并行机会可见但默认串行</strong>: T1 完成时, T2/T3/T5 三个 task 都同时变成 ready. 但 <code>/build</code> 默认<strong>串行</strong>执行 (T2 → T3 → T5), 因为: (a) 多数 ys-powers 用户在同一台机器跑单个 LLM agent, 并行写代码会污染彼此上下文; (b) 串行的 commit 历史更干净, 方便 review. <strong>并行留给 <code>/ship</code> 的三个 specialist 那种"读代码不写代码"的场景</strong>.</span></li>
+        <li><span class="badge">3</span><span class="content"><strong>Skill 自动加载</strong>: <code>Skill(incremental-implementation)</code> 在 T1 真正开始<strong>前</strong>就加载 — 不是在每个 task 内部手动调, 是 pre-flight 阶段一并准备好. 这是 <code>/build</code> 把方法论"前置注入"的设计: 不用每个 task 都"先想该用什么 skill".</span></li>
+      </ol>
+
+      <p>整个 pre-flight 在 plan 文件清晰的前提下通常 5-10 秒, 但换来的好处是后续 13 个 task 的执行顺序永远正确 — 不会出现"做完 T5 发现忘做 T4"这种串行手动执行的经典翻车.</p>
+
+      <h4>/ys-review — 审查阶段</h4>
+      <p>对当前变更做 5 轴结构化审查: Correctness / Readability / Architecture / Security / Performance. 输出按 Critical / Important / Suggestion 三级分类, 带 file:line 引用. 涉及浏览器代码时, 额外调 <code>browser-testing-with-devtools</code> 做真实运行时验证.</p>
+
+      <h4>/ys-review 自动触发条件</h4>
+      <p><code>/ys-review</code> 在主干上必经, 但<strong>触发深度</strong>也分档:</p>
+
+      <div class="evidence-spread">
+        <table class="fact-table" aria-label="/ys-review 自动触发条件">
+          <thead>
+            <tr>
+              <th class="col-signal">信号</th>
+              <th class="col-threshold">触发档位</th>
+              <th class="col-desc">说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>改动行数</td>
+              <td>&lt; 100 行 → 单轴快速扫; &gt; 500 行 → 全 5 轴</td>
+              <td>大改动需要 architecture + security 深度</td>
+            </tr>
+            <tr>
+              <td>改动文件</td>
+              <td>跨 ≥ 3 模块 → 加 architecture 维</td>
+              <td>单文件改动不需要架构审查</td>
+            </tr>
+            <tr>
+              <td>涉及敏感路径</td>
+              <td><code>auth</code> / <code>payment</code> / <code>secret</code> / <code>data-migration</code> 命中 → security 必跑</td>
+              <td>一票否决</td>
+            </tr>
+            <tr>
+              <td>引入新依赖</td>
+              <td>npm / pip / vcpkg / apt 任一新增 → dependency review</td>
+              <td>看是否真需要新依赖</td>
+            </tr>
+            <tr>
+              <td>引入新外部 API</td>
+              <td>HTTP client / DB driver / SDK → architecture + security</td>
+              <td>边界和凭据处理</td>
+            </tr>
+            <tr>
+              <td>用户显式请求全 5 轴</td>
+              <td>任意</td>
+              <td>重大 release 前手动跑</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>为什么不每次都跑全 5 轴</strong>: 5 轴 × N 文件 = 几分钟到几十分钟, 单文件 typo 修复用不上. <strong>让改动规模自己决定深度</strong>.</p>
+
+      <h4>/ys-review 实际输出示例</h4>
+      <p>跑 12 个 commit 的 cvoice MVP, 输出是这样:</p>
+
+      <div class="terminal-window">
+        <div class="terminal-head">
+          <span class="dot red"></span><span class="dot yel"></span><span class="dot grn"></span>
+          <span class="label">/ys-review · cvoice MVP</span>
+        </div>
+        <pre>⏺ /ys-review: cvoice MVP 12 个 commit 五维度审查
+
+  Context
+  - Branch: feat/cvoice-mvp
+  - Commits: 12 (T1 vcpkg → T12 integration tests)
+  - Spec: docs/ys-powers/specs/2026-07-15-cvoice-design.md
+  - Plan: docs/ys-powers/plans/2026-07-15-cvoice-implementation.md
+
+  ---
+  1. Correctness
+
+  ┌─────┬──────────────────────────────┬────────────┬──────────────────────────────────────────────────┐
+  │  #  │             文件             │    等级    │                       发现                       │
+  ├─────┼──────────────────────────────┼────────────┼──────────────────────────────────────────────────┤
+  │ C1  │ src/control_http.cc          │ Important  │ app_id=0 的请求会构造无效 AiBot, SDK 进房失败  │
+  │     │                              │            │ 但 HTTP 返回 500. 应早返回 400                    │
+  ├─────┼──────────────────────────────┼────────────┼──────────────────────────────────────────────────┤
+  │ C2  │ src/config.cc                │ Important  │ --mode=video_loopback 走到 TODO 分支, 但 spec   │
+  │     │                              │            │ 没标记, 用户会困惑                                │
+  ├─────┼──────────────────────────────┼────────────┼──────────────────────────────────────────────────┤
+  │ C3  │ include/cvoice/ai_bot.h      │ Suggestion │ room_id=0 被当 "未设" 处理, 但 0 是合法值.       │
+  │     │                              │            │ Magic value 问题                                  │
+  ├─────┼──────────────────────────────┼────────────┼──────────────────────────────────────────────────┤
+  │ C4  │ tests/audio_pipeline_test.cc │ Suggestion │ 没断言 pts/sample_rate/channels 透传. happy path │
+  │     │                              │            │ 不够                                                │
+  └─────┴──────────────────────────────┴────────────┴──────────────────────────────────────────────────┘
+
+  3. Architecture
+
+  ┌─────┬─────────────────────┬────────────┬────────────────────────────────────────────────┐
+  │  #  │        文件         │    等级    │                    发现                     │
+  ├─────┼─────────────────────┼────────────┼────────────────────────────────────────────────┤
+  │ A1  │ 整个项目            │ Critical   │ 集成测试只在 Linux + 真实 SDK 端到端验证.    │
+  │     │                     │            │ T12 deferred → T13 也 deferred. MVP 验证缺口  │
+  ├─────┼─────────────────────┼────────────┼────────────────────────────────────────────────┤
+  │ A2  │ src/room_manager.cc │ Important  │ RoomManager::CreateBot 调真实 TRTCCloud,    │
+  │     │                     │            │ 无法单元测试. 抽象 IRoomBot 可让可测.         │
+  │     │                     │            │ MVP 可接受, 应明确 follow-up                  │
+  ├─────┼─────────────────────┼────────────┼────────────────────────────────────────────────┤
+  │ A3  │ src/main.cc         │ Suggestion │ cvoice_core 抽出来了, 但 4 个 Run 函数直接   │
+  │     │                     │            │ link 具体类型, 没用到抽象                       │
+  └─────┴─────────────────────┴────────────┴────────────────────────────────────────────────┘
+
+  4. Security 🔒
+
+  ┌─────┬─────────────────────┬────────────┬────────────────────────────────────────────────┐
+  │  #  │        文件         │    等级    │                    发现                     │
+  ├─────┼─────────────────────┼────────────┼────────────────────────────────────────────────┤
+  │ S1  │ 整个项目            │ Critical   │ TRTC AppID/Key 在 user prompt 明文传输.      │
+  │     │                     │            │ Key 已泄露到会话 context / transcript           │
+  ├─────┼─────────────────────┼────────────┼────────────────────────────────────────────────┤
+  │ S2  │ src/main.cc         │ Important  │ CLI flag 直接接受 app_key, 没警告用户测试用  │
+  ├─────┼─────────────────────┼────────────┼────────────────────────────────────────────────┤
+  │ S3  │ src/config.cc       │ Important  │ YAML loader 接受 sdk_app_key, 没拒绝包含      │
+  │     │                     │            │ app_key 的配置文件                               │
+  └─────┴─────────────────────┴────────────┴────────────────────────────────────────────────┘
+
+  ---
+  📊 总结
+
+  ┌────────────┬──────┬─────────────────────────────────────┐
+  │    等级    │ 数量 │              主要方向               │
+  ├────────────┼──────┼─────────────────────────────────────┤
+  │ Critical   │ 2    │ A1 (验证缺口) + S1 (Key 在 context) │
+  ├────────────┼──────┼─────────────────────────────────────┤
+  │ Important  │ 4    │ C1, C2, A2, S2/S3                   │
+  ├────────────┼──────┼─────────────────────────────────────┤
+  │ Suggestion │ 8    │ 命名、抽象、文档                    │
+  └────────────┴──────┴─────────────────────────────────────┘</pre>
+      </div>
+
+      <p><strong>关键看三点</strong>:</p>
+
+      <ol class="observe-list">
+        <li><span class="badge">1</span><span class="content"><strong>Critical 强制人介入</strong>: A1 (集成验证缺口) 和 S1 (Key 泄露) 是 2 个 Critical. <strong>Critical 不自动修复</strong> — 它们涉及架构决策或安全合规, 必须人来定. <code>/ys-review</code> 把这两个明确标 Critical 是为了<strong>阻止"全是 Suggestion"那种温水煮青蛙的报告</strong>.</span></li>
+        <li><span class="badge">2</span><span class="content"><strong>三级分级不是装饰</strong>: Critical 必须修 (阻断 <code>/ship</code>), Important 强烈建议修 (下一次 task 顺手做), Suggestion 可选 (沉淀到 SOP). <strong>没有 "P0/P1/P2/P3" 那种模糊分级</strong> — 5 个轴各自 Critical/Important/Suggestion, 总数一目了然.</span></li>
+        <li><span class="badge">3</span><span class="content"><strong>维度间会互相印证</strong>: S1 (Key 在 context) 表面是 Security, 实际暗示 Documentation 缺失 (CLAUDE.md 没写"测试 key 处理约定"). 修复 S1 不只是 redact — 是补文档 + 改工作流. <code>/ys-review</code> 在 Critical 处会主动 raise 这种"看起来是一个 bug, 其实是流程缺陷"的判断.</span></li>
+      </ol>
+
+      <h4>/ship — 交付阶段</h4>
+      <p>v1 已经把并行 fan-out 讲得很清楚, 这里只补充一句<strong>设计动机</strong>: 三个 specialist 各自只看自己领域的代码, 不会互相污染, 主上下文拿回的是 3 份独立报告, 合并时再做交叉验证. 这比"主 agent 一个人既审代码又审安全又审测试"要可靠得多, 因为后者会被自己上下文里的偏见带偏.</p>
+
+      <h4>辅助 command 速览</h4>
+      <p>主干之外还有一组工具型 command, 大多属于 <strong>embedded-workflow</strong> (流程写在 command 本体, 不显式委托 skill), 按场景随调随用:</p>
+
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <span class="cmd-name">/refactor</span>
+          <span class="cmd-desc">先 <code>brainstorming</code> 出方案, 再用 TDD 守住行为, 在不破坏行为的前提下消除 code smell</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/code-simplify</span>
+          <span class="cmd-desc">→ <code>code-simplification</code>: 降低复杂度, 不改行为</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/gc</span>
+          <span class="cmd-desc">完整 Git 工作流 — 分支 / 提交 / 推送 / PR 一步完成</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/local-commit</span>
+          <span class="cmd-desc">极简本地提交 — 暂存 → 生成 message → 确认 → 提交</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/s2m</span>
+          <span class="cmd-desc">worktree 工作完成后安全回到 main 并清理</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/teach-code</span>
+          <span class="cmd-desc">由浅入深逐层讲解任意代码模块</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/doc-codebase</span>
+          <span class="cmd-desc">分析代码库并生成 <code>ARCHITECTURE.md</code></span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/easy-analysis</span>
+          <span class="cmd-desc">对复杂文档做宏观概览 + 逐段精读 + 引用分析</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/sop-add</span>
+          <span class="cmd-desc">把当前会话经验抽取为可复用 SOP</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/wskill</span>
+          <span class="cmd-desc">写新 skill — 先 <code>explore-then-ask</code> 收敛, 再走 <code>writing-skills</code> 生成</span>
+        </div>
+        <div class="cmd-card">
+          <span class="cmd-name">/wcommand</span>
+          <span class="cmd-desc">写新 command — 同上, 但走 command 写作流程</span>
+        </div>
+      </div>
+
+      <h3 id="sec-2-7">2.7 为什么用 HTML 而不是 Markdown 打通"人类 ↔ AI"</h3>
+
+      <p>v1 这一节只有引用, 没有正文, v2 补上.</p>
+
+      <div class="pull-quote">当一份内容要在"AI 生成"和"人类阅读"之间往返时, HTML 是更合适的中间格式.</div>
+
+      <p><strong>三个理由</strong>:</p>
+
+      <ol>
+        <li><strong>HTML 是自包含的, Markdown 不是</strong>. 一份 Markdown 文档要变好看, 必须嵌 CSS; 一份带样式的 HTML 文件复制粘贴就能直接打开. 分享给同事, 客户, 写博客, 都省事.</li>
+        <li><strong>HTML 表达能力强于 Markdown</strong>. Markdown 表达交互, 布局, 视觉对比很吃力 — 你很难用 Markdown 写一个"左侧导航 + 右侧详情 + 可折叠代码块"的页面. HTML + 一段 CSS 就能搞定.</li>
+        <li><strong>AI 也很擅长写 HTML</strong>. 只要 prompt 里说清楚"自包含单文件 + 浏览器直接打开", LLM 输出的 HTML 质量稳定. Markdown 反而容易出现"作者用某个渲染器的特性, 读者那边不支持"的兼容问题.</li>
+      </ol>
+
+      <p><strong>典型场景</strong>:</p>
+      <ul>
+        <li>复杂研究报告 / 数据分析结果</li>
+        <li>设计稿 / 教学材料</li>
+        <li>想分享给非技术同事的产品文档</li>
+        <li><code>ys-powers</code> 内部的 <code>html-generator</code> subagent 就是干这个的</li>
+      </ul>
+    </section>
+
+    <!-- 3. References -->
+    <section id="sec-refs" class="body-section summary-on evidence-on">
+      <span class="section-num">03 / 参考资料</span>
+      <h2>refer 与外部引用</h2>
+
+      <h3>自研项目</h3>
+      <ul>
+        <li><a href="https://github.com/carl10086/ys-powers" target="_blank" rel="noopener"><code>spec-coding</code> (即 <code>ys-powers</code>)</a> — 覆盖 coding 全流程, 核心抽象层次: <code>commands</code> → <code>skills</code> → <code>subagent</code> → <code>reference</code></li>
+        <li><a href="https://github.com/carl10086/cc-view" target="_blank" rel="noopener"><code>cc-view</code></a> — TypeScript 实现, 用来观察和管理 Claude Code 的底层运行时</li>
+        <li><a href="https://github.com/carl10086/ys-code" target="_blank" rel="noopener"><code>ys-code</code></a> — TypeScript 实现, 基于 <code>pi-mono</code> 架构复刻 Claude Code, 帮助你彻底搞清楚每一个命令背后到底发生了什么</li>
+        <li><a href="https://github.com/carl10086/cc-switch-tui" target="_blank" rel="noopener"><code>cc-switch-tui</code></a> — Rust 实现的多模型切换工具. 解决传统 <code>cc-switch</code> 的两个痛点: 不支持同时启用多个模型; 会污染唯一的 <code>settings.json</code>. 多 Kimi-code 实例并发, 响应更快, 性价比更高</li>
+        <li><code>cc-notify</code> — 基于 Rust 实现, 为 Claude Code 提供更友好的通知体验</li>
+      </ul>
+
+      <h3>配套推荐工具</h3>
+      <ul>
+        <li><code>cmux</code> — 多窗口支持, 命令行体验更舒服</li>
+        <li><a href="https://github.com/CleverCloud/mdr" target="_blank" rel="noopener"><code>mdr</code></a> — 终端 Markdown 渲染器</li>
+        <li><a href="https://github.com/jackwener/opencli" target="_blank" rel="noopener"><code>opencli</code></a></li>
+      </ul>
+
+      <h3>HTML vs Markdown 引用</h3>
+      <ul>
+        <li><a href="https://x.com/karpathy/status/2053872850101285137" target="_blank" rel="noopener">Andrej Karpathy 推文</a> (via Chrome DevTools 实时抓取)</li>
+        <li><a href="https://thariqs.github.io/html-effectiveness/" target="_blank" rel="noopener">Thariq Shihipar 示例站点</a> (via Chrome DevTools)</li>
+        <li><a href="https://simonwillison.net/2026/May/8/unreasonable-effectiveness-of-html/" target="_blank" rel="noopener">Simon Willison: Using Claude Code — The Unreasonable Effectiveness of HTML</a> (via Chrome DevTools)</li>
+        <li><a href="https://artifact.land" target="_blank" rel="noopener">artifact.land</a> (via Chrome DevTools)</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="doc-footer">
+    <span>ys-powers · AI Coding 工作流增强 · v2 · 2026-07</span>
+    <span>文档样式: <code>data-ha-style="document"</code></span>
+  </footer>
+
+</div>
+
+<script>
+/* Reading mode switcher */
+(function() {
+  const buttons = document.querySelectorAll('.reader-rail .mode-tabs button');
+  const body = document.body;
+
+  // In summary mode, only summary-on sections are visible.
+  // In evidence mode, only evidence-on sections are visible.
+  // In full mode, everything is visible.
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      body.dataset.readingMode = mode;
+      buttons.forEach(b => b.classList.toggle('active', b === btn));
+    });
+  });
+})();
+
+/* Mermaid */
+(function() {
+  if (typeof mermaid === 'undefined') return;
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    securityLevel: 'loose',
+    themeVariables: {
+      primaryColor: '#ffdbcd',
+      primaryTextColor: '#1e1b19',
+      primaryBorderColor: '#a03b00',
+      lineColor: '#7b40e0',
+      secondaryColor: '#f5ece9',
+      tertiaryColor: '#fbf2ef',
+      fontFamily: "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
+      fontSize: '14px',
+      borderRadius: 10
+    },
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    sequence: { useMaxWidth: true },
+    gantt: { useMaxWidth: true }
+  });
+
+  function renderAll() {
+    const els = document.querySelectorAll('.mermaid');
+    return Promise.all(Array.from(els).map(el => {
+      const src = el.textContent.trim();
+      el.dataset.src = src;
+      const id = (el.id || 'mermaid') + '-svg';
+      return mermaid.render(id, src)
+        .then(({ svg }) => { el.innerHTML = svg; })
+        .catch(err => {
+          console.warn('[mermaid] render failed:', err);
+          const stage = el.closest('.mermaid-stage');
+          if (stage) stage.classList.add('render-failed');
+        });
+    }));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAll);
+  } else {
+    renderAll();
+  }
+})();
+
+/* Mermaid zoom + pan controls — works for every stage */
+(function() {
+  document.querySelectorAll('.mermaid-stage').forEach(stage => {
+    const mermaidEl = stage.querySelector('.mermaid');
+    const readout = stage.querySelector('.scale-readout');
+    let scale = 1.0;
+    let tx = 0;
+    let ty = 0;
+
+    function apply() {
+      if (mermaidEl) mermaidEl.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
+      if (readout) readout.textContent = Math.round(scale * 100) + '%';
+    }
+
+    function reset() {
+      scale = 1.0;
+      tx = 0;
+      ty = 0;
+      apply();
+    }
+
+    // Buttons: zoom in/out/reset
+    stage.querySelectorAll('.mermaid-controls button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const step = parseFloat(btn.dataset.zoom || '0');
+        if (step === 0) { reset(); return; }
+        scale = Math.max(0.5, Math.min(3.0, scale + step));
+        apply();
+      });
+    });
+
+    // Drag-to-pan (mouse + touch)
+    let dragging = false;
+    let startX = 0, startY = 0, startTx = 0, startTy = 0;
+
+    function onDown(e) {
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      startTx = tx; startTy = ty;
+      mermaidEl.classList.add('dragging');
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      tx = startTx + (e.clientX - startX) / scale;
+      ty = startTy + (e.clientY - startY) / scale;
+      apply();
+    }
+    function onUp() {
+      if (!dragging) return;
+      dragging = false;
+      mermaidEl.classList.remove('dragging');
+    }
+
+    mermaidEl.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    mermaidEl.addEventListener('touchstart', onDown, { passive: true });
+    mermaidEl.addEventListener('touchmove', onMove, { passive: false });
+    mermaidEl.addEventListener('touchend', onUp);
+  });
+})();
+</script>
+</body>
+</html>
