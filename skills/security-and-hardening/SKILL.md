@@ -29,7 +29,7 @@ Security-first development practices for web applications. Treat every external 
 - **Hash passwords** with bcrypt/scrypt/argon2 (never store plaintext)
 - **Set security headers** (CSP, HSTS, X-Frame-Options, X-Content-Type-Options)
 - **Use httpOnly, secure, sameSite cookies** for sessions
-- **Run `npm audit`** (or equivalent) before every release
+- **Run the detected package manager's native audit** against the committed lockfile before every release
 
 ### Ask First (Requires Human Approval)
 
@@ -213,16 +213,16 @@ function validateUpload(file: UploadedFile) {
 }
 ```
 
-## Triaging npm audit Results
+## Triaging Dependency Audit Results
 
-Not all audit findings require immediate action. Use this decision tree:
+Package-manager audits report known advisories; they do not prove a package is trustworthy or that vulnerable code is reachable. Use this decision tree:
 
 ```
-npm audit reports a vulnerability
+The native package-manager audit reports a vulnerability
 ├── Severity: critical or high
-│   ├── Is the vulnerable code reachable in your app?
+│   ├── Is the vulnerable code reachable in runtime, build, test, or deployment paths?
 │   │   ├── YES --> Fix immediately (update, patch, or replace the dependency)
-│   │   └── NO (dev-only dep, unused code path) --> Fix soon, but not a blocker
+│   │   └── NO (confirmed unused across those paths) --> Fix soon, but not a blocker
 │   └── Is a fix available?
 │       ├── YES --> Update to the patched version
 │       └── NO --> Check for workarounds, consider replacing the dependency, or add to allowlist with a review date
@@ -234,11 +234,24 @@ npm audit reports a vulnerability
 ```
 
 **Key questions:**
-- Is the vulnerable function actually called in your code path?
+- Is the vulnerable function actually called in runtime, build, test, or deployment paths?
 - Is the dependency a runtime dependency or dev-only?
 - Is the vulnerability exploitable given your deployment context (e.g., a server-side vulnerability in a client-only app)?
 
 When you defer a fix, document the reason and set a review date.
+
+### Supply-Chain Hygiene
+
+Do not assume npm or treat the nearest manifest as the install root. Apply this order:
+
+1. **Find the installation boundary and manager.** Use the workspace root that owns the lockfile, or an independent nested project only when it is outside that workspace. There, corroborate `packageManager` (when present), the lockfile, and CI; stop on disagreement or competing lockfiles. Pin the manager version and use the matrix in `references/security-checklist.md`.
+2. **Block dependency scripts before first execution.** Bootstrap with scripts disabled or a documented fail-closed policy, inspect the pending script source, approve only the minimum required packages, commit the policy, then verify with a clean frozen/immutable install. Never blanket-approve scripts.
+
+Audits only find known advisories; they do not catch a newly malicious or typosquatted package. Therefore:
+
+- **Never apply forced audit remediation automatically** (`npm audit fix --force` or equivalent). Preview the remediation, read changelogs, and test each resulting upgrade; forced fixes may cross declared dependency ranges.
+- **Verify registry signatures and provenance where supported** (`npm audit signatures`, `pnpm audit signatures`) and treat absence as a signal to investigate, not automatic proof of compromise.
+- **Review new dependencies, lockfile diffs, and script-policy changes together** — ownership, maintenance, release age, provenance, transitive graph, and typosquats such as `cross-env` vs `crossenv` (OWASP **A06**, **LLM03**).
 
 ## Rate Limiting
 
@@ -311,6 +324,11 @@ git diff --cached | grep -i "password\|secret\|api_key\|token"
 - [ ] CORS restricted to known origins
 - [ ] Dependencies audited for vulnerabilities
 - [ ] Error messages don't expose internals
+
+### Supply Chain
+- [ ] One authoritative lockfile committed; CI uses that manager's frozen/immutable install
+- [ ] Native audit triaged by reachability and fix risk; dependency install scripts blocked unless explicitly approved
+- [ ] New dependencies reviewed (ownership, provenance, release age, transitive graph)
 ```
 ## See Also
 
@@ -325,6 +343,7 @@ For detailed security checklists and pre-commit verification steps, see `referen
 | "No one would try to exploit this" | Automated scanners will find it. Security by obscurity is not security. |
 | "The framework handles security" | Frameworks provide tools, not guarantees. You still need to use them correctly. |
 | "It's just a prototype" | Prototypes become production. Security habits from day one. |
+| "The audit passed, so the dependency is safe" | Audits match known advisories. They do not detect a newly malicious package or make unreviewed install scripts safe to execute. |
 
 ## Red Flags
 
@@ -335,12 +354,14 @@ For detailed security checklists and pre-commit verification steps, see `referen
 - No rate limiting on authentication endpoints
 - Stack traces or internal errors exposed to users
 - Dependencies with known critical vulnerabilities
+- Default-allowed install scripts at the dependency boundary (no per-package policy)
+- Forced `npm audit fix --force` upgrades that cross declared dependency ranges
 
 ## Verification
 
 After implementing security-relevant code:
 
-- [ ] `npm audit` shows no critical or high vulnerabilities
+- [ ] Native audit shows no critical or high vulnerabilities reachable in runtime, build, test, or deployment paths
 - [ ] No secrets in source code or git history
 - [ ] All user input validated at system boundaries
 - [ ] Authentication and authorization checked on every protected endpoint
