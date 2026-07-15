@@ -8,14 +8,14 @@
 
 - Remote:      https://github.com/addyosmani/agent-skills.git
 - Branch:      main
-- Commit:      aba7c4e9695c363e65cb59effe926c7f1d1abe3d
-- Short:       aba7c4e
-- Author Date: 2026-06-28 11:11:20 -0700
-- Subject:     Merge pull request #323 from An-idd/feat/validate-naming-and-trigger
+- Commit:      98967c45a42b88d6b8fb3a88b7ff6273920763d6
+- Short:       98967c4
+- Author Date: 2026-07-12 10:58:04 -0700
+- Subject:     Merge pull request #396 from nucliweb/docs/adoption-guide
 - Worktree:    clean
-- 快照时间:    2026-07-03
-- ys-powers 同期 commit: 533b0fd96b8a7d3fa3cc3ad95f197562aa6b9dc2
-- 新增 tag:    0.6.2
+- 快照时间:    2026-07-16
+- ys-powers 同期 commit: 076ebc127f585773c06e62bab6c1c3d81c2cc3fa
+- 新增 tag:    无
 
 ## 当前 skills 清单（24 个）
 
@@ -56,14 +56,14 @@
 | api-and-interface-design | — | 同名 | 缺 analysis |
 | browser-testing-with-devtools | — | 同名 | 缺 analysis |
 | ci-cd-and-automation | — | 同名 | 缺 analysis |
-| code-review-and-quality | — | 同名 | 缺 analysis |
+| code-review-and-quality | — | 同名 | 缺 analysis；待同步：依赖升级纪律子节(+5 规则、+2 反模式、+2 红旗) |
 | code-simplification | — | 同名 | 缺 analysis |
-| deprecation-and-migration | — | 同名 | 缺 analysis |
+| deprecation-and-migration | — | 同名 | 缺 analysis；待同步：DB schema expand/contract 章节(+5 规则、+3 反模式、+3 红旗) |
 | documentation-and-adrs | — | 同名 | 缺 analysis |
-| frontend-ui-engineering | — | 同名 | 缺 analysis |
-| git-workflow-and-versioning | — | 同名 | 缺 analysis |
-| performance-optimization | — | 同名 | 缺 analysis |
-| security-and-hardening | — | 同名 | 缺 analysis |
+| frontend-ui-engineering | — | 同名 | 缺 analysis；待同步：frontmatter 加 "accessible, responsive" + WCAG 触发词 |
+| git-workflow-and-versioning | — | 同名 | 缺 analysis；待同步：Release & Versioning 章节(SemVer / tag / changelog) |
+| performance-optimization | — | 同名 | 缺 analysis；待同步：frontmatter 加 "frontend, backend, queries, databases" + N+1 触发词 |
+| security-and-hardening | — | 同名 | 缺 analysis；待同步：install-script gate + manager 边界识别 + 三大表 |
 | shipping-and-launch | — | 同名 | 缺 analysis |
 | source-driven-development | — | 同名 | 缺 analysis |
 | using-agent-skills | — | 同名 | 缺 analysis |
@@ -74,6 +74,97 @@
 ---
 
 ## 更新历史
+
+### 2026-07-16: aba7c4e..98967c4
+
+**摘要**：本次为「方法论纵深」+「跨 CLI 扩展」双轨更新。方法论侧：`security-and-hardening` 重写 supply-chain 章节(manager 边界识别 + install-script gate + provenance 验证)、新增 `deprecation-and-migration` 的 Expand/Contract 数据库迁移章节、`code-review-and-quality` 新增依赖升级纪律子节、`git-workflow-and-versioning` 新增 Release & Versioning 章节、`planning-and-task-breakdown` + `spec-driven-development` 引入 `tasks/plan.md` / `tasks/todo.md` 输出约定。跨 CLI 侧：新增 Codex 插件支持(`.codex-plugin/`) + HTTPS git-config workaround；新增三层级 skill eval 框架(`evals/` + `scripts/run-evals.js`)。`.gemini/` 本次无变更。
+
+**上下游**：
+- 起点: aba7c4e (Merge pull request #323 from An-idd/feat/validate-naming-and-trigger)
+- 终点: 98967c4 (Merge pull request #396 from nucliweb/docs/adoption-guide)
+- 期间提交数: 49
+- ys-powers 同期 commit: 076ebc1
+
+#### 4 维度变更
+
+**1. 方法论修订**（既有 SKILL.md 内容变化）
+- `security-and-hardening/SKILL.md`（+36 行，结构调整较大）：
+  - "Triaging npm audit Results" → "Triaging Dependency Audit Results"，决策树从「dev-only 路径」扩展到「runtime/build/test/deploy 全路径」可达性判断
+  - Supply-Chain Hygiene 章节重写：新增「Find the installation boundary and manager」流程（workspace root 识别 + packageManager/lockfile/CI 三方核对），新增「Block dependency scripts before first execution」4 步 gate（bootstrap 关闭 → 检视 source → 最小批准 → frozen 验证）
+  - 引入「Never apply forced audit remediation automatically」原则（反对 `npm audit fix --force`），引入 `npm audit signatures` / `pnpm audit signatures` provenance 验证
+  - Verification Supply Chain checklist 重写（单 lockfile、scripts 默认关闭、ownership/provenance/release age/transitive graph）
+  - 新增 Rationalization："The audit passed, so the dependency is safe"
+- `deprecation-and-migration/SKILL.md`（+41 行）：新增 **Database Schema Migrations (Expand/Contract)** 章节——EXPAND→MIGRATE→CONTRACT 三阶段 + rename column 案例 + 5 条规则（additive first、tested down path、批式 backfill、`CREATE INDEX CONCURRENTLY`、feature flag 切换）；新增 3 条 Rationalization + 3 条 Red Flag + 数据库迁移后 Verification
+- `code-review-and-quality/SKILL.md`（+15 行）：新增 **Upgrading an existing dependency** 子节——5 条升级纪律（changelog 优先 / 单包升级 / 测试定夺 / 透传图审视 / lockfile 诚实）；新增 2 条 Rationalization + 2 条 Red Flag + Verification 增加 1 条
+- `git-workflow-and-versioning/SKILL.md`（+57 行）：新增 **Release & Versioning** 章节——SemVer 阐释 + `git tag -a` 发布约定 + 给人类看的 changelog（区别于 `git log`）+ 与 `shipping-and-launch` 链接；frontmatter description 增加「cutting a release, choosing a semantic version bump, tagging, or writing a changelog」触发词；新增 3 条 Rationalization + 3 条 Red Flag
+- `planning-and-task-breakdown/SKILL.md`（+9 行）：强调 plan 输出到 `tasks/plan.md`，task list 输出到 `tasks/todo.md`（新增 Output Files 章节，明确 `/build` 与下游工具预期路径）
+- `spec-driven-development/SKILL.md`（+2 行）：引用 `tasks/plan.md` 与 `tasks/todo.md` 输出约定，指向 `/plan` 惯例
+- `frontend-ui-engineering/SKILL.md`（frontmatter 微调）：description 增加「accessible, responsive」+ WCAG 触发词
+- `performance-optimization/SKILL.md`（frontmatter 微调）：description 增加「across frontend, backend, queries, and databases」+ N+1 触发词
+- `references/security-checklist.md`（+60 行）：新增 manager × install × audit 命令矩阵（npm / pnpm / Yarn 1-4+），新增「Install-Script Gate」段落，含按 manager 版本号的 policy 表（npm 11.18.x / 12.x、pnpm 10.x / 11+、Yarn 2-4.14+ / 1）
+- `references/testing-patterns.md`（+21/-21 行）：Playwright 示例改用 `getByRole` / `getByLabel` role-based locator（替换旧的 CSS selector 写法）
+- `commands/webperf.toml`（小修订）：CrUX API key 改为 `$CRUX_API_KEY` / `$GOOGLE_API_KEY` 环境变量引用，明确「never hard-code these values」
+
+**2. 新增**（skills / commands / agents / hooks / references 出现新文件）
+- `evals/`：全新三层级 skill eval 框架——`README.md`（文档）+ `cases/*.json`（24 个 skill 各一个 routing case）+ `scripts/run-evals.js`（449 行的 executor）；含 trace grading、owners、trust levels 机制，Tier 3 强化 + 负样例成对路由测试
+- `.codex-plugin/plugin.json`：Codex CLI 插件声明；配套 `docs/codex-setup.md`（Codex CLI v0.122+ 安装指引）
+- `.agents/plugins/marketplace.json`：refer 自身 marketplace 配置
+- `docs/adoption-guide.md`（greenfield vs brownfield rollout 决策，含 merge-blocking review label 列表）
+- `docs/developer-onboarding.md`（新贡献者 onboarding）
+- `scripts/validate-commands.js`：新增跨 CLI command description 一致性校验逻辑（malformed entry 检测）
+- `.gitattributes`：文本行结尾归一化（Windows 兼容）
+
+**3. 删除/合并**
+- 无实质删除。
+
+**4. 编排层变化**（commands ⇄ agents ⇄ hooks 组合关系）
+- **Codex CLI 集成**：`fix: prevent Codex from loading Claude hooks`（防止 Codex 误读 Claude hooks）+ `fix: use root Codex plugin layout`（简化 plugin 路径）+ `docs(codex): update install command for Codex CLI v0.122+`（breaking 命令更新）
+- **HTTPS git-config workaround**：`docs: document the HTTPS git-config workaround for the /plugin install`——新增 `git config --global url."https://github.com/".insteadOf git@github.com:` 作为 Windows/macOS 上 SSH 失败的统一解决方案
+- **Eval 框架纳入 CI**：`feat(evals): add a three-tier skill eval framework` + `feat(evals): harden Tier 3 and make negatives pairwise routing tests` + `fix(evals): cover description vocabulary gaps` + `fix(evals): pipe grader prompt via stdin; grant executor tool permissions`
+- **AGENTS.md / CLAUDE.md scope 声明**：新增顶部 scope 提示，明确这两个文件仅作用于 refer 仓库自身，不应被复制到其他项目或全局配置
+- **`commands/webperf.toml`**：Deep mode 触发条件进一步细化（CrUX key 文档化）
+
+#### 同步决策
+
+- **要同步**：
+  - `security-and-hardening` 的 supply-chain 重写（manager 边界识别 + install-script gate + provenance 验证 + 反对 forced fix）→ 写入 `ys-powers/skills/security-and-hardening/SKILL.md`；同步 `references/security-checklist.md` 的 manager × install × audit 矩阵与 version-pinned policy 表
+  - `deprecation-and-migration` 的 Expand/Contract 数据库迁移章节 → 写入 `ys-powers/skills/deprecation-and-migration/SKILL.md`（含 5 规则 + 3 反模式 + 3 红旗 + Verification）
+  - `code-review-and-quality` 的「Upgrading an existing dependency」子节 → 写入 `ys-powers/skills/code-review-and-quality/SKILL.md`（含 5 纪律 + 2 反模式 + 2 红旗 + Verification 增加 1 条）
+  - `git-workflow-and-versioning` 的「Release & Versioning」章节 → 写入 `ys-powers/skills/git-workflow-and-versioning/SKILL.md`（ys-powers 当前完全缺失此能力）；同步 frontmatter description 触发词
+  - `frontend-ui-engineering` / `performance-optimization` 的 frontmatter 触发词收紧 → 写入对应 SKILL.md
+  - `planning-and-task-breakdown` / `spec-driven-development` 的 `tasks/plan.md` / `tasks/todo.md` 输出约定 → 写入对应 SKILL.md，并核对 ys-powers 的 `/plan` 命令当前是否真的写到 `tasks/plan.md`（当前 grep 显示无此约定，需决策）
+
+- **暂不同步**：
+  - `evals/` + `scripts/run-evals.js` —— refer 24-skill 三层级 eval 框架；ys-powers 自身 skill ~30，触发词与路由语义不同，全盘移植工作量大；可参考框架思想但独立构建
+  - `.codex-plugin/` + `docs/codex-setup.md` —— ys-powers 仅服务 Claude Code
+  - `.agents/plugins/marketplace.json` —— refer 自身 marketplace 配置
+  - `scripts/validate-commands.js` —— 多 CLI 同步校验器，ys-powers 无此需求
+  - `docs/adoption-guide.md` / `docs/developer-onboarding.md` / `docs/codex-setup.md` / `docs/copilot-setup.md` / `docs/cursor-setup.md` 等多 CLI setup 文档 —— 仅服务 refer 自身多平台分发
+  - `.gitattributes` —— refer CI 自身的 Windows 兼容
+  - `commands/webperf.toml` —— ys-powers 无 `webperf` command
+  - `references/testing-patterns.md` 的 Playwright role-based locator 示例 —— ys-powers 不直接维护 testing reference
+  - `.gemini/` —— 本次无变更，标记不相关
+  - `README.md` / `CONTRIBUTING.md` 的多 CLI 路由 + skills CLI 推广 —— 仅与 refer 分发相关
+
+- **已确认同步**：
+  - `AGENTS.md` / `CLAUDE.md` scope 提示 —— ys-powers 自身 CLAUDE.md 已经在第 1 段写明本仓库上下文，且 refer 已在 `docs/agent-skills/CLAUDE.md` 顶部标注「Claude 不应修改 refer/ 下任何文件」，无需重复同步
+
+- **待定**：
+  - **是否引入 evals 框架**：ys-powers skill ~30，写 30 个 routing case + 配 eval runner 是中型工程。引入会让 quality gate 更扎实；不引入则保留当前 manual review。可在 `/wskill` 或 `using-agent-skills` 升级时一并决策
+  - **`tasks/plan.md` 输出约定是否在 ys-powers /plan 命令中落地**：refer 已统一为 `tasks/plan.md` + `tasks/todo.md`，ys-powers 当前 `/plan` 命令（`commands/plan.md`）未规定此路径。需核对：是否同步约定，或保留 ys-powers 自身惯例
+  - **refer `references/security-checklist.md` 与 ys-powers `references/security-checklist.md` 的同步策略**：两个项目各自维护同名 checklist，本次 refer 大幅扩充 manager 矩阵与 install-script gate。ys-powers 端应优先采用 refer 端方法论，但 checklist 形式可独立维护
+
+#### TODO
+
+- [ ] 同步 `security-and-hardening`：install-script gate + manager 边界识别 + provenance 验证章节（重写风格按 `writing-skills`）
+- [ ] 同步 `references/security-checklist.md`：manager × install × audit 命令矩阵 + version-pinned policy 表
+- [ ] 同步 `deprecation-and-migration`：Expand/Contract 数据库迁移章节（5 规则 + 3 反模式 + 3 红旗 + Verification）
+- [ ] 同步 `code-review-and-quality`：Upgrading an existing dependency 子节（5 纪律 + 2 反模式 + 2 红旗 + Verification）
+- [ ] 同步 `git-workflow-and-versioning`：Release & Versioning 章节（SemVer / tag / changelog）+ frontmatter 触发词
+- [ ] 同步 `frontend-ui-engineering` / `performance-optimization` 的 frontmatter 触发词
+- [ ] 决策：`tasks/plan.md` / `tasks/todo.md` 输出约定是否在 `/plan` 命令落地；若是，修改 `commands/plan.md` 与 `/build` 期望路径
+- [ ] 决策：是否引入三层级 evals 框架（参考 `refer/evals/` 与 `scripts/run-evals.js`）
+- [ ] 决策：`references/security-checklist.md` 是直接同步 refer 内容，还是仅对齐方法论、独立维护 checklist
 
 ### 2026-07-03: 2e0dfbf..aba7c4e
 
