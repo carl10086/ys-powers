@@ -88,17 +88,55 @@ cors({ origin: '*' })  // Allows any origin
 
 ## Dependency Security
 
+First locate the **installation boundary**. If the package is matched by a parent `workspaces` declaration, use that workspace root; otherwise use the nearest project root that owns both its manifest and dependency graph. At that boundary, corroborate `packageManager` (when present), the lockfile, and CI commands. Stop if they disagree or competing manager lockfiles exist there. A nested project is independent only when it is outside the parent workspace; independent subprojects may legitimately use different managers.
+
+| Manager/version signal | Frozen/immutable CI install | Known-advisory audit |
+|---|---|---|
+| npm (`package-lock.json` or `npm-shrinkwrap.json`) | `npm ci` | `npm audit` |
+| pnpm | `pnpm install --frozen-lockfile` | `pnpm audit` |
+| Yarn 2+ | `yarn install --immutable` | `yarn npm audit -A -R` |
+| Yarn 1 | `yarn install --frozen-lockfile` | `yarn audit` |
+
+For an unlisted manager or version, consult its official documentation; do not substitute another manager's commands or newer defaults.
+
+### Install-Script Gate
+
+Never discover dependency lifecycle scripts by first executing an ordinary install on a client whose defaults have not been verified.
+
+1. Bootstrap with dependency scripts disabled, or with a documented default-deny policy plus fail-closed enforcement.
+2. Inspect the exact script source and package version before approval.
+3. Record the narrowest native allow/deny policy at the installation boundary and commit it.
+4. Run a clean frozen/immutable install with that policy and verify the required packages still build.
+
+**Point-in-time snapshot:** Package-manager defaults and command names change quickly. Verify this matrix against the pinned client's current official documentation before relying on it.
+
+| Manager version | Native policy |
+|---|---|
+| npm without verified granular approvals | Bootstrap with `npm ci --ignore-scripts`, or persist `ignore-scripts=true` when project-wide blocking is intended. Keep scripts disabled or deliberately upgrade before allowing any reviewed dependency script. |
+| npm 11.18.x (verified on 11.18.0) | Unreviewed dependency scripts run with a warning by default. Enforce `strict-allow-scripts=true` before a normal install, then use the workspace-unaware `npm install-scripts ls` from the installation boundary; keep approvals version-pinned and denials name-wide. |
+| npm 12.x (verified on 12.0.1) | Unreviewed dependency scripts are skipped by default; `strict-allow-scripts=true` makes their presence fail the install before execution. Use the same `npm install-scripts` review and approval flow. |
+| pnpm 11+ | Use `pnpm approve-builds` and commit `allowBuilds` decisions; `strictDepBuilds` defaults to `true`, so unreviewed builds fail. |
+| pnpm 10.26–10.x | Configure `allowBuilds` explicitly, or use `pnpm approve-builds` with the legacy `onlyBuiltDependencies` / `ignoredBuiltDependencies` lists. Set `strictDepBuilds: true`; its v10 default is `false`. |
+| pnpm 10.1–10.25 | `pnpm approve-builds` records the legacy lists; enable `strictDepBuilds` where supported (10.3+). |
+| Older or unknown pnpm | Bootstrap with `pnpm install --frozen-lockfile --ignore-scripts`. Keep scripts disabled unless the pinned version documents an enforceable policy. |
+| Yarn 4.14+ | Dependency postinstalls are disabled by default. Grant only required exceptions with top-level `dependenciesMeta.<package>.built: true`. |
+| Yarn 2–4.13 | Set `enableScripts: false` in `.yarnrc.yml`, then grant only required exceptions with top-level `dependenciesMeta.<package>.built: true`; do not enable scripts globally. |
+| Yarn 1 | Bootstrap with `yarn install --ignore-scripts`; keep scripts disabled unless each required exception is reviewed under the pinned client's documented workflow. |
+
+### Quick audit commands
+
 ```bash
-# Audit dependencies
-npm audit
-
-# Fix automatically where possible
-npm audit fix
-
-# Check for critical vulnerabilities
+# Audit dependencies (one-shot per manager)
+npm audit                       # or: pnpm audit / yarn audit
 npm audit --audit-level=critical
 
-# Keep dependencies updated
+# NEVER apply forced fixes without review
+# npm audit fix --force          # ❌ may cross declared dependency ranges
+
+# Verify registry signatures where supported
+npm audit signatures            # or: pnpm audit signatures
+
+# Upgrade deliberately (not in bulk) — see security-and-hardening skill
 npx npm-check-updates
 ```
 
