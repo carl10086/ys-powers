@@ -106,7 +106,7 @@ flowchart LR
         reviewSkill["code-review-and-quality"]
         simplify["code-simplification"]
         shipping["shipping-and-launch"]
-        writing["writing-skills"]
+        writing["writing-great-skills"]
         debug["debugging-and-error-recovery"]
         sec["security-and-hardening"]
         perf["performance-optimization"]
@@ -169,7 +169,7 @@ flowchart LR
         debug["debugging-and-error-recovery"]
         api["api-and-interface-design"]
         migration["deprecation-and-migration"]
-        writing["writing-skills"]
+        writing["writing-great-skills"]
     end
 
     using -. discovers .-> discoverySet
@@ -207,7 +207,7 @@ flowchart LR
 | `/ys-review` | 单 skill 委托型 + 审查维度建议 | `code-review-and-quality`; 安全 / 性能维度提到 `security-and-hardening`, `performance-optimization` |
 | `/code-simplify` | 单 skill 委托型 | `code-simplification` |
 | `/ship` | skill 委托型 + agent fan-out | `shipping-and-launch`; 并行编排 3 个 agents |
-| `/wskill` | 多 skill 串联型 | `explore-then-ask`, `writing-skills` |
+| `/wskill` | 多 skill 串联型 | `explore-then-ask`, `writing-great-skills` |
 | `/refactor` | 单 skill 委托型 + 自包含方案设计 gate | `test-driven-development` |
 | `/doc-codebase` | embedded-workflow | 无显式 skill 依赖 |
 | `/easy-analysis` | embedded-workflow | 无显式 skill 依赖 |
@@ -327,11 +327,11 @@ flowchart LR
 直接关系：
 
 - `invokes` `explore-then-ask`
-- `invokes` `writing-skills`
+- `invokes` `writing-great-skills`
 
 说明：
 
-`/wskill` 先澄清 skill 需求，再进入 skill 编写流程。它和 `/spec` 类似，都是“先澄清，再生成结构化产物”的串联型 command。
+`/wskill` 先按需澄清 skill 需求，再用 `writing-great-skills` 控制 trigger、scope、information hierarchy 和 pruning。旧 `writing-skills` 保留为手动 legacy reference，不再作为日常入口。
 
 ### 4.10 `/refactor`
 
@@ -510,17 +510,18 @@ flowchart LR
 
 `api-and-interface-design` 在接口演进和兼容性语境中提到 deprecation / migration planning。这里是设计时的迁移参考关系，不代表每次 API 设计都必须进入迁移流程。
 
-### 5.10 `writing-skills`
+### 5.10 `writing-great-skills`
 
-类型：skill 编写 skill。
+类型：skill / command 编写参考 skill。
 
 关系：
 
-- `required-background` `test-driven-development`
+- `used-by` `/wskill`
+- `used-by` `/wcommand`
 
 理由：
 
-`writing-skills` 明确写到：必须理解 `superpowers:test-driven-development`，因为它把 RED-GREEN-REFACTOR 应用到 skill 文档测试。当前仓库也有 `test-driven-development` skill，但原文使用的是 `superpowers:` 前缀，因此这里记录为方法论背景关系，而不是本地强调用。
+`writing-great-skills` 聚焦 predictability：invocation、description、information hierarchy、progressive disclosure、single source of truth、no-op pruning。相比旧 `writing-skills` 的重型 RED-GREEN-REFACTOR，它更适合作为日常 authoring single source of truth。
 
 ### 5.11 当前没有明确对外 skill 关系的 skills
 
@@ -623,7 +624,7 @@ Command = the when
 | `/ys-review` | `code-review-and-quality`, recommends `security-and-hardening`, `performance-optimization` |
 | `/code-simplify` | `code-simplification` |
 | `/ship` | `shipping-and-launch`; orchestrates agents |
-| `/wskill` | `explore-then-ask`, `writing-skills` |
+| `/wskill` | `explore-then-ask`, `writing-great-skills` |
 | `/refactor` | `test-driven-development` |
 
 ### 8.2 Skill 查 Command
@@ -642,7 +643,7 @@ Command = the when
 | `performance-optimization` | `/ys-review` recommends |
 | `code-simplification` | `/code-simplify` |
 | `shipping-and-launch` | `/ship` |
-| `writing-skills` | `/wskill` |
+| `writing-great-skills` | `/wskill`, `/wcommand` |
 
 ### 8.3 Skill 查 Skill
 
@@ -660,4 +661,3 @@ Command = the when
 | `git-workflow-and-versioning` | `code-review-and-quality` | `references` |
 | `ci-cd-and-automation` | `debugging-and-error-recovery` | `fallback` |
 | `api-and-interface-design` | `deprecation-and-migration` | `references` |
-| `writing-skills` | `test-driven-development` | `required-background` |

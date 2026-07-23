@@ -272,7 +272,7 @@ flowchart LR
   - **`/easy-analysis`**: 对复杂文档做宏观概览 + 逐段精读 + 引用分析
   - **`/sop-add`**: 把当前会话经验抽取为可复用 SOP (Standard Operating Procedure)
 - **元能力**
-  - **`/wskill`**: 写新 skill — 先 `explore-then-ask` 收敛, 再走 `writing-skills` 生成
+  - **`/wskill`**: 写新 skill — 先按需澄清, 再用 `writing-great-skills` 控制 trigger / hierarchy / pruning
 
 ### 2.5 为什么用 HTML 而不是 Markdown 打通"人类 ↔ AI"
 

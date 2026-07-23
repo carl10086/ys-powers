@@ -1,7 +1,6 @@
 ---
-name: Writing Great Skills
-description: Reference for writing and editing skills and commands well — the vocabulary and principles that make a skill or command predictable. Use when creating, reviewing, or refactoring a skill/command.
-disable-model-invocation: true
+name: writing-great-skills
+description: Use when creating, reviewing, or refactoring skills or commands; when deciding invocation, description wording, information hierarchy, splitting, or pruning.
 ---
 
 # 编写优质 Skills / Commands
