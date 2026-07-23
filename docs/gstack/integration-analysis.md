@@ -13,7 +13,7 @@
 
 | 领域 | ys-powers 的能力深度 | gstack 的对应能力 | 结论 |
 |------|---------------------|-------------------|------|
-| **技能编写方法论** | `writing-skills` 用 RED-GREEN-REFACTOR 写技能，TDD 式压力测试验证 | 直接写模板，无测试验证机制 | **ys-powers 独有** |
+| **技能/命令编写方法论** | `writing-great-skills` 用 predictability、information hierarchy、progressive disclosure 和 no-op pruning 设计可预测能力 | 直接写模板，无系统剪枝机制 | **ys-powers 独有** |
 | **编码规范体系** | `code.md` 行为指南 + `code-simplification` + 五轴审查 + Code Smells 目录 | 审查有子专家分工，但无系统规范约束 | **ys-powers 更系统** |
 | **Git 工作流** | `git-workflow-and-versioning` + `gc` + `s2m` + `local-commit` + worktree 支持 | 基础 git 操作 + `/ship` | **ys-powers 更完整** |
 | **发布流程** | `shipping-and-launch`（feature flag、staged rollout、rollback plan、监控阈值表） | `/ship` 自举测试框架，但发布策略较薄 | **ys-powers 更深** |

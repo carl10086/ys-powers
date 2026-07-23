@@ -70,10 +70,10 @@ Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出
 
 ## 撰写 Skills / Commands 的强制约束
 
-**新建或重大修改 `skills/` 与 `commands/` 下文件前，必须先阅读 [`skills/writing-skills/anthropic-best-practices.md`](skills/writing-skills/anthropic-best-practices.md)。**
+**新建或重大修改 `skills/` 与 `commands/` 下文件前，必须先阅读 [`skills/writing-great-skills/SKILL.md`](skills/writing-great-skills/SKILL.md)。**
 
-- `skills/` 下的 SKILL.md 与子文件：**严格遵循**全部条款（YAML frontmatter、SKILL.md 500 行上限、progressive disclosure、gerund 命名、anti-patterns 等）。
-- `commands/` 下的命令手册：**参考其中通用原则**（简洁、术语一致、workflow/checklist 模式、避免时间敏感信息、anti-patterns），无需照搬 SKILL.md 专属条款。
+- `skills/` 下的 SKILL.md 与子文件：遵循 predictability、trigger-focused description、information hierarchy、progressive disclosure、single source of truth、no-op pruning。
+- `commands/` 下的命令手册：保持 focused workflow；steps 必须可执行并有 completion criterion；不要复制 skill/reference 正文。
 - 小幅微调（typo、措辞、单条 bullet）不强制重读；但凡涉及结构、段落、frontmatter 变更必须先核对。
 
 ## STALE-FILE-CLEANUP

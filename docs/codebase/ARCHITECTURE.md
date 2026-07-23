@@ -52,7 +52,7 @@ skills/<skill-name>/
 - `skills/test-driven-development/SKILL.md` — RED-GREEN-REFACTOR cycle with Iron Law
 - `skills/systematic-debugging/SKILL.md` — Four-phase debugging process (Root Cause → Pattern Analysis → Hypothesis → Implementation)
 - `skills/subagent-driven-development/SKILL.md` — Fresh-subagent-per-task execution with two-stage review
-- `skills/writing-skills/SKILL.md` — TDD applied to process documentation with Claude Search Optimization
+- `skills/writing-great-skills/SKILL.md` — Predictable skills/commands via invocation, hierarchy, and pruning
 - `skills/writing-plans/SKILL.md` — Bite-sized implementation plans with exact file paths and commands
 - `skills/using-git-worktrees/SKILL.md` — Isolated workspace creation with safety verification
 - `skills/verification-before-completion/SKILL.md` — Evidence-before-claims verification gate
@@ -72,9 +72,9 @@ skills/<skill-name>/
 
 **Where to add new skills:**
 - Create directory `skills/<kebab-case-name>/`
-- Follow TDD for skills: baseline test (RED) → write skill (GREEN) → close loopholes (REFACTOR)
-- Reference `skills/writing-skills/SKILL.md` for authoring guidelines
-- Reference `skills/writing-skills/testing-skills-with-subagents.md` for testing methodology
+- Use `skills/writing-great-skills/SKILL.md` for authoring: predictable trigger, information hierarchy, progressive disclosure, and pruning
+- Add supporting references only when they are heavy or branch-specific
+- For discipline-enforcing skills, verify pressure scenarios before rollout
 
 ### Layer 3: Commands (`commands/`)
 
@@ -274,7 +274,7 @@ The universal improvement cycle applied to both code and documentation:
 - **GREEN**: Make minimal change to pass (implement code / write skill addressing specific failure)
 - **REFACTOR**: Improve while maintaining correctness (clean code / close loopholes)
 
-Use this cycle for: code changes (skills/test-driven-development), skill creation (skills/writing-skills), debugging fixes (skills/systematic-debugging).
+Use this cycle for: code changes (`skills/test-driven-development`), discipline-enforcing skill pressure tests (`skills/writing-skills/testing-skills-with-subagents.md`), debugging fixes (`skills/systematic-debugging`).
 
 ### Claude Search Optimization (CSO)
 
@@ -321,10 +321,10 @@ Keep all references one level deep from SKILL.md. Never nest references: `SKILL.
 
 | Entry Point | File | Purpose |
 |-------------|------|---------|
-| Skill authoring guide | `skills/writing-skills/SKILL.md` | How to create, test, and deploy skills |
-| Anthropic best practices | `skills/writing-skills/anthropic-best-practices.md` | Official skill authoring guidance |
-| Testing methodology | `skills/writing-skills/testing-skills-with-subagents.md` | RED-GREEN-REFACTOR for skills |
-| Graphviz conventions | `skills/writing-skills/graphviz-conventions.dot` | Diagram styling rules |
+| Skill/command authoring guide | `skills/writing-great-skills/SKILL.md` | How to design predictable skills and commands |
+| Authoring glossary | `skills/writing-great-skills/GLOSSARY.md` | Shared vocabulary for invocation, hierarchy, and pruning |
+| Legacy skill testing guide | `skills/writing-skills/testing-skills-with-subagents.md` | Heavy RED-GREEN-REFACTOR pressure testing for discipline skills |
+| Legacy Anthropic best practices | `skills/writing-skills/anthropic-best-practices.md` | Upstream reference, loaded only when needed |
 
 ### For Developers Using Skills
 
@@ -392,7 +392,7 @@ Never write "TBD", "TODO", "implement later", or "add appropriate error handling
 
 ### Language Policy
 
-**All new skills MUST be written in Chinese (简体中文).** This rule is enforced at `skills/writing-skills/SKILL.md` line 24-38.
+**All new skills SHOULD be written in Chinese (简体中文).** This convention is enforced by `/wskill` and reviewed against `skills/writing-great-skills/SKILL.md`.
 
 What MUST be Chinese:
 - Overview, usage conditions, core patterns, all explanations
@@ -407,14 +407,15 @@ What MAY remain in English:
 
 Existing skills in English (e.g., `find-bugs`) are grandfathered but new skills must follow this policy.
 
-### TDD as Universal Method
+### Authoring Discipline
 
-Apply RED-GREEN-REFACTOR to:
-- Code changes (skills/test-driven-development)
-- Skill creation (skills/writing-skills)
-- Debugging fixes (skills/systematic-debugging)
+For skills and commands, optimize for predictability first:
+- trigger-focused description
+- one source of truth per idea
+- information hierarchy before adding reference files
+- no-op pruning before shipping
 
-The Iron Law applies universally: "No production code without a failing test first" / "No skill without a failing test first".
+Use heavy RED-GREEN-REFACTOR pressure testing only for discipline-enforcing skills where agents have an incentive to bypass the rule.
 
 ### Verification Culture
 
@@ -452,7 +453,7 @@ Use `commands/gc.md` for all git operations:
 1. Create directory: `skills/<kebab-case-name>/`
 2. Write `skills/<kebab-case-name>/SKILL.md` with YAML frontmatter
 3. Add supporting files in same directory if needed
-4. Test using RED-GREEN-REFACTOR (see `skills/writing-skills/testing-skills-with-subagents.md`)
+4. Review against `skills/writing-great-skills/SKILL.md`; add pressure scenarios only for discipline-enforcing skills
 5. Run `python install/local-install.py` to deploy
 6. Update this ARCHITECTURE.md to include the new skill
 
@@ -514,7 +515,7 @@ Use `commands/gc.md` for all git operations:
 | `skills/subagent-driven-development/SKILL.md` | Task execution with subagents |
 | `skills/test-driven-development/SKILL.md` | TDD for code |
 | `skills/systematic-debugging/SKILL.md` | Four-phase debugging |
-| `skills/writing-skills/SKILL.md` | TDD for skill documentation |
+| `skills/writing-great-skills/SKILL.md` | Skill/command authoring via predictability and pruning |
 | `skills/verification-before-completion/SKILL.md` | Evidence-before-claims verification |
 | `skills/using-git-worktrees/SKILL.md` | Isolated workspace setup |
 | `skills/executing-plans/SKILL.md` | Plan execution in separate sessions |

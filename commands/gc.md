@@ -1,5 +1,5 @@
 ---
-description: 智能 Git 工作流：分支创建、提交、推送、PR 一步完成
+description: Use when committing current workspace changes by creating a typed branch, committing, pushing, and outputting a PR/MR link
 ---
 
 ## 安全红线
