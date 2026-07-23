@@ -47,7 +47,8 @@ skills/<skill-name>/
 ```
 
 **Key files:**
-- `skills/brainstorming/SKILL.md` — Design-before-implementation workflow with HARD-GATE enforcement
+- `skills/explore-then-ask/SKILL.md` — Context-first requirement clarification and design confirmation
+- `skills/spec-driven-development/SKILL.md` — Structured spec workflow before implementation
 - `skills/test-driven-development/SKILL.md` — RED-GREEN-REFACTOR cycle with Iron Law
 - `skills/systematic-debugging/SKILL.md` — Four-phase debugging process (Root Cause → Pattern Analysis → Hypothesis → Implementation)
 - `skills/subagent-driven-development/SKILL.md` — Fresh-subagent-per-task execution with two-stage review
@@ -81,7 +82,7 @@ skills/<skill-name>/
 
 **Key files:**
 - `commands/gc.md` — Git workflow: branch naming, commitizen format, PR creation
-- `commands/refactor.md` — Refactoring playbook: mandatory brainstorming phase, TDD execution, code smell identification
+- `commands/refactor.md` — Refactoring playbook: gated design phase, TDD execution, code smell identification
 - `commands/sop-add.md` — SOP generation from session history with YAML metadata
 - `commands/teach-code.md` — Code teaching: macro-to-micro explanation with interactive checkpoints
 
@@ -186,19 +187,17 @@ Follow workflow steps, load supporting files on demand
 New feature or change
     |
     v
-Use skills/brainstorming/SKILL.md
-    ├── Explore project context
-    ├── Ask clarifying questions (one at a time)
-    ├── Propose 2-3 approaches with trade-offs
-    ├── Present design sections, get approval
-    └── Write spec to docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md
+Run /spec
+    ├── Invoke skills/explore-then-ask/SKILL.md for context-first clarification
+    ├── Optionally invoke skills/domain-modeling/SKILL.md for domain terms / ADRs
+    └── Invoke skills/spec-driven-development/SKILL.md to write a structured spec
     |
     v
-Use skills/writing-plans/SKILL.md
+Run /plan
     ├── Read spec
     ├── Map file structure
-    ├── Decompose into bite-sized tasks (2-5 minutes each)
-    └── Write plan to docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md
+    ├── Decompose into dependency-ordered tasks with acceptance criteria
+    └── Write plan to docs/ys-powers/plans/YYYY-MM-DD-<feature-name>.md
     |
     v
 Use skills/subagent-driven-development/SKILL.md OR skills/executing-plans/SKILL.md
@@ -260,10 +259,10 @@ Use in rules and skills to express obligation strength:
 
 A block in documentation that unconditionally stops execution until a condition is met. Use for preconditions that must be satisfied before any implementation work.
 
-Example from `skills/brainstorming/SKILL.md`:
+Example from `commands/refactor.md`:
 ```markdown
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it.
+Do not edit files until a concrete refactoring plan has been presented and approved.
 </HARD-GATE>
 ```
 
@@ -331,8 +330,8 @@ Keep all references one level deep from SKILL.md. Never nest references: `SKILL.
 
 | Entry Point | File | Purpose |
 |-------------|------|---------|
-| Design phase | `skills/brainstorming/SKILL.md` | Before any creative work |
-| Planning phase | `skills/writing-plans/SKILL.md` | After spec, before code |
+| Spec phase | `commands/spec.md` | Clarify requirements and write the structured spec |
+| Planning phase | `commands/plan.md` | After spec, before code |
 | Execution phase | `skills/subagent-driven-development/SKILL.md` | Same-session task execution |
 | Alternative execution | `skills/executing-plans/SKILL.md` | Separate-session execution |
 | Debugging | `skills/systematic-debugging/SKILL.md` | Any bug or unexpected behavior |
@@ -509,8 +508,9 @@ Use `commands/gc.md` for all git operations:
 | `commands/refactor.md` | Refactoring command |
 | `commands/sop-add.md` | SOP generation command |
 | `commands/teach-code.md` | Code teaching command |
-| `skills/brainstorming/SKILL.md` | Design-before-implementation workflow |
-| `skills/writing-plans/SKILL.md` | Implementation plan authoring |
+| `skills/explore-then-ask/SKILL.md` | Context-first requirement clarification |
+| `skills/spec-driven-development/SKILL.md` | Structured spec authoring |
+| `skills/planning-and-task-breakdown/SKILL.md` | Implementation plan authoring |
 | `skills/subagent-driven-development/SKILL.md` | Task execution with subagents |
 | `skills/test-driven-development/SKILL.md` | TDD for code |
 | `skills/systematic-debugging/SKILL.md` | Four-phase debugging |

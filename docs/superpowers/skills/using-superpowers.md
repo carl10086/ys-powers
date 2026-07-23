@@ -32,11 +32,11 @@ Skill 必须在任何回应或行动**之前**调用，包括澄清问题、探�
 
 多个 skill 可能适用时：
 
-1. **Process skills 优先**（如 `brainstorming`、`systematic-debugging`）— 决定怎么做。
+1. **Process skills 优先**（如 `spec-driven-development`、`systematic-debugging`）— 决定怎么做。
 2. **Implementation skills 其次**（如具体技术 skill）— 指导执行。
 
 例如：
-- “Let's build X” → 先 `brainstorming`，再实现 skill。
+- “Let's build X” → 先 `spec-driven-development`，再实现 skill。
 - “Fix this bug” → 先 `systematic-debugging`，再领域 skill。
 
 ## Skill 类型

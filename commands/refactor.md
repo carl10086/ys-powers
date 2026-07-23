@@ -8,15 +8,13 @@ description: 代码重构专家。识别 code smells，应用标准重构手法�
 <HARD-GATE>
 **不要直接开始改代码。**
 
-使用本命令前，必须先调用 `brainstorming` skill 进行重构方案设计。本文档中所有内容（Code Smells 识别、重构手法、输出格式、风险评估框架）都是 `brainstorming` 阶段的输入和思考素材。
-
 重构分成两个阶段：
-1. **方案设计** — 通过 `brainstorming` 产出具体重构计划
-2. **代码执行** — 严格遵循 TDD 流程逐步实施（使用 `test-driven-development` skill）
+1. **方案设计** — 先分析目标代码、调用方、测试覆盖和 code smells，输出具体重构方案。
+2. **代码执行** — 用户批准方案后，严格遵循 TDD 流程逐步实施（使用 `test-driven-development` skill）。
 
-在 `brainstorming` 完成并输出重构方案之前，禁止直接编辑文件。
+在重构方案输出并获得用户批准之前，禁止直接编辑文件。
 
-类，函数，字段的注释非常重要，尤其是中文注释
+类，函数，字段的注释非常重要，尤其是中文注释。
 </HARD-GATE>
 
 ## 重构黄金法则
@@ -118,9 +116,9 @@ description: 代码重构专家。识别 code smells，应用标准重构手法�
 
 ---
 
-## 输出格式（brainstorming 阶段使用）
+## 输出格式（方案设计阶段使用）
 
-在 `brainstorming` 阶段分析代码问题时，按以下格式输出重构方案：
+分析代码问题时，按以下格式输出重构方案：
 
 ```markdown
 ## 当前问题

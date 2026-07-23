@@ -68,7 +68,7 @@
 | 维度 | 详情 |
 |------|------|
 | **gstack 做法** | YC 风格的 6 个强制性问题，从商业/用户价值角度重新框定需求。 |
-| **ys-powers 现状** | `idea-refine`、`brainstorming`、`explore-then-ask` 覆盖从想法到设计，但**缺少 CEO/产品视角的强制审查**。 |
+| **ys-powers 现状** | `idea-refine`、`explore-then-ask`、`spec-driven-development` 覆盖从想法到设计，但**缺少 CEO/产品视角的强制审查**。 |
 | **为什么值得关心** | 工程团队容易陷入"用优雅方案解决错误问题"。`/office-hours` 不是日常工具，而是**项目启动时的疫苗**——在投入大量工程资源前验证方向。 |
 | **为什么不是 P0** | 对已有明确需求的工程任务价值有限，不是每次编码都需要。 |
 | **集成建议** | 新增可选 `ys-office-hours` command，提取 6 个核心问题的精简版（~150 行 prompt）。不纳入默认 workflow，由用户按需调用。 |

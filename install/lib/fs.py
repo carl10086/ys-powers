@@ -45,16 +45,12 @@ def cleanup_stale_files(project_root: Path, source_name: str, target_dir: Path) 
 
         stale_file = target_dir / old_name
         try:
-            # 先尝试 unlink（安全处理文件和 symlink 本身，不跟随 symlink）
-            stale_file.unlink()
-            print(f"  清理 stale 文件: {old_name}")
-        except IsADirectoryError:
-            # 是目录，递归删除
-            try:
+            if stale_file.is_dir() and not stale_file.is_symlink():
                 shutil.rmtree(stale_file)
                 print(f"  清理 stale 目录: {old_name}")
-            except OSError as e:
-                print(f"  错误: 无法删除 {old_name}: {e}", file=sys.stderr)
+            else:
+                stale_file.unlink()
+                print(f"  清理 stale 文件: {old_name}")
         except FileNotFoundError:
             pass
         except OSError as e:
@@ -207,9 +203,8 @@ def install_directory(
         print(f"  源路径: {source_dir}", file=sys.stderr)
         return False
 
-    # file 策略下：先清理 stale 文件，再执行覆盖
-    if strategy == "file":
-        cleanup_stale_files(project_root, source_name, target_subdir)
+    # 清理 stale 文件，再执行覆盖；folder 策略也需要清理已从源目录删除的子项。
+    cleanup_stale_files(project_root, source_name, target_subdir)
 
     # 收集变更（在安装前，基于当前源和目标状态）
     changes = _collect_changes(source_dir, target_subdir)
