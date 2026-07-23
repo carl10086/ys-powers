@@ -160,7 +160,7 @@ digraph analysis_flow {
 <NN>-<skill-name>-analysis.md
 ```
 
-示例：`07-brainstorming-skill.md`
+示例：`07-skill-workflow-analysis.md`
 
 **强制要求。** 仅聊天输出是不够的。
 

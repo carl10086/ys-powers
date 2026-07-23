@@ -458,7 +458,7 @@ v1 已经把并行 fan-out 讲得很清楚, 这里只补充一句**设计动机*
 主干之外还有一组工具型 command, 大多属于 **embedded-workflow**(流程写在 command 本体, 不显式委托 skill), 按场景随调随用:
 
 - **重构与简化**
-  - **`/refactor`**: 先 `brainstorming` 出方案, 再用 TDD 守住行为, 在不破坏行为的前提下消除 code smell
+  - **`/refactor`**: 先输出重构方案并获批准, 再用 TDD 守住行为, 在不破坏行为的前提下消除 code smell
   - **`/code-simplify`** → `code-simplification`: 降低复杂度, 不改行为
 - **Git 与版本**
   - **`/gc`**: 完整 Git 工作流 — 分支 / 提交 / 推送 / PR 一步完成

@@ -107,7 +107,6 @@ flowchart LR
         simplify["code-simplification"]
         shipping["shipping-and-launch"]
         writing["writing-skills"]
-        brainstorming["brainstorming"]
         debug["debugging-and-error-recovery"]
         sec["security-and-hardening"]
         perf["performance-optimization"]
@@ -133,7 +132,6 @@ flowchart LR
     ship --> shipping
     wskill --> explore
     wskill --> writing
-    refactor --> brainstorming
     refactor --> tdd
     build -. fallback .-> debug
 
@@ -172,8 +170,6 @@ flowchart LR
         api["api-and-interface-design"]
         migration["deprecation-and-migration"]
         writing["writing-skills"]
-        brainstorming["brainstorming"]
-        missing["writing-plans\nmissing"]
     end
 
     using -. discovers .-> discoverySet
@@ -190,7 +186,6 @@ flowchart LR
     cicd -. fallback .-> debug
     api -. references .-> migration
     writing -. required-background .-> tdd
-    brainstorming -. unresolved .-> missing
 ```
 
 注意：这两张图都不是“所有可能使用顺序”。它们只表达源文件中明确出现的关系。没有出现在图里的 skill，不代表不重要，只代表当前源文件里没有明确的跨 skill 关系需要放入图中。
@@ -213,7 +208,7 @@ flowchart LR
 | `/code-simplify` | 单 skill 委托型 | `code-simplification` |
 | `/ship` | skill 委托型 + agent fan-out | `shipping-and-launch`; 并行编排 3 个 agents |
 | `/wskill` | 多 skill 串联型 | `explore-then-ask`, `writing-skills` |
-| `/refactor` | 多 skill 串联型 | `brainstorming`, `test-driven-development` |
+| `/refactor` | 单 skill 委托型 + 自包含方案设计 gate | `test-driven-development` |
 | `/doc-codebase` | embedded-workflow | 无显式 skill 依赖 |
 | `/easy-analysis` | embedded-workflow | 无显式 skill 依赖 |
 | `/gc` | embedded-workflow | 无显式 skill 依赖 |
@@ -340,16 +335,15 @@ flowchart LR
 
 ### 4.10 `/refactor`
 
-类型：多 skill 串联型 command。
+类型：自包含方案设计 gate + skill 委托型 command。
 
 直接关系：
 
-- `requires` `brainstorming`
 - `uses` `test-driven-development`
 
 说明：
 
-`/refactor` 的 hard gate 明确要求先调用 `brainstorming` 做重构方案设计，然后执行阶段严格遵循 TDD。这里 `brainstorming` 是前置强关系，`test-driven-development` 是执行阶段强关系。
+`/refactor` 的 hard gate 要求先分析目标代码、调用方、测试覆盖和 code smells，输出重构方案并获得用户批准。执行阶段严格遵循 TDD。方案设计逻辑保留在 command 内部，不再依赖单独的设计 skill。
 
 ### 4.11 Embedded-workflow commands
 
@@ -432,23 +426,8 @@ flowchart LR
 
 这里是实现阶段衔接关系，不是 spec 阶段内部的直接调用。
 
-### 5.4 `brainstorming`
 
-类型：设计澄清与方案形成 skill。
-
-关系：
-
-- `unresolved-reference` `writing-plans`
-
-理由：
-
-`brainstorming` 的流程中写到：用户批准 spec 后 invoke `writing-plans` skill 创建实现计划。但当前 `skills/` 源目录中没有 `writing-plans`。因此只能记录为 unresolved reference，不能画成有效依赖。
-
-维护建议：
-
-如果未来补充 `skills/writing-plans/SKILL.md`，应把这条关系从 unresolved 改成明确的 `follows` 或 `invokes`，并重新检查 `/plan` 与 `planning-and-task-breakdown` 的边界是否重叠。
-
-### 5.5 `test-driven-development`
+### 5.4 `test-driven-development`
 
 类型：测试与验证方法论 skill。
 
@@ -462,7 +441,7 @@ flowchart LR
 
 这是浏览器场景下的补充验证关系，不是所有 TDD 场景的强制关系。
 
-### 5.6 `code-review-and-quality`
+### 5.5 `code-review-and-quality`
 
 类型：五维 code review skill。
 
@@ -477,7 +456,7 @@ flowchart LR
 
 这两条是专项深入关系。review 主 skill 仍然是 `code-review-and-quality`。
 
-### 5.7 `incremental-implementation`
+### 5.6 `incremental-implementation`
 
 类型：增量实现 skill。
 
@@ -491,7 +470,7 @@ flowchart LR
 
 这是提交实践引用，不是实现流程的前置依赖。
 
-### 5.8 `git-workflow-and-versioning`
+### 5.7 `git-workflow-and-versioning`
 
 类型：git 工作流 skill。
 
@@ -505,7 +484,7 @@ flowchart LR
 
 这是 reviewability 相关的引用关系。
 
-### 5.9 `ci-cd-and-automation`
+### 5.8 `ci-cd-and-automation`
 
 类型：CI/CD 自动化 skill。
 
@@ -519,7 +498,7 @@ flowchart LR
 
 这是失败路径关系，不属于正常 CI 配置主路径。
 
-### 5.10 `api-and-interface-design`
+### 5.9 `api-and-interface-design`
 
 类型：API 与模块边界设计 skill。
 
@@ -531,7 +510,7 @@ flowchart LR
 
 `api-and-interface-design` 在接口演进和兼容性语境中提到 deprecation / migration planning。这里是设计时的迁移参考关系，不代表每次 API 设计都必须进入迁移流程。
 
-### 5.11 `writing-skills`
+### 5.10 `writing-skills`
 
 类型：skill 编写 skill。
 
@@ -543,7 +522,7 @@ flowchart LR
 
 `writing-skills` 明确写到：必须理解 `superpowers:test-driven-development`，因为它把 RED-GREEN-REFACTOR 应用到 skill 文档测试。当前仓库也有 `test-driven-development` skill，但原文使用的是 `superpowers:` 前缀，因此这里记录为方法论背景关系，而不是本地强调用。
 
-### 5.12 当前没有明确对外 skill 关系的 skills
+### 5.11 当前没有明确对外 skill 关系的 skills
 
 以下 skills 当前没有作为 source 进入 `Skill -> Skill` 主线，不代表不重要，只代表源文件中没有明确的对外 skill 关系需要记录：
 
@@ -645,7 +624,7 @@ Command = the when
 | `/code-simplify` | `code-simplification` |
 | `/ship` | `shipping-and-launch`; orchestrates agents |
 | `/wskill` | `explore-then-ask`, `writing-skills` |
-| `/refactor` | `brainstorming`, `test-driven-development` |
+| `/refactor` | `test-driven-development` |
 
 ### 8.2 Skill 查 Command
 
@@ -664,7 +643,6 @@ Command = the when
 | `code-simplification` | `/code-simplify` |
 | `shipping-and-launch` | `/ship` |
 | `writing-skills` | `/wskill` |
-| `brainstorming` | `/refactor` |
 
 ### 8.3 Skill 查 Skill
 
@@ -675,7 +653,6 @@ Command = the when
 | `spec-driven-development` | `incremental-implementation` | `follows` |
 | `spec-driven-development` | `test-driven-development` | `follows` |
 | `spec-driven-development` | `context-engineering` | `recommends` |
-| `brainstorming` | `writing-plans` | `unresolved-reference` |
 | `test-driven-development` | `browser-testing-with-devtools` | `recommends` |
 | `code-review-and-quality` | `security-and-hardening` | `recommends` |
 | `code-review-and-quality` | `performance-optimization` | `recommends` |

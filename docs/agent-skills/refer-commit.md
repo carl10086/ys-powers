@@ -237,7 +237,7 @@
   - `idea-refine.sh` 可执行位 → 已在 refer commit `079913a` 中修复，ys-powers 同步对应文件即可（一次性 chmod）
 
 - **待定**：
-  - `observability-and-instrumentation` skill 是否引入 ys-powers → 需用户决策。引入会扩 ys-powers skill 数至 30+；不引入则依赖 `using-agent-skills` 决策树指向 refer 即可（与 `brainstorming` / `sop-search` / `writing-skills` 现状一致）
+  - `observability-and-instrumentation` skill 是否引入 ys-powers → 需用户决策。引入会扩 ys-powers skill 数至 30+；不引入则依赖 `using-agent-skills` 决策树指向 refer 即可（与 `sop-search` / `writing-skills` 现状一致）
   - `webperf` command + `web-performance-auditor` agent 是否引入 → 需用户决策。ys-powers 当前没有 agent 子目录惯例，需先决定是否建立 `agents/` 模式
   - `definition-of-done.md` 引入位置 → `references/` 还是 `skills/`？前者更轻量、后者更易被 skill 触发发现
 

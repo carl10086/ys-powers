@@ -21,8 +21,8 @@
 | 阶段 | 触发 Skill | 产出 | 下一步 |
 |---|---|---|---|
 | 启动/自检 | `using-superpowers` | 识别并激活适用的 skill | 视任务而定 |
-| 工作区隔离 | `using-git-worktrees` | 干净的独立工作区 | `brainstorming` / `writing-plans` / `executing-plans` |
-| 意图澄清 | `brainstorming` | 经批准的 design spec | `writing-plans` |
+| 工作区隔离 | `using-git-worktrees` | 干净的独立工作区 | `writing-plans` / `executing-plans` |
+| 意图澄清 | `explore-then-ask` / `spec-driven-development` | 经批准的 design spec | `planning-and-task-breakdown` |
 | 计划制定 | `writing-plans` | 可执行的 implementation plan | `subagent-driven-development` 或 `executing-plans` |
 | 任务实现 | `subagent-driven-development` / `executing-plans` | 逐个完成并验证的任务 | `requesting-code-review`（最终审查） |
 | 分支收尾 | `finishing-a-development-branch` | 合并/PR/清理 | — |
@@ -38,13 +38,12 @@
 
 ---
 
-## Skill 清单（13 个）
+## Skill 清单（12 个）
 
 | Skill | 一句话定位 | 典型触发 |
 |---|---|---|
 | `using-superpowers` | 会话启动器：行动前必须先调用相关 skill | 任何对话/任务开始时 |
 | `using-git-worktrees` | 确保功能工作发生在隔离工作区 | 开始新功能、执行 plan 前 |
-| `brainstorming` | 把模糊想法聊成经批准的设计/spec | 任何创造性工作之前 |
 | `writing-plans` | 把 spec 拆成极细粒度、可执行的计划 | 有 spec 的多步任务，动手前 |
 | `executing-plans` | 在独立会话中按检查点执行计划 | 有 plan，无 subagent 或需另开会话 |
 | `subagent-driven-development` | 同会话内用子 agent 逐任务实现计划 | 任务相对独立、在当前会话执行 |
@@ -82,7 +81,6 @@ docs/superpowers/
 └── skills/
     ├── using-superpowers.md
     ├── using-git-worktrees.md
-    ├── brainstorming.md
     ├── writing-plans.md
     ├── executing-plans.md
     ├── subagent-driven-development.md

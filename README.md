@@ -133,7 +133,6 @@ flowchart LR
         codesimp["code-simplification"]
         shipping["shipping-and-launch"]
         writing["writing-skills"]
-        brainstorm["brainstorming"]
         debug["debugging-and-error-recovery"]
     end
 
@@ -151,7 +150,6 @@ flowchart LR
     ship --> shipping
     wskill --> explore
     wskill --> writing
-    refactor --> brainstorm
     refactor --> tdd
 ```
 
@@ -183,7 +181,7 @@ flowchart LR
 
 在对应场景自动应用：
 
-**构思与规划** — `idea-refine` · `explore-then-ask` · `spec-driven-development` · `planning-and-task-breakdown` · `brainstorming`
+**构思与规划** — `idea-refine` · `explore-then-ask` · `spec-driven-development` · `planning-and-task-breakdown`
 
 **构建** — `incremental-implementation` · `frontend-ui-engineering` · `api-and-interface-design`
 
