@@ -16,6 +16,9 @@ CLARIFY ──→ SPECIFY ──→ [REVIEW] ──→ [PLAN] ──→ BUILD �
  intent     spec         spec         plan       + tests    TDD /      code       ship
                                                   per task   bug
                                                              repro
+
+fast path（用户明确选择跳过 SPECIFY / PLAN 时）：
+CLARIFY ──→ 直接实现 ──→ REVIEW ──→ SHIP
 ```
 
 - **CLARIFY**（本命令）：产出确认的 intent 陈述。
@@ -93,7 +96,16 @@ CLARIFY ──→ SPECIFY ──→ [REVIEW] ──→ [PLAN] ──→ BUILD �
 
 如果发现冲突，把冲突点作为补充问题抛回给用户，重新确认后再进入下一步。
 
-## Phase 4: 保存意图文档（可选）
+## Phase 4: 出口路由
+
+路由完全由用户决定，不评估、不推荐：
+
+1. 用户已明确要求直接实现（"直接开干"、"不用写 spec"、"快速实现" 等）→ 免问，走 fast path
+2. 否则，问一句：「接下来走 fast path 还是 `/spec`？」等用户回答后再继续
+
+fast path → 本命令结束，本会话直接实现（不调 `/build`，照常写测试并跑全量测试）；`/spec` → 继续 Phase 5。
+
+## Phase 5: 保存意图文档（可选）
 
 如果用户希望持久化或交接，询问是否保存到：
 
@@ -103,7 +115,7 @@ docs/ys-powers/intent/<topic>.md
 
 其中 `<topic>` 优先使用用户传入的 `[topic]` 参数；若未传，则从确认意图中提炼 kebab-case 短名。仅当用户明确确认后才保存。
 
-## Phase 5: 沉淀到领域语言（可选追加）
+## Phase 6: 沉淀到领域语言（可选追加）
 
 intent 文档保存之后，若意图满足以下任一条件，询问用户是否叠加 `/domain-modeling`：
 
