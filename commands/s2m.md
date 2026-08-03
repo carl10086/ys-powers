@@ -1,6 +1,7 @@
 ---
 name: switch-to-main
 description: Use when working in a git worktree and need to return to main branch, update it, and clean up the worktree environment
+disable-model-invocation: true
 ---
 
 # Switch to Main

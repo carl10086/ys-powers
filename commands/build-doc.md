@@ -1,5 +1,6 @@
 ---
 description: Implements the next documentation task incrementally — draft, review against style guide, verify, save. Use when writing or updating technical documentation, user guides, API docs, or any Markdown documents following a spec/plan workflow.
+disable-model-invocation: true
 ---
 
 ## Workflow

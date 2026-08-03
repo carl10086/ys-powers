@@ -1,5 +1,6 @@
 ---
 description: Start spec-driven development — load confirmed intent, discuss implementation design, prepare workspace, then write spec
+disable-model-invocation: true
 ---
 
 ## Phase 1: Load Intent and Design Dialogue

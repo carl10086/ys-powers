@@ -1,6 +1,7 @@
 ---
 name: doc-codebase
 description: 分析项目代码库架构并生成 ARCHITECTURE.md 到 docs/codebase/，用于项目 onboarding、重构前了解现状、或更新过期架构文档
+disable-model-invocation: true
 ---
 
 # 代码库架构映射

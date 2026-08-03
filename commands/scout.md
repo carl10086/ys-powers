@@ -1,5 +1,6 @@
 ---
 description: 多渠道并行信息探索。输入查询后，自动拆解角度、分配精准渠道（Context7、OpenCLI browser、Chrome DevTools、GitHub）、并行派遣 sub-agent、汇总结果。不使用 WebSearch。
+disable-model-invocation: true
 ---
 
 # Scout

@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Easy Analysis
 
 ## 概述

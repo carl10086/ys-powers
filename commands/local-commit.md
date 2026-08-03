@@ -1,6 +1,7 @@
 ---
 name: local-commit
 description: 本地项目极简提交：暂存、生成 message、确认、一步完成
+disable-model-invocation: true
 ---
 
 ## 安全红线

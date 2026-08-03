@@ -1,6 +1,7 @@
 ---
 name: create-guide
 description: Use when the user asks to understand code, create a learning guide, write examples for understanding, or says a module feels like "someone else's code" they need to internalize. Also triggers when the user asks for usage examples, documentation for comprehension, or runnable tutorials for a codebase module.
+disable-model-invocation: true
 ---
 
 # Create Guide

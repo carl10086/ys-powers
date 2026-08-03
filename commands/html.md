@@ -1,5 +1,6 @@
 ---
 description: Convert any input into a polished HTML page using the html-generator subagent
+disable-model-invocation: true
 ---
 
 Invoke the html-generator agent via subagent to generate a polished HTML page from the user's input.

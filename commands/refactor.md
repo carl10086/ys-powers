@@ -1,6 +1,7 @@
 ---
 name: refactoring
 description: 代码重构专家。识别 code smells，应用标准重构手法，在保持行为不变的前提下改进代码结构。
+disable-model-invocation: true
 ---
 
 # 重构

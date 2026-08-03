@@ -1,5 +1,6 @@
 ---
 description: Manage zsh aliases with conflict checking and Markdown help docs
+disable-model-invocation: true
 ---
 
 Help the user create or manage zsh aliases for a specific tool/topic.
