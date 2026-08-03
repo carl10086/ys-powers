@@ -85,7 +85,7 @@ agents/README.md
 flowchart LR
     subgraph Commands["commands: 用户入口 / 工作流编排"]
         spec["/spec"]
-        plan["/plan"]
+        ysPlan["/ys-plan"]
         build["/build"]
         test["/test"]
         ysReview["/ys-review"]
@@ -120,7 +120,7 @@ flowchart LR
 
     spec --> explore
     spec --> specdev
-    plan --> planning
+    ysPlan --> planning
     build --> incremental
     build --> tdd
     test --> tdd
@@ -201,7 +201,7 @@ flowchart LR
 | Command | 类型 | 直接关系 |
 |---------|------|----------|
 | `/spec` | 多 skill 串联型 | `explore-then-ask`, `spec-driven-development` |
-| `/plan` | 单 skill 委托型 | `planning-and-task-breakdown` |
+| `/ys-plan` | 单 skill 委托型 | `planning-and-task-breakdown` |
 | `/build` | 多 skill 组合型 | `incremental-implementation`, `test-driven-development`; 失败时 `debugging-and-error-recovery` |
 | `/test` | 多 skill 组合型 | `test-driven-development`; 浏览器相关时 `browser-testing-with-devtools` |
 | `/ys-review` | 单 skill 委托型 + 审查维度建议 | `code-review-and-quality`; 安全 / 性能维度提到 `security-and-hardening`, `performance-optimization` |
@@ -236,7 +236,7 @@ flowchart LR
 
 如果以后 `/spec` 增加 plan 或 build 阶段，不应直接把后续阶段画进 `/spec` 的强依赖，除非 command 源文件明确要求 invoke 对应 skill。
 
-### 4.3 `/plan`
+### 4.3 `/ys-plan`
 
 类型：单 skill 委托型 command。
 
@@ -246,7 +246,7 @@ flowchart LR
 
 说明：
 
-`/plan` 的核心流程在 `planning-and-task-breakdown` 中。command 自身主要负责读取 spec、进入 plan mode、确认保存路径等命令级约束。
+`/ys-plan` 的核心流程在 `planning-and-task-breakdown` 中。command 自身主要负责读取 spec、进入 plan mode、确认保存路径等命令级约束。
 
 ### 4.4 `/build`
 
@@ -618,7 +618,7 @@ Command = the when
 | Command | Direct Skills |
 |---------|---------------|
 | `/spec` | `explore-then-ask`, `spec-driven-development` |
-| `/plan` | `planning-and-task-breakdown` |
+| `/ys-plan` | `planning-and-task-breakdown` |
 | `/build` | `incremental-implementation`, `test-driven-development`, fallback `debugging-and-error-recovery` |
 | `/test` | `test-driven-development`, conditional `browser-testing-with-devtools` |
 | `/ys-review` | `code-review-and-quality`, recommends `security-and-hardening`, `performance-optimization` |
@@ -633,7 +633,7 @@ Command = the when
 |-------|-----------------|
 | `explore-then-ask` | `/spec`, `/wskill` |
 | `spec-driven-development` | `/spec` |
-| `planning-and-task-breakdown` | `/plan` |
+| `planning-and-task-breakdown` | `/ys-plan` |
 | `incremental-implementation` | `/build` |
 | `test-driven-development` | `/build`, `/test`, `/refactor` |
 | `debugging-and-error-recovery` | `/build` fallback |

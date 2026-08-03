@@ -193,7 +193,7 @@ Run /spec
     └── Invoke skills/spec-driven-development/SKILL.md to write a structured spec
     |
     v
-Run /plan
+Run /ys-plan
     ├── Read spec
     ├── Map file structure
     ├── Decompose into dependency-ordered tasks with acceptance criteria
@@ -331,7 +331,7 @@ Keep all references one level deep from SKILL.md. Never nest references: `SKILL.
 | Entry Point | File | Purpose |
 |-------------|------|---------|
 | Spec phase | `commands/spec.md` | Clarify requirements and write the structured spec |
-| Planning phase | `commands/plan.md` | After spec, before code |
+| Planning phase | `commands/ys-plan.md` | After spec, before code |
 | Execution phase | `skills/subagent-driven-development/SKILL.md` | Same-session task execution |
 | Alternative execution | `skills/executing-plans/SKILL.md` | Separate-session execution |
 | Debugging | `skills/systematic-debugging/SKILL.md` | Any bug or unexpected behavior |

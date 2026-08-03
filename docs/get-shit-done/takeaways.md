@@ -135,7 +135,7 @@
 
 | Agent | 用途 | 触发场景 |
 |-------|------|----------|
-| `plan-checker` | 验证 plan 的可执行性 | `/plan` 完成后自动执行 |
+| `plan-checker` | 验证 plan 的可执行性 | `/ys-plan` 完成后自动执行 |
 | `spec-reviewer` | 评审 spec 的完整性 | `/spec` 完成后可选执行 |
 | `debugger` | 系统化的调试流程 | `/build` 失败时自动触发 |
 | `context-engineer` | 优化上下文加载 | 大项目操作时建议 |
@@ -206,7 +206,7 @@
 - Gemini CLI（如果已安装）
 - Codex CLI（如果已安装）
 
-输出：REVIEWS.md，可被 `/plan --reviews` 消费
+输出：REVIEWS.md，可被 `/ys-plan --reviews` 消费
 ```
 
 **实施方式**：

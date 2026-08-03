@@ -12,7 +12,7 @@
 |------|---------------|-----------|----------|
 | 项目初始化 | `/gsd-new-project` | 无 | GSD 有完整的项目脚手架，ys-powers 假设项目已存在 |
 | 需求澄清 | `/gsd-discuss-phase`, `/gsd-spec-phase` | `/spec` | 两者都有 spec 驱动，但 GSD 多了 Socratic 问答 + 模糊度评分 |
-| 规划 | `/gsd-plan-phase` | `/plan` | GSD 有内置研究 Agent 和验证循环；ys-powers 更轻量 |
+| 规划 | `/gsd-plan-phase` | `/ys-plan` | GSD 有内置研究 Agent 和验证循环；ys-powers 更轻量 |
 | 执行 | `/gsd-execute-phase` | `/build` | GSD 有 wave 并行；ys-powers 是单线程增量实现 |
 | 验证 | `/gsd-verify-work` | `/test` | GSD 是对话式 UAT；ys-powers 是 TDD 技能调用 |
 | 交付 | `/gsd-ship` | `/ship` | 两者都有 fan-out 评审，但 GSD 还管 PR 创建和合并追踪 |

@@ -66,7 +66,7 @@ Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项�
 |-----------|---------|
 | 意图还不清楚，想先聊明白 | `/clarify-intent` |
 | 有一个模糊想法，想梳理成设计 | `/spec` → `explore-then-ask`、`spec-driven-development` |
-| 需求已明确，要拆任务 | `/plan` |
+| 需求已明确，要拆任务 | `/ys-plan` |
 | 写代码/改逻辑 | `/build`（增量实现）或 `/refactor`（重构） |
 | 写 UI/前端 | `frontend-ui-engineering` [skill] 自动触发 |
 | 修 bug | `/test`（先写重现测试）→ `/build` |
@@ -83,7 +83,7 @@ Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项�
 ```mermaid
 flowchart LR
     A[/clarify-intent<br/>澄清/] --> B[/spec<br/>构思/]
-    B --> C[/plan<br/>规划/]
+    B --> C[/ys-plan<br/>规划/]
     C --> D[/build<br/>构建/]
     D --> E[/ys-review<br/>审查/]
     E --> F[/ship<br/>交付/]
@@ -98,7 +98,7 @@ flowchart LR
 **主线**（实线）：澄清 → 构思 → 规划 → 构建 → 审查 → 交付  
 **支撑**（虚线）：构建、审查、交付阶段按需触发的横向能力，非强制步骤
 
-**可选步骤**：`/review-spec`（spec 质量审查）、`/plan`（小改动可跳过）、`/test`（bug 修复或显式 TDD 时单独调用）详见 `commands/clarify-intent.md`。
+**可选步骤**：`/review-spec`（spec 质量审查）、`/ys-plan`（小改动可跳过）、`/test`（bug 修复或显式 TDD 时单独调用）详见 `commands/clarify-intent.md`。
 
 ## 简化依赖关系
 
@@ -109,7 +109,7 @@ flowchart LR
     subgraph Commands["显式 commands"]
         clarify["/clarify-intent"]
         spec["/spec"]
-        plan["/plan"]
+        ysPlan["/ys-plan"]
         build["/build"]
         test["/test"]
         review["/ys-review"]
@@ -139,7 +139,7 @@ flowchart LR
     clarify --> interview
     spec --> explore
     spec --> specdev
-    plan --> planning
+    ysPlan --> planning
     build --> incremental
     build --> tdd
     build -.失败时.-> debug
@@ -159,7 +159,7 @@ flowchart LR
 
 | 类型 | 数量 | 调用方式 | 核心代表 |
 |------|------|----------|----------|
-| 显式命令 | 25 | 直接输入 `/command` | `/clarify-intent` `/spec` `/plan` `/build` |
+| 显式命令 | 25 | 直接输入 `/command` | `/clarify-intent` `/spec` `/ys-plan` `/build` |
 | 行为技能 | 25 | 场景自动触发 | `idea-refine` `test-driven-development` |
 | 子智能体 | 3 | 自动指派 | `code-reviewer` |
 | 编码规范 | 1 | 自动生效 | `code.md` |
@@ -171,7 +171,7 @@ flowchart LR
 | 阶段 | 命令 |
 |------|------|
 | 意图澄清 | `/clarify-intent` |
-| 构思与规划 | `/spec` `/plan` |
+| 构思与规划 | `/spec` `/ys-plan` |
 | 构建与验证 | `/build` `/test` |
 | 审查与优化 | `/ys-review` `/refactor` `/code-simplify` |
 | 交付与提交 | `/ship` `/gc` `/local-commit` |
@@ -229,7 +229,7 @@ ys-powers/
 /spec
 
 # 2. 拆任务（小改动可跳过）
-/plan
+/ys-plan
 
 # 3. 逐个实现
 /build

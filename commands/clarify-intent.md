@@ -25,7 +25,7 @@ CLARIFY ──→ 直接实现 ──→ REVIEW ──→ SHIP
 - **CLARIFY**（本命令）：产出确认的 intent 陈述。
 - **SPECIFY**：`/spec`，写结构化设计文档。
 - **[REVIEW]**：可选 `/review-spec`，对 spec 做六维度质量审查。
-- **[PLAN]**：可选 `/plan`，把 spec 拆成可执行任务。小改动可在 spec 中直接带过。
+- **[PLAN]**：可选 `/ys-plan`，把 spec 拆成可执行任务。小改动可在 spec 中直接带过。
 - **BUILD**：`/build`，按任务逐个实现；每个任务内部已经走「写测试 → 实现 → 跑全量测试」的循环。
 - **[TEST]**：可选 `/test`，仅在以下情况单独调用：修 bug 时先写失败测试（Prove-It 模式）、需要专门补全边界/异常/并发测试、用户明确要求显式 TDD。
 - **REVIEW**：`/ys-review`，五维度代码审查。

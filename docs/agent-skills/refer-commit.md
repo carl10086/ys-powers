@@ -132,7 +132,7 @@
   - `code-review-and-quality` 的「Upgrading an existing dependency」子节 → 写入 `ys-powers/skills/code-review-and-quality/SKILL.md`（含 5 纪律 + 2 反模式 + 2 红旗 + Verification 增加 1 条）
   - `git-workflow-and-versioning` 的「Release & Versioning」章节 → 写入 `ys-powers/skills/git-workflow-and-versioning/SKILL.md`（ys-powers 当前完全缺失此能力）；同步 frontmatter description 触发词
   - `frontend-ui-engineering` / `performance-optimization` 的 frontmatter 触发词收紧 → 写入对应 SKILL.md
-  - `planning-and-task-breakdown` / `spec-driven-development` 的 `tasks/plan.md` / `tasks/todo.md` 输出约定 → 写入对应 SKILL.md，并核对 ys-powers 的 `/plan` 命令当前是否真的写到 `tasks/plan.md`（当前 grep 显示无此约定，需决策）
+  - `planning-and-task-breakdown` / `spec-driven-development` 的 `tasks/plan.md` / `tasks/todo.md` 输出约定 → 写入对应 SKILL.md，并核对 ys-powers 的 `/ys-plan` 命令当前是否真的写到 `tasks/plan.md`（当前 grep 显示无此约定，需决策）
 
 - **暂不同步**：
   - `evals/` + `scripts/run-evals.js` —— refer 24-skill 三层级 eval 框架；ys-powers 自身 skill ~30，触发词与路由语义不同，全盘移植工作量大；可参考框架思想但独立构建
@@ -151,7 +151,7 @@
 
 - **待定**：
   - **是否引入 evals 框架**：ys-powers skill ~30，写 30 个 routing case + 配 eval runner 是中型工程。引入会让 quality gate 更扎实；不引入则保留当前 manual review。可在 `/wskill` 或 `using-agent-skills` 升级时一并决策
-  - **`tasks/plan.md` 输出约定是否在 ys-powers /plan 命令中落地**：refer 已统一为 `tasks/plan.md` + `tasks/todo.md`，ys-powers 当前 `/plan` 命令（`commands/plan.md`）未规定此路径。需核对：是否同步约定，或保留 ys-powers 自身惯例
+  - **`tasks/plan.md` 输出约定是否在 ys-powers /ys-plan 命令中落地**：refer 已统一为 `tasks/plan.md` + `tasks/todo.md`，ys-powers 当前 `/ys-plan` 命令（`commands/ys-plan.md`）未规定此路径。需核对：是否同步约定，或保留 ys-powers 自身惯例
   - **refer `references/security-checklist.md` 与 ys-powers `references/security-checklist.md` 的同步策略**：两个项目各自维护同名 checklist，本次 refer 大幅扩充 manager 矩阵与 install-script gate。ys-powers 端应优先采用 refer 端方法论，但 checklist 形式可独立维护
 
 #### TODO
@@ -162,7 +162,7 @@
 - [ ] 同步 `code-review-and-quality`：Upgrading an existing dependency 子节（5 纪律 + 2 反模式 + 2 红旗 + Verification）
 - [ ] 同步 `git-workflow-and-versioning`：Release & Versioning 章节（SemVer / tag / changelog）+ frontmatter 触发词
 - [ ] 同步 `frontend-ui-engineering` / `performance-optimization` 的 frontmatter 触发词
-- [ ] 决策：`tasks/plan.md` / `tasks/todo.md` 输出约定是否在 `/plan` 命令落地；若是，修改 `commands/plan.md` 与 `/build` 期望路径
+- [ ] 决策：`tasks/plan.md` / `tasks/todo.md` 输出约定是否在 `/ys-plan` 命令落地；若是，修改 `commands/ys-plan.md` 与 `/build` 期望路径
 - [ ] 决策：是否引入三层级 evals 框架（参考 `refer/evals/` 与 `scripts/run-evals.js`）
 - [ ] 决策：`references/security-checklist.md` 是直接同步 refer 内容，还是仅对齐方法论、独立维护 checklist
 
