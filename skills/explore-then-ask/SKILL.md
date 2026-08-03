@@ -1,15 +1,17 @@
 ---
 name: explore-then-ask
-description: Explore project context and clarify requirements through structured dialogue. A self-contained behavioral skill for context-first design clarification — primarily dialogue; no browser, no implementation handoff. May write to a user-specified document path.
+description: Explore project context and turn confirmed requirements into an approved design through structured dialogue — propose approaches with trade-offs, present design sections. No requirement re-clarification; no implementation handoff. May write to a user-specified document path.
 ---
 
 # Explore Then Ask
 
 ## Overview
 
-Turn vague ideas into clarified designs through natural collaborative dialogue.
+Turn confirmed requirements into an approved design through natural collaborative dialogue.
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present 2-3 approaches with trade-offs, then present the design in sections and get user approval.
+Start from a confirmed intent (typically produced by `/clarify-intent`). Understand the current project context, propose 2-3 approaches with trade-offs, then present the design in sections and get user approval.
+
+需求还没确认（要什么、为什么、验收标准不清楚）→ 停止并告知用户：需求未确认，请先运行 `/clarify-intent`。
 
 This skill is primarily dialogue-based. It does NOT invoke other skills or hand off to implementation. It ends when the user approves the design direction. Writing to a user-specified document path is the only allowed file-writing case.
 
@@ -38,10 +40,8 @@ Complete these in order:
 2. **Explore project context** — check files, docs, recent commits
    - If `CONTEXT.md` exists at the project root, read it for established domain terminology
    - If `docs/adr/` exists, scan recent ADRs to respect prior architectural decisions
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-   - Challenge fuzzy language and invent edge-case scenarios as terms are discussed, but do not write files or invoke other skills
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — in sections scaled to their complexity, get user approval after each section
+3. **Propose 2-3 approaches** — with trade-offs and your recommendation
+4. **Present design** — in sections scaled to their complexity, get user approval after each section
 
 ## Process Flow
 
@@ -50,9 +50,6 @@ Search Historical SOPs
         |
         v
 Explore project context
-        |
-        v
-Ask clarifying questions (one at a time)
         |
         v
 Propose 2-3 approaches (with trade-offs)
@@ -85,8 +82,8 @@ This step is unconditional. Even if the project has few SOPs, executing this que
 Check out the current project state (files, docs, recent commits), incorporating any SOP insights discovered in Step 1.
 
 - Do this silently — don't dump file listings unless something is unclear
-- Before asking detailed questions, assess scope: if the request describes multiple independent subsystems, flag this immediately and help decompose
-- If the project is too large, help the user decompose into sub-projects, then explore-and-clarify the first one
+- Before proposing approaches, assess scope: if the request describes multiple independent subsystems, flag this immediately and help decompose
+- If the project is too large, help the user decompose into sub-projects, then explore-and-design the first one
 
 **Surface assumptions immediately** after exploring:
 
@@ -97,24 +94,15 @@ Check out the current project state (files, docs, recent commits), incorporating
 → 有不对的地方请现在纠正，否则我将基于这些假设继续。
 ```
 
-### 3. Ask Clarifying Questions
+### 3. Propose 2-3 Approaches
 
-Ask questions **one at a time** to refine the idea.
-
-- Prefer multiple choice questions when possible
-- Only one question per message — if a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria
-- Continue until requirements are concrete
-
-### 4. Propose 2-3 Approaches
-
-Once you understand what you're building, propose different approaches with trade-offs.
+Based on the confirmed requirements, propose different approaches with trade-offs.
 
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 - Be ready to go back and clarify if something doesn't make sense
 
-### 5. Present Design
+### 4. Present Design
 
 Present the design in sections scaled to complexity.
 
