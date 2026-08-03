@@ -1,6 +1,7 @@
 ---
 name: SOP-ADD
 description: Extracts key information from current session history and generates structured SOP files. Use when a task is completed and the user wants to capture the experience for future reference, or when the user explicitly asks to "document this" or "save as SOP".
+disable-model-invocation: true
 ---
 
 # SOP-ADD

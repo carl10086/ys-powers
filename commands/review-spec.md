@@ -1,5 +1,6 @@
 ---
 description: Review and improve spec documents across six dimensions with 0-10 scoring, quality gate, and up to 3 review rounds
+disable-model-invocation: true
 ---
 
 ## Phase 1: Load Context

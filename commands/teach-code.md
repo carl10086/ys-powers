@@ -1,6 +1,7 @@
 ---
 name: teach-code
 description: "带你由浅入深理解任意代码模块的源码。先宏观再细节，AI 逐步讲解，用户随时追问或确认。"
+disable-model-invocation: true
 ---
 
 # teach-code

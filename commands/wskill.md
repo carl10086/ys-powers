@@ -1,6 +1,7 @@
 ---
 description: Use when creating or materially editing a skill with a predictable trigger, scope, and information hierarchy
 argument-hint: [skill-name-or-idea]
+disable-model-invocation: true
 ---
 
 # /wskill

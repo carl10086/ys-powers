@@ -1,6 +1,7 @@
 ---
 name: org-bookmarks
 description: Use when the user asks to organize, clean up, or restructure Chrome bookmarks, mentions duplicate bookmarks, mixed-up categories, or too many bookmarks without clear classification. Reorganizes by reading the Chrome Bookmarks JSON, reporting the current state and sync risk, clarifying the target structure through multi-turn dialogue, and generating a Netscape Bookmark HTML import file on the Desktop. Avoids editing the Bookmarks JSON directly because Chrome sync overwrites local changes.
+disable-model-invocation: true
 ---
 
 # Organizing Chrome Bookmarks

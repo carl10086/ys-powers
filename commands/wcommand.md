@@ -1,6 +1,7 @@
 ---
 description: Use when creating or materially editing a slash command with a focused workflow and predictable execution path
 argument-hint: [command-name-or-idea]
+disable-model-invocation: true
 ---
 
 # /wcommand

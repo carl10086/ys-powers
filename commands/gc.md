@@ -1,5 +1,6 @@
 ---
 description: Use when committing current workspace changes by creating a typed branch, committing, pushing, and outputting a PR/MR link
+disable-model-invocation: true
 ---
 
 ## 安全红线

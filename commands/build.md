@@ -1,5 +1,6 @@
 ---
 description: Implement the next task incrementally — build, test, verify, commit
+disable-model-invocation: true
 ---
 
 <HARD-RULE name="build-must-register-tasks-first">

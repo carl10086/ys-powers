@@ -1,6 +1,7 @@
 ---
 description: 先读项目上下文，再调用 interview-me 澄清真实意图，允许访谈中动态查询项目，输出确认的 intent
 argument-hint: [topic]
+disable-model-invocation: true
 ---
 
 ## 本命令在整体工作流中的位置
