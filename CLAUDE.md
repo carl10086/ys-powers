@@ -87,7 +87,8 @@ Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出
 ```json
 {
   "commands": {
-    "review.md": "ys-review.md"
+    "review.md": "ys-review.md",
+    "plan.md": "ys-plan.md"
   },
   "rules": {},
   "hooks": {},
@@ -112,3 +113,4 @@ Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出
 | 目录 | 旧文件名 | 新文件名 |
 |------|----------|----------|
 | commands | review.md | ys-review.md |
+| commands | plan.md | ys-plan.md |

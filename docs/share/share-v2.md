@@ -1,6 +1,6 @@
 # ys-powers: AI Coding 工作流增强(v2)
 
-> v2 主要变化: 把 `/clarify-intent` 提到流程首位, `/spec` 不再承担澄清职责, 标注 `/plan` `/test` 为可选, 新增 `/review-spec` 提及, 补全 HTML vs Markdown 一节.
+> v2 主要变化: 把 `/clarify-intent` 提到流程首位, `/spec` 不再承担澄清职责, 标注 `/ys-plan` `/test` 为可选, 新增 `/review-spec` 提及, 补全 HTML vs Markdown 一节.
 
 ## refer
 
@@ -76,7 +76,7 @@ Spec 编程的本质, 是把**传统工程的编程思想**和**个人操作习�
 flowchart LR
     A[/clarify-intent<br/>澄清/] --> B[/spec<br/>构思/]
     B --> C[/review-spec<br/>spec 质量/]
-    C --> D[/plan<br/>拆任务/]
+    C --> D[/ys-plan<br/>拆任务/]
     D --> E[/build<br/>构建/]
     E --> F[/ys-review<br/>审查/]
     F --> G[/ship<br/>交付/]
@@ -145,11 +145,11 @@ v1 把 `/test` 画在主干上, v2 改为可选. 原因是 `/build` 里每个 ta
 - **补全边界/异常/并发测试**: `/build` 写的是 happy path, 这些用例值得专项补
 - **用户明确要求显式 TDD**
 
-`/plan` 同理: 小改动直接在 spec 里列 acceptance criteria 就行, 单独拆 task 反而冗余. 大特性(spec 涉及多模块、跨多人)才走 `/plan`.
+`/ys-plan` 同理: 小改动直接在 spec 里列 acceptance criteria 就行, 单独拆 task 反而冗余. 大特性(spec 涉及多模块、跨多人)才走 `/ys-plan`.
 
-#### `/plan` 自动触发条件
+#### `/ys-plan` 自动触发条件
 
-`/plan` 标注为"可选"不等于"随便跳过". 下面是建议**自动**触发它的判断条件(任一命中即建议跑):
+`/ys-plan` 标注为"可选"不等于"随便跳过". 下面是建议**自动**触发它的判断条件(任一命中即建议跑):
 
 | 信号 | 阈值 | 说明 |
 |------|------|------|
