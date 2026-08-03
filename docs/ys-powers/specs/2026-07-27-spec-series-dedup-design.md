@@ -1,7 +1,7 @@
 # spec 系列去重 + explore-then-ask 流程优化 — 改动思路
 
 日期：2026-07-27
-状态：待批准（未动任何源文件）
+状态：已批准并执行（2026-07-27，含三轮 review 的 3 处调整：状态 2 topic 不符按没有处理、skill 重定向改为「停止并告知用户」、删命令层 "(in Chinese)"）
 
 ## 1. 问题
 
@@ -69,10 +69,10 @@ Continue through explore-then-ask's full dialogue flow: ...
 载入 confirmed intent（需求澄清只发生在 `/clarify-intent`，本命令不重复）：
 
 1. 本会话刚运行过 `/clarify-intent` → 直接使用会话内 confirmed intent
-2. 否则从 `docs/ys-powers/intent/` 读取：用户指定了 topic 读对应文件；未指定取最近修改的一份；无法确定则询问用户
+2. 否则从 `docs/ys-powers/intent/` 读取：用户指定了 topic 读对应文件；未指定取最近修改的一份；topic 与当前需求明显不符的按没有处理；无法确定则询问用户
 3. 目录不存在或没有匹配文档 → 停止，提示用户先运行 `/clarify-intent`
 
-以 confirmed intent 为输入，调用 **explore-then-ask** skill 做实现层设计对话（in Chinese）：
+以 confirmed intent 为输入，调用 **explore-then-ask** skill 做实现层设计对话：
 
 1. Tech stack preferences and constraints
 2. Known boundaries (what to always do, ask first about, and never do)
@@ -149,7 +149,7 @@ Turn confirmed requirements into an approved design through natural collaborativ
 
 Start from a confirmed intent (typically produced by `/clarify-intent`). Understand the current project context, propose 2-3 approaches with trade-offs, then present the design in sections and get user approval.
 
-需求还没确认（要什么、为什么、验收标准不清楚）→ 先去 `/clarify-intent`，本 skill 不做需求澄清。
+需求还没确认（要什么、为什么、验收标准不清楚）→ 停止并告知用户：需求未确认，请先运行 `/clarify-intent`。
 ```
 
 **⑥ 残留词修正**
