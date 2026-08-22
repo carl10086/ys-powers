@@ -104,7 +104,12 @@ CLARIFY ──→ 直接实现 ──→ REVIEW ──→ SHIP
 1. 用户已明确要求直接实现（"直接开干"、"不用写 spec"、"快速实现" 等）→ 免问，走 fast path
 2. 否则，问一句：「接下来走 fast path 还是 `/spec`？」等用户回答后再继续
 
-fast path → 本命令结束，本会话直接实现（不调 `/build`，照常写测试并跑全量测试）；`/spec` → 继续 Phase 5。
+fast path → 本命令结束，本会话直接实现；`/spec` → 继续 Phase 5。
+
+fast path 行为约束（命令结束后生效）：
+
+- **git**：直接基于当前分支开发——不 `git stash`、不新建分支、不切换分支、不创建 worktree。如需隔离，由用户显式操作，agent 不主动做
+- **实现**：不调 `/build`，但显式调用 `incremental-implementation` + `test-driven-development` skills；任一步失败走 `debugging-and-error-recovery`
 
 ## Phase 5: 保存意图文档（可选）
 
