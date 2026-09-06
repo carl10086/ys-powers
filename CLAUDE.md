@@ -56,6 +56,12 @@ Matt Pocock 的工程级技能集，分 `engineering/`、`productivity/`、`misc
 
 **适用查阅**：找领域建模（`domain-modeling`）、架构词汇（`codebase-design`）、TDD/调试（`tdd`、`diagnosing-bugs`）、工作流（`grill-with-docs`、`to-prd`、`implement`）时。ys-powers 的 `skills/domain-modeling/` 直接参考其 `engineering/domain-modeling/`，由 `skills/explore-then-ask/` 在 grilling 阶段触发。
 
+### humanlayer-skills/
+
+HumanLayer 的 Claude Code 插件仓库（5 个 skill：improve-claude-md、narrow-react-prop-types、build-iterated-agentic-loop、design-control-loop、show-me）。其中 show-me 已完整搬运为自有 `skills/show-me/`（仅追加中文语言规则）。
+
+**适用查阅**：想看 show-me 原版、或评估其余 4 个 skill 是否值得搬运时。
+
 ### html-anything/
 
 Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出等）转换为美观、可分享的单一 HTML 页面。支持 source-aware parsing、自动风格路由与多风格系统。
