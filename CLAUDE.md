@@ -21,7 +21,6 @@
 - `docs/awesome-claude-skills/` — `refer/awesome-claude-skills/` 项目的中文索引/笔记
 - `docs/superpowers/` — `refer/superpowers` 项目的 skill 分析与实施 specs（`specs/` 子目录）
 - `docs/get-shit-done/` — `refer/get-shit-done/` 项目的对照笔记
-- `docs/html-anything/` — `refer/html-anything/` 项目的对照笔记
 - `docs/gstack/` — gstack 项目的能力借鉴与集成分析
 - `docs/opencode/` — OpenCode 配置参考
 - `docs/share/` — ys-powers 整体介绍与分享文档
@@ -62,11 +61,11 @@ HumanLayer 的 Claude Code 插件仓库（5 个 skill：improve-claude-md、narr
 
 **适用查阅**：想看 show-me 原版、或评估其余 4 个 skill 是否值得搬运时。
 
-### html-anything/
+### answer-me-with-html/
 
-Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出等）转换为美观、可分享的单一 HTML 页面。支持 source-aware parsing、自动风格路由与多风格系统。
+把复杂回答渲染成单页离线 HTML 的 skill：模型只写扩展 Markdown draft，随包的单文件 CLI `am.mjs`（Node 20+、零依赖）负责布局/配色/图表。已逐字搬运为自有 `skills/answer-me-with-html/`（未做本地化改动），此目录保留为上游对照与更新来源。
 
-**适用查阅**：想借鉴「把 agent 输出从 Markdown 升级为富 HTML 页面」的交互设计或 prompt 组织方式时。
+**适用查阅**：需要对照上游原版、评估新版本是否同步到 `skills/answer-me-with-html/` 时。
 
 ## 给 Claude 的工作约定
 
@@ -84,31 +83,38 @@ Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出
 
 ## STALE-FILE-CLEANUP
 
-`install/local-install.py` 对 commands/rules/hooks/references 目录使用「文件级同名覆盖」策略。当源侧文件重命名（如 `review.md` → `ys-review.md`）时，目标项目中的旧名文件不会自动消失，导致新旧共存。
+`install/install.py` 对 commands/rules/hooks/references 目录使用「文件级同名覆盖」策略。当源侧文件重命名（如 `review.md` → `ys-review.md`）或删除时，目标项目中的旧名文件不会自动消失，导致残留。
 
 ### renames.json
 
-`install/renames.json` 记录文件重命名映射，用于安装时自动清理目标侧 stale 文件。
+`install/renames.json` 记录文件重命名/删除映射，用于安装时自动清理目标侧 stale 文件。
 
 ```json
 {
   "commands": {
     "review.md": "ys-review.md",
-    "plan.md": "ys-plan.md"
+    "plan.md": "ys-plan.md",
+    "html.md": "removed"
   },
   "rules": {},
   "hooks": {},
-  "references": {}
+  "references": {},
+  "skills": {
+    "brainstorming": "removed"
+  },
+  "agents": {
+    "html-generator.md": "removed"
+  }
 }
 ```
 
-格式：按目录分组，键为旧文件名，值为新文件名。
+格式：按目录分组，键为旧文件名，值为新文件名；删除操作将值写为 `"removed"`（清理逻辑只看键，目录或文件均可删）。
 
 ### AI 维护义务
 
-每次在 commands / rules / hooks / references 目录下执行文件重命名（rename）操作后：
+每次在 commands / rules / hooks / references / skills / agents 目录下执行文件重命名（rename）或删除（delete）操作后：
 
-1. **必须**更新 `install/renames.json`，在对应目录下添加 `"旧名": "新名"` 映射
+1. **必须**更新 `install/renames.json`，重命名添加 `"旧名": "新名"` 映射，删除添加 `"旧名": "removed"`
 2. **必须**在 commit message 中注明 renames.json 的变更
 3. 由 human review 确认映射是否正确
 
@@ -120,3 +126,7 @@ Agent skill，将各类输入（回答、文件、文件夹、URL、服务导出
 |------|----------|----------|
 | commands | review.md | ys-review.md |
 | commands | plan.md | ys-plan.md |
+| commands | html.md | removed |
+| skills | brainstorming | removed |
+| skills | html-anything | removed |
+| agents | html-generator.md | removed |

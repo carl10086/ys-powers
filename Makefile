@@ -3,7 +3,7 @@
 YS_POWERS_ROOT := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PYTHON := uv run --python 3.12 python
 
-.PHONY: help sync-html global-install local-install update-global update-local uninstall-global uninstall-local opencli-install opencli-uninstall
+.PHONY: help global-install local-install update-global update-local uninstall-global uninstall-local opencli-install opencli-uninstall
 
 help:
 	@echo "ys-powers Makefile"
@@ -18,7 +18,6 @@ help:
 	@echo "  make update-local      更新本地安装"
 	@echo "  make uninstall-global  卸载全局安装"
 	@echo "  make uninstall-local   卸载本地安装"
-	@echo "  make sync-html         同步 html-anything 上游更新"
 	@echo "  make opencli-install   安装 opencli skills 到当前项目"
 	@echo "  make opencli-install project-dir=/path/to/project"
 	@echo "                         安装 opencli skills 到指定项目"
@@ -35,9 +34,6 @@ help:
 	@echo "  global: skills/commands/agents/rules/hooks 复制到 ~/.claude/"
 	@echo "  local:  同上，但复制到 <project-dir>/.claude/"
 	@echo "  hooks 注入 settings.json (global) 或 settings.local.json (local)"
-
-sync-html:
-	$(PYTHON) scripts/sync_html_anything.py
 
 global-install:
 	$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install global

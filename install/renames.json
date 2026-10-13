@@ -1,12 +1,17 @@
 {
   "commands": {
     "review.md": "ys-review.md",
-    "plan.md": "ys-plan.md"
+    "plan.md": "ys-plan.md",
+    "html.md": "removed"
   },
   "rules": {},
   "hooks": {},
   "references": {},
   "skills": {
-    "brainstorming": "removed"
+    "brainstorming": "removed",
+    "html-anything": "removed"
+  },
+  "agents": {
+    "html-generator.md": "removed"
   }
 }
