@@ -132,7 +132,7 @@ flowchart LR
         quality["code-review-and-quality"]
         codesimp["code-simplification"]
         shipping["shipping-and-launch"]
-        writing["writing-skills"]
+        writing["writing-great-skills"]
         debug["debugging-and-error-recovery"]
     end
 
@@ -193,7 +193,7 @@ flowchart LR
 
 **维护** — `code-simplification` · `debugging-and-error-recovery` · `documentation-and-adrs` · `deprecation-and-migration`
 
-**支撑** — `using-agent-skills`（元技能）· `context-engineering` · `source-driven-development` · `sop-search` · `writing-skills`
+**支撑** — `using-agent-skills`（元技能）· `context-engineering` · `source-driven-development` · `sop-search` · `writing-great-skills`
 
 ### 子智能体（Agent）
 
