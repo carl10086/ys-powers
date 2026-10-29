@@ -274,7 +274,7 @@ The universal improvement cycle applied to both code and documentation:
 - **GREEN**: Make minimal change to pass (implement code / write skill addressing specific failure)
 - **REFACTOR**: Improve while maintaining correctness (clean code / close loopholes)
 
-Use this cycle for: code changes (`skills/test-driven-development`), discipline-enforcing skill pressure tests (`skills/writing-skills/testing-skills-with-subagents.md`), debugging fixes (`skills/systematic-debugging`).
+Use this cycle for: code changes (`skills/test-driven-development`), debugging fixes (`skills/systematic-debugging`).
 
 ### Claude Search Optimization (CSO)
 
@@ -323,8 +323,6 @@ Keep all references one level deep from SKILL.md. Never nest references: `SKILL.
 |-------------|------|---------|
 | Skill/command authoring guide | `skills/writing-great-skills/SKILL.md` | How to design predictable skills and commands |
 | Authoring glossary | `skills/writing-great-skills/GLOSSARY.md` | Shared vocabulary for invocation, hierarchy, and pruning |
-| Legacy skill testing guide | `skills/writing-skills/testing-skills-with-subagents.md` | Heavy RED-GREEN-REFACTOR pressure testing for discipline skills |
-| Legacy Anthropic best practices | `skills/writing-skills/anthropic-best-practices.md` | Upstream reference, loaded only when needed |
 
 ### For Developers Using Skills
 
