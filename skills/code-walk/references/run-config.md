@@ -5,12 +5,12 @@
 通用占位符：
 
 - `<topic>`：本次 debug 主题（kebab-case）
-- `<module>`：IDE 模块名，取 `.idea/modules.xml` 里的条目或 `*.iml` 文件名（不带扩展名）
+- `<module>`：IDE 模块名。有 `.idea/modules.xml` / `*.iml` 时取其中的名字；**两者都没有时（新建项目）用项目目录名，不创建任何 `.idea` 文件**——IDE 首次打开项目会自己建模块；若配置不识别，在 IDE 的 Run Configuration 里重新选择模块即可
 - `$PROJECT_DIR$`：JetBrains 内置宏，指项目根目录，原样保留
 
 <rules>
 - 只选与项目语言对应的一个模板，按需填占位符，其余原样。
-- `module` 名写错是"配置不被 IDE 识别"的最常见原因；查 `.idea/modules.xml` 确认。
+- `module` 名按上面的回退规则填写；写错是"配置不被 IDE 识别"的最常见原因。
 </rules>
 
 ## Java / Kotlin（IntelliJ，`type="Application"`）
