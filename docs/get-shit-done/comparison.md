@@ -47,9 +47,7 @@
 
 - `/gc` — 智能 Git 工作流（分支→提交→推送→PR 一键完成）
 - `/s2m` — worktree 回主分支清理
-- `/scout` — 多渠道并行信息探索
 - `/local-commit` — 极简本地提交
-- `/alias` — zsh 别名管理
 - `/html` — 转换为 HTML 页面
 - `/doc-codebase` — 代码库文档化
 

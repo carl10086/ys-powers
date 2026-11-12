@@ -173,7 +173,7 @@ Start from a confirmed intent (typically produced by `/clarify-intent`). Underst
 | `skills/spec-driven-development/SKILL.md` 本体 | 可独立用于无 clarify 前置的场景；命令层覆盖即可 |
 | skill 的 ASSUMPTIONS 机制（surface assumptions） | 书面假设清单，不是访谈，是残余歧义的安全网 |
 | "go back and clarify" ×3（`### 3/4`、Key Principles） | 设计层往返，非需求层系统访谈 |
-| Key Principles「一次一问 / 多选题」 | 设计对话仍在用；`wskill.md:15` 借用此原则，删了指针死 |
+| Key Principles「一次一问 / 多选题」 | 设计对话仍在用；authoring command 曾借用此原则，删除后不再保留指针 |
 | Anti-Pattern 节（"too simple to need a design"） | 流程层规则：进入本 skill 后不许拿"简单"当借口跳过设计呈现 |
 | `docs/codebase/power-dependencies.md` | `spec --> explore` 边仍成立（调用保留，只是重新限定任务） |
 

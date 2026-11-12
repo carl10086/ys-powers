@@ -390,7 +390,7 @@ Never write "TBD", "TODO", "implement later", or "add appropriate error handling
 
 ### Language Policy
 
-**All new skills SHOULD be written in Chinese (简体中文).** This convention is enforced by `/wskill` and reviewed against `skills/writing-great-skills/SKILL.md`.
+**All new skills SHOULD be written in Chinese (简体中文).** This convention is reviewed against `skills/writing-great-skills/SKILL.md`.
 
 What MUST be Chinese:
 - Overview, usage conditions, core patterns, all explanations

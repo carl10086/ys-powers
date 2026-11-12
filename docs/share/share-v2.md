@@ -469,9 +469,6 @@ v1 已经把并行 fan-out 讲得很清楚, 这里只补充一句**设计动机*
   - **`/doc-codebase`**: 分析代码库并生成 `ARCHITECTURE.md`
   - **`/easy-analysis`**: 对复杂文档做宏观概览 + 逐段精读 + 引用分析
   - **`/sop-add`**: 把当前会话经验抽取为可复用 SOP (Standard Operating Procedure)
-- **元能力**
-  - **`/wskill`**: 写新 skill — 先按需澄清, 再用 `writing-great-skills` 控制 trigger / hierarchy / pruning
-  - **`/wcommand`**: 写新 command — 同上, 但产物是 focused workflow entrypoint
 
 ### 2.7 为什么用 HTML 而不是 Markdown 打通"人类 ↔ AI"
 

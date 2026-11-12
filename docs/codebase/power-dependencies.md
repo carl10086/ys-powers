@@ -196,7 +196,7 @@ flowchart LR
 
 ### 4.1 Command 清单
 
-当前 `commands/` 源目录包含 16 个 command：
+当前依赖图追踪 15 个 command：
 
 | Command | 类型 | 直接关系 |
 |---------|------|----------|
@@ -207,7 +207,6 @@ flowchart LR
 | `/ys-review` | 单 skill 委托型 + 审查维度建议 | `code-review-and-quality`; 安全 / 性能维度提到 `security-and-hardening`, `performance-optimization` |
 | `/code-simplify` | 单 skill 委托型 | `code-simplification` |
 | `/ship` | skill 委托型 + agent fan-out | `shipping-and-launch`; 并行编排 3 个 agents |
-| `/wskill` | 多 skill 串联型 | `explore-then-ask`, `writing-great-skills` |
 | `/refactor` | 单 skill 委托型 + 自包含方案设计 gate | `test-driven-development` |
 | `/doc-codebase` | embedded-workflow | 无显式 skill 依赖 |
 | `/easy-analysis` | embedded-workflow | 无显式 skill 依赖 |
@@ -319,19 +318,6 @@ flowchart LR
 `/ship` 先委托 `shipping-and-launch`，然后并行调度三个 specialist personas。三个 agents 独立检查当前变更，结果回到主 agent 汇总成 go / no-go 决策和 rollback plan。
 
 这里的 agents 是 `/ship` 的执行辅助，不是全局依赖主线。
-
-### 4.9 `/wskill`
-
-类型：多 skill 串联型 command。
-
-直接关系：
-
-- `invokes` `explore-then-ask`
-- `invokes` `writing-great-skills`
-
-说明：
-
-`/wskill` 先按需澄清 skill 需求，再用 `writing-great-skills` 控制 trigger、scope、information hierarchy 和 pruning。旧 `writing-skills` 保留为手动 legacy reference，不再作为日常入口。
 
 ### 4.10 `/refactor`
 
@@ -512,16 +498,12 @@ flowchart LR
 
 ### 5.10 `writing-great-skills`
 
-类型：skill / command 编写参考 skill。
+类型：skill 编写参考 skill。
 
-关系：
-
-- `used-by` `/wskill`
-- `used-by` `/wcommand`
-
-理由：
+说明：
 
 `writing-great-skills` 聚焦 predictability：invocation、description、information hierarchy、progressive disclosure、single source of truth、no-op pruning。相比旧 `writing-skills` 的重型 RED-GREEN-REFACTOR，它更适合作为日常 authoring single source of truth。
+
 
 ### 5.11 当前没有明确对外 skill 关系的 skills
 
@@ -624,14 +606,13 @@ Command = the when
 | `/ys-review` | `code-review-and-quality`, recommends `security-and-hardening`, `performance-optimization` |
 | `/code-simplify` | `code-simplification` |
 | `/ship` | `shipping-and-launch`; orchestrates agents |
-| `/wskill` | `explore-then-ask`, `writing-great-skills` |
 | `/refactor` | `test-driven-development` |
 
 ### 8.2 Skill 查 Command
 
 | Skill | 被 command 使用 |
 |-------|-----------------|
-| `explore-then-ask` | `/spec`, `/wskill` |
+| `explore-then-ask` | `/spec` |
 | `spec-driven-development` | `/spec` |
 | `planning-and-task-breakdown` | `/ys-plan` |
 | `incremental-implementation` | `/build` |
@@ -643,7 +624,6 @@ Command = the when
 | `performance-optimization` | `/ys-review` recommends |
 | `code-simplification` | `/code-simplify` |
 | `shipping-and-launch` | `/ship` |
-| `writing-great-skills` | `/wskill`, `/wcommand` |
 
 ### 8.3 Skill 查 Skill
 
