@@ -15,7 +15,7 @@ disable-model-invocation: true
 
 Invoke the incremental-implementation skill alongside test-driven-development.
 
-Read the plan for this feature. If a plan was generated earlier in this session, use that file path. Otherwise, check `docs/workflow/plans/` for the most recent plan file, or ask the user for the plan path if ambiguous. Then pick the next pending task. For each task:
+Read the plan for this feature. If a plan was generated earlier in this session, use that file path. Otherwise, check `docs/ys-powers/plans/` for the most recent plan file, or ask the user for the plan path if ambiguous. Then pick the next pending task. For each task:
 
 1. Read the task's acceptance criteria
 2. Load relevant context (existing code, patterns, types)

@@ -20,7 +20,7 @@ Doc Task Progress:
 
 **Step 1: Read plan task**
 
-Read the plan for this feature. If a plan was generated earlier in this session, use that file path. Otherwise, check `docs/workflow/plans/` for the most recent plan file, or ask the user for the spec path if ambiguous. Then pick the next pending documentation task.
+Read the plan for this feature. If a plan was generated earlier in this session, use that file path. Otherwise, check `docs/ys-powers/plans/` for the most recent plan file, or ask the user for the spec path if ambiguous. Then pick the next pending documentation task.
 
 Extract:
 - Task description
@@ -89,7 +89,7 @@ Write the documentation following the style guide. Use the appropriate template 
 
 **Step 4: Self-review**
 
-Review against the checklist in `docs/workflow/guidelines/chinese-tech-writing-guide.md` Section 9. Key items:
+Review against the checklist in `docs/ys-powers/guidelines/chinese-tech-writing-guide.md` Section 9. Key items:
 
 - [ ] Title levels are continuous, only one H1 per document
 - [ ] Chinese and English are separated by spaces

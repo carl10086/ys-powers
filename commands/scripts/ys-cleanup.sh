@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-TARGET_DIR="${1:-./docs/workflow}"
+TARGET_DIR="${1:-./docs/ys-powers}"
 DAYS_AGO="${2:-7}"
 
 if [[ ! -d "$TARGET_DIR" ]]; then
