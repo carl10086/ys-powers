@@ -69,7 +69,7 @@ Continue through explore-then-ask's full dialogue flow: ...
 载入 confirmed intent（需求澄清只发生在 `/clarify-intent`，本命令不重复）：
 
 1. 本会话刚运行过 `/clarify-intent` → 直接使用会话内 confirmed intent
-2. 否则从 `docs/workflow/intent/` 读取：用户指定了 topic 读对应文件；未指定取最近修改的一份；topic 与当前需求明显不符的按没有处理；无法确定则询问用户
+2. 否则从 `docs/ys-powers/intent/` 读取：用户指定了 topic 读对应文件；未指定取最近修改的一份；topic 与当前需求明显不符的按没有处理；无法确定则询问用户
 3. 目录不存在或没有匹配文档 → 停止，提示用户先运行 `/clarify-intent`
 
 以 confirmed intent 为输入，调用 **explore-then-ask** skill 做实现层设计对话：

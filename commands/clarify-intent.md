@@ -53,7 +53,7 @@ CLARIFY ──→ 直接实现 ──→ REVIEW ──→ SHIP
 2. 最近的 5-10 条 git commit message（不看 diff）
 3. 目录结构（只扫与 `[topic]` 直接相关的子目录树，不读文件）
 
-**Phase 1 不读 `docs/adr/` 与 `docs/workflow/intent/`，这是故意的。**
+**Phase 1 不读 `docs/adr/` 与 `docs/ys-powers/intent/`，这是故意的。**
 
 读得太早会拿既有词汇束缚用户真实意图。三步时序分清：
 
@@ -119,7 +119,7 @@ fast path 行为约束（命令结束后生效）：
 如果用户希望持久化或交接，询问是否保存到：
 
 ```text
-docs/workflow/intent/<topic>.md
+docs/ys-powers/intent/<topic>.md
 ```
 
 其中 `<topic>` 优先使用用户传入的 `[topic]` 参数；若未传，则从确认意图中提炼 kebab-case 短名。仅当用户明确确认后才保存。

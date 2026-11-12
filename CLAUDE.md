@@ -17,12 +17,9 @@
 按主题划分子目录，每个子目录聚焦一个话题：
 
 `docs/ARCHITECTURE.md` — `/doc-codebase` 生成的当前项目架构地图
-`docs/agent-skills/` — agent-skills 与 refer/skills 项目的中文索引/笔记
-`docs/get-shit-done/` — `refer/get-shit-done/` 项目的对照笔记
 `docs/gstack/` — gstack 项目的能力借鉴与集成分析
 `docs/share/` — ys-powers 整体介绍与分享文档
-`docs/workflow/` — intent、spec、plan 和写作指南等工作流产物
-`docs/learning/` — 代码理解和学习笔记
+工作流命令默认将产物写入使用项目的 `docs/ys-powers/`；本仓库不保留该产物目录。
 
 ## refer/ 第三方参考项目
 
