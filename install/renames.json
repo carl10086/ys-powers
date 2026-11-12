@@ -2,7 +2,11 @@
   "commands": {
     "review.md": "ys-review.md",
     "plan.md": "ys-plan.md",
-    "html.md": "removed"
+    "html.md": "removed",
+    "alias.md": "removed",
+    "scout.md": "removed",
+    "wcommand.md": "removed",
+    "wskill.md": "removed"
   },
   "rules": {},
   "hooks": {},

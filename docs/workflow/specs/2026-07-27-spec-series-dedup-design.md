@@ -69,7 +69,7 @@ Continue through explore-then-ask's full dialogue flow: ...
 载入 confirmed intent（需求澄清只发生在 `/clarify-intent`，本命令不重复）：
 
 1. 本会话刚运行过 `/clarify-intent` → 直接使用会话内 confirmed intent
-2. 否则从 `docs/ys-powers/intent/` 读取：用户指定了 topic 读对应文件；未指定取最近修改的一份；topic 与当前需求明显不符的按没有处理；无法确定则询问用户
+2. 否则从 `docs/workflow/intent/` 读取：用户指定了 topic 读对应文件；未指定取最近修改的一份；topic 与当前需求明显不符的按没有处理；无法确定则询问用户
 3. 目录不存在或没有匹配文档 → 停止，提示用户先运行 `/clarify-intent`
 
 以 confirmed intent 为输入，调用 **explore-then-ask** skill 做实现层设计对话：
@@ -173,9 +173,9 @@ Start from a confirmed intent (typically produced by `/clarify-intent`). Underst
 | `skills/spec-driven-development/SKILL.md` 本体 | 可独立用于无 clarify 前置的场景；命令层覆盖即可 |
 | skill 的 ASSUMPTIONS 机制（surface assumptions） | 书面假设清单，不是访谈，是残余歧义的安全网 |
 | "go back and clarify" ×3（`### 3/4`、Key Principles） | 设计层往返，非需求层系统访谈 |
-| Key Principles「一次一问 / 多选题」 | 设计对话仍在用；`wskill.md:15` 借用此原则，删了指针死 |
+| Key Principles「一次一问 / 多选题」 | 设计对话仍在用；authoring command 曾借用此原则，删除后不再保留指针 |
 | Anti-Pattern 节（"too simple to need a design"） | 流程层规则：进入本 skill 后不许拿"简单"当借口跳过设计呈现 |
-| `docs/codebase/power-dependencies.md` | `spec --> explore` 边仍成立（调用保留，只是重新限定任务） |
+| `docs/ARCHITECTURE.md` | `spec --> explore` 边仍成立（调用保留，只是重新限定任务） |
 
 ## 5. 已否备选
 

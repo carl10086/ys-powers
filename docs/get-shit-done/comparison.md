@@ -47,9 +47,7 @@
 
 - `/gc` — 智能 Git 工作流（分支→提交→推送→PR 一键完成）
 - `/s2m` — worktree 回主分支清理
-- `/scout` — 多渠道并行信息探索
 - `/local-commit` — 极简本地提交
-- `/alias` — zsh 别名管理
 - `/html` — 转换为 HTML 页面
 - `/doc-codebase` — 代码库文档化
 
@@ -146,7 +144,7 @@ GSD 是**有状态框架**，项目状态集中管理：
 ys-powers 是**无状态系统**：
 
 - 不管理项目级状态文件
-- Spec 和 Plan 保存在 `docs/superpowers/specs/` 和 `docs/superpowers/plans/`
+- Spec 和 Plan 保存在 `docs/workflow/specs/` 和 `docs/workflow/plans/`
 - 状态由用户自行管理（git 提交、GitHub Issues 等）
 - 无 `.planning/` 目录要求
 

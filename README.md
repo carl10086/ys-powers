@@ -102,7 +102,7 @@ flowchart LR
 
 ## 简化依赖关系
 
-README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖说明见 [`docs/power-dependencies.md`](docs/power-dependencies.md)。
+README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖关系以各 command 和 skill 的当前内容为准。
 
 ```mermaid
 flowchart LR
@@ -159,8 +159,8 @@ flowchart LR
 
 | 类型 | 数量 | 调用方式 | 核心代表 |
 |------|------|----------|----------|
-| 显式命令 | 25 | 直接输入 `/command` | `/clarify-intent` `/spec` `/ys-plan` `/build` |
-| 行为技能 | 25 | 场景自动触发 | `idea-refine` `test-driven-development` |
+| 显式命令 | 21 | 直接输入 `/command` | `/clarify-intent` `/spec` `/ys-plan` `/build` |
+| 行为技能 | 30 | 场景自动触发 | `idea-refine` `test-driven-development` |
 | 子智能体 | 3 | 自动指派 | `code-reviewer` |
 | 编码规范 | 1 | 自动生效 | `code.md` |
 
@@ -175,7 +175,7 @@ flowchart LR
 | 构建与验证 | `/build` `/test` |
 | 审查与优化 | `/ys-review` `/refactor` `/code-simplify` |
 | 交付与提交 | `/ship` `/gc` `/local-commit` |
-| 辅助 | `/sop-add` `/s2m` `/doc-codebase` `/teach-code` `/wskill` `/easy-analysis` |
+| 辅助 | `/sop-add` `/s2m` `/doc-codebase` `/teach-code` `/easy-analysis` |
 
 ### 行为技能（自动触发）
 

@@ -150,7 +150,7 @@
   - `AGENTS.md` / `CLAUDE.md` scope 提示 —— ys-powers 自身 CLAUDE.md 已经在第 1 段写明本仓库上下文，且 refer 已在 `docs/agent-skills/CLAUDE.md` 顶部标注「Claude 不应修改 refer/ 下任何文件」，无需重复同步
 
 - **待定**：
-  - **是否引入 evals 框架**：ys-powers skill ~30，写 30 个 routing case + 配 eval runner 是中型工程。引入会让 quality gate 更扎实；不引入则保留当前 manual review。可在 `/wskill` 或 `using-agent-skills` 升级时一并决策
+  - **是否引入 evals 框架**：ys-powers skill ~30，写 30 个 routing case + 配 eval runner 是中型工程。引入会让 quality gate 更扎实；不引入则保留当前 manual review。可在 `using-agent-skills` 升级时一并决策
   - **`tasks/plan.md` 输出约定是否在 ys-powers /ys-plan 命令中落地**：refer 已统一为 `tasks/plan.md` + `tasks/todo.md`，ys-powers 当前 `/ys-plan` 命令（`commands/ys-plan.md`）未规定此路径。需核对：是否同步约定，或保留 ys-powers 自身惯例
   - **refer `references/security-checklist.md` 与 ys-powers `references/security-checklist.md` 的同步策略**：两个项目各自维护同名 checklist，本次 refer 大幅扩充 manager 矩阵与 install-script gate。ys-powers 端应优先采用 refer 端方法论，但 checklist 形式可独立维护
 

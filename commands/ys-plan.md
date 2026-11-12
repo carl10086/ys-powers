@@ -5,11 +5,11 @@ disable-model-invocation: true
 
 Invoke the planning-and-task-breakdown skill.
 
-Read the spec for this feature. If a spec was generated earlier in this session, use that file path. Otherwise, check `docs/ys-powers/specs/` for the most recent spec file, or ask the user for the spec path if ambiguous. Then read the relevant codebase sections. Then:
+Read the spec for this feature. If a spec was generated earlier in this session, use that file path. Otherwise, check `docs/workflow/specs/` for the most recent spec file, or ask the user for the spec path if ambiguous. Then read the relevant codebase sections. Then:
 
 <HARD-RULE name="plan-no-code-changes">
 
-- Read only — no code changes。仅本命令产物 `docs/ys-powers/plans/YYYY-MM-DD-<feature-name>.md` 可写。
+- Read only — no code changes。仅本命令产物 `docs/workflow/plans/YYYY-MM-DD-<feature-name>.md` 可写。
 
 </HARD-RULE>
 
@@ -21,7 +21,7 @@ Read the spec for this feature. If a spec was generated earlier in this session,
 
 <IMPORTANT>
 - Write the plan content in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
-- Save the plan to `docs/ys-powers/plans/YYYY-MM-DD-<feature-name>.md` where `<feature-name>` is a kebab-case short name derived from the plan title.
+- Save the plan to `docs/workflow/plans/YYYY-MM-DD-<feature-name>.md` where `<feature-name>` is a kebab-case short name derived from the plan title.
 - If the directory does not exist, create it first.
 - Auto-save without asking for path confirmation. Print the final saved path on completion.
 </IMPORTANT>

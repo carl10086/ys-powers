@@ -1,11 +1,11 @@
 ---
 name: map-codebase
-description: 分析项目代码库架构并生成 ARCHITECTURE.md 到 docs/codebase/，用于项目 onboarding、重构前了解现状、或更新过期架构文档
+description: 分析项目代码库架构并生成 ARCHITECTURE.md 到 docs/，用于项目 onboarding、重构前了解现状、或更新过期架构文档
 ---
 
 # 代码库架构映射
 
-分析当前项目代码库，生成结构化的架构文档到 `docs/codebase/ARCHITECTURE.md`。
+分析当前项目代码库，生成结构化的架构文档到 `docs/ARCHITECTURE.md`。
 
 ## 使用时机
 
@@ -16,8 +16,8 @@ description: 分析项目代码库架构并生成 ARCHITECTURE.md 到 docs/codeb
 ## 约束
 
 <CRITICAL>
-- 生成的文档必须写入 `docs/codebase/ARCHITECTURE.md`
-- 如果 `docs/codebase/` 目录不存在，先创建它
+- 生成的文档必须写入 `docs/ARCHITECTURE.md`
+- 如果 `docs/` 目录不存在，先创建它
 - 绝不读取 `.env`、密钥文件等敏感内容
 </CRITICAL>
 
@@ -41,14 +41,14 @@ description: 分析项目代码库架构并生成 ARCHITECTURE.md 到 docs/codeb
 
 ### 1. 检查现有文档
 
-检查 `docs/codebase/ARCHITECTURE.md` 是否已存在：
+检查 `docs/ARCHITECTURE.md` 是否已存在：
 
 ```bash
-ls -la docs/codebase/ARCHITECTURE.md 2>/dev/null && echo "EXISTS" || echo "NOT_FOUND"
+ls -la docs/ARCHITECTURE.md 2>/dev/null && echo "EXISTS" || echo "NOT_FOUND"
 ```
 
 - 如果存在：告知用户当前文档的行数和最后修改时间，询问是否覆盖
-- 如果不存在：创建 `docs/codebase/` 目录
+- 如果不存在：创建 `docs/` 目录
 
 ### 2. 探索代码库
 
@@ -75,7 +75,7 @@ ls tsconfig.json vite.config.* .eslintrc.* 2>/dev/null
 
 ### 3. 生成 ARCHITECTURE.md
 
-写入 `docs/codebase/ARCHITECTURE.md`，必须包含以下章节：
+写入 `docs/ARCHITECTURE.md`，必须包含以下章节：
 
 | 章节 | 内容要求 |
 |------|---------|
@@ -99,7 +99,7 @@ ls tsconfig.json vite.config.* .eslintrc.* 2>/dev/null
 生成完成后，扫描文档是否意外包含敏感信息：
 
 ```bash
-grep -E '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|-----BEGIN.*PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.)' docs/codebase/ARCHITECTURE.md 2>/dev/null && echo "SECRETS_FOUND" || echo "CLEAN"
+grep -E '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|-----BEGIN.*PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+)' docs/ARCHITECTURE.md 2>/dev/null && echo "SECRETS_FOUND" || echo "CLEAN"
 ```
 
 如果发现敏感信息，必须删除后重新生成。
@@ -111,7 +111,7 @@ grep -E '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|-----BEGIN.*P
 ```
 代码库架构映射完成。
 
-文件：docs/codebase/ARCHITECTURE.md
+文件：docs/ARCHITECTURE.md
 行数：[N] 行
 
 包含章节：
