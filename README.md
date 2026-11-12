@@ -102,7 +102,7 @@ flowchart LR
 
 ## 简化依赖关系
 
-README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖说明见 [`docs/power-dependencies.md`](docs/power-dependencies.md)。
+README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖关系以各 command 和 skill 的当前内容为准。
 
 ```mermaid
 flowchart LR

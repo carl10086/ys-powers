@@ -131,7 +131,7 @@ flowchart LR
 
 **Phase 3 — `spec-driven-development` skill**
 
-从 6 个维度产出 spec: 目标 / 命令 / 项目结构 / 代码风格 / 测试策略 / 边界. 写到 `docs/ys-powers/specs/YYYY-MM-DD-<feature>-design.md`.
+从 6 个维度产出 spec: 目标 / 命令 / 项目结构 / 代码风格 / 测试策略 / 边界. 写到 `docs/workflow/specs/YYYY-MM-DD-<feature>-design.md`.
 
 **(可选) Phase 4 — `html-generator` subagent**
 
@@ -167,7 +167,7 @@ v1 把 `/test` 画在主干上, v2 改为可选. 原因是 `/build` 里每个 ta
 跑完后, 输出是这样:
 
 ```text
-⏺ Plan 已生成: docs/ys-powers/plans/2026-07-15-cvoice-implementation.md
+⏺ Plan 已生成: docs/workflow/plans/2026-07-15-cvoice-implementation.md
 
 ---
 Plan 摘要
@@ -255,7 +255,7 @@ Round 1 跑完后, 用户回答"yes"继续 Round 2, 输出收敛后是这样:
 ```text
 SPEC REVIEW REPORT — Round 2/3
 ═══════════════════════════════════════════════════
-Spec:     docs/ys-powers/specs/2026-07-15-cvoice-design.md
+Spec:     docs/workflow/specs/2026-07-15-cvoice-design.md
 Score:    54/60 (avg 9.0)  Gate: PASS
 Rounds:   2 (converged: yes, scores unchanged from R1)
 
@@ -375,8 +375,8 @@ VERDICT: Ready for build
   Context
   - Branch: feat/cvoice-mvp
   - Commits: 12 (T1 vcpkg → T12 integration tests)
-  - Spec: docs/ys-powers/specs/2026-07-15-cvoice-design.md
-  - Plan: docs/ys-powers/plans/2026-07-15-cvoice-implementation.md
+  - Spec: docs/workflow/specs/2026-07-15-cvoice-design.md
+  - Plan: docs/workflow/plans/2026-07-15-cvoice-implementation.md
 
   ---
   五维度发现

@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 1. Locate the spec file:
    - If user provided a path, use it
-   - Otherwise, find the most recent `.md` in `docs/ys-powers/specs/`
+   - Otherwise, find the most recent `.md` in `docs/workflow/specs/`
    - If none found, ask user for the spec path
 
 2. Read the spec file + project context:
