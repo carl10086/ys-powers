@@ -29,7 +29,7 @@ bash ./scripts/idea-refine.sh
 
 ## Output
 
-The final output is a markdown one-pager saved to `docs/ideas/[idea-name].md` (after user confirmation), containing:
+The final output is a markdown one-pager saved to `docs/ys-powers/ideas/[idea-name].md` (after user confirmation), containing:
 - Problem Statement
 - Recommended Direction
 - Key Assumptions

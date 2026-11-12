@@ -121,4 +121,4 @@ Do NOT invoke any implementation skill, write any code, scaffold any project, or
 
 ## 总结
 
-讲完后生成代码理解笔记，保存到 `docs/ys-powers/specs/YYYY-MM-DD-<模块名>-read.md`
+讲完后生成代码理解笔记，保存到 `docs/ys-powers/learning/YYYY-MM-DD-<模块名>-read.md`
