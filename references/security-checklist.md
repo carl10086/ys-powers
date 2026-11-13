@@ -8,9 +8,11 @@ Quick reference for web application security. Use alongside the `security-and-ha
 - [Authentication](#authentication)
 - [Authorization](#authorization)
 - [Input Validation](#input-validation)
+- [Destructive Path Operations](#destructive-path-operations)
 - [Security Headers](#security-headers)
 - [CORS Configuration](#cors-configuration)
 - [Data Protection](#data-protection)
+- [Personal Data Lifecycle](#personal-data-lifecycle)
 - [Dependency Security](#dependency-security)
 - [Error Handling](#error-handling)
 - [OWASP Top 10 Quick Reference](#owasp-top-10-quick-reference)
@@ -27,6 +29,7 @@ Quick reference for web application security. Use alongside the `security-and-ha
 - [ ] Session cookies: `httpOnly`, `secure`, `sameSite: 'lax'`
 - [ ] Session expiration configured (reasonable max-age)
 - [ ] Rate limiting on login endpoint (≤10 attempts per 15 minutes)
+- [ ] Rate limiting uses a shared store when more than one instance serves traffic
 - [ ] Password reset tokens: time-limited (≤1 hour), single-use
 - [ ] Account lockout after repeated failures (optional, with notification)
 - [ ] MFA supported for sensitive operations (optional but recommended)
@@ -50,6 +53,17 @@ Quick reference for web application security. Use alongside the `security-and-ha
 - [ ] SQL queries parameterized (no string concatenation)
 - [ ] HTML output encoded (use framework auto-escaping)
 - [ ] URLs validated before redirect (prevent open redirect)
+
+## Destructive Path Operations
+
+- [ ] Resolve symlinks before authorizing a derived target
+- [ ] Keep the resolved target under an explicit allowlisted root
+- [ ] Require the target to be at least one level below that root
+- [ ] Read and verify ownership evidence before delete, move, or overwrite
+- [ ] Log rejected targets and never fall back to a broader path
+
+A path shape check is not authorization. `realpath` followed by a separate operation can still have a check/use race; use descriptor-based no-follow or beneath-root guarantees for high-risk operations.
+
 
 ## Security Headers
 
@@ -85,6 +99,16 @@ cors({ origin: '*' })  // Allows any origin
 - [ ] PII encrypted at rest (if required by regulation)
 - [ ] HTTPS for all external communication
 - [ ] Database backups encrypted
+
+## Personal Data Lifecycle
+
+- [ ] Classify personal data as non-personal, PII, or sensitive when adding fields
+- [ ] Collect each field for a stated purpose and minimize unnecessary copies
+- [ ] Set a retention limit before storing personal data
+- [ ] Provide a working deletion path for databases, backups, caches, search indexes, and analytics copies
+- [ ] Support export, correction, and deletion rights where required
+- [ ] Record consent and a data-processing agreement before sharing PII with a third party
+
 
 ## Dependency Security
 

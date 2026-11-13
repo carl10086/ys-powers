@@ -118,6 +118,23 @@ Long conversations accumulate stale context. Manage this:
 - **Summarize progress** when context is getting long: "So far we've completed X, Y, Z. Now working on W."
 - **Compact deliberately** — if the tool supports it, compact/summarize before critical work
 
+### Restartable Session Boundaries
+
+A fresh session is safe at a completed task boundary, not at an arbitrary context limit. Before leaving the current session, persist:
+
+1. The accepted scope and decisions in the spec or plan
+2. The current task status and the next pending task
+3. The files changed and the actual working-tree state
+4. The exact verification commands and their outcomes
+5. Unresolved questions, risks, and required approvals
+
+Commit completed work only when the user or repository workflow authorizes it. Otherwise, record that the changes remain uncommitted.
+
+In the fresh session, read the rules, spec, plan, task status, and actual `git status` before acting. Re-run verification when its baseline is missing, the code has moved, or the next task depends on it. Do not infer approval from a previous conversation unless a durable artifact records it.
+
+Completion criterion: a new session can identify the current task, repository state, verification evidence, and approval status without relying on the previous conversation.
+
+
 ## Context Packing Strategies
 
 ### The Brain Dump
@@ -287,3 +304,6 @@ After setting up context, confirm:
 - [ ] Agent output follows the patterns shown in the rules file
 - [ ] Agent references actual project files and APIs (not hallucinated ones)
 - [ ] Context is refreshed when switching between major tasks
+- [ ] Session handoff persists scope, task status, changed files, working-tree state, verification outcomes, risks, and approvals
+- [ ] A fresh session reads durable artifacts and actual `git status` before acting
+- [ ] Approval is not inferred from conversation history
