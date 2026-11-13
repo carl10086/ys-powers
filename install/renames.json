@@ -14,7 +14,8 @@
   "skills": {
     "brainstorming": "removed",
     "html-anything": "removed",
-    "writing-skills": "removed"
+    "writing-skills": "removed",
+    "show-me": "removed"
   },
   "agents": {
     "html-generator.md": "removed"
