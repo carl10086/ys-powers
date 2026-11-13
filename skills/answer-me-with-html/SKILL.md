@@ -1,18 +1,10 @@
 ---
 name: answer-me-with-html
 argument-hint: "[config [key value] | clean | update]"
+disable-model-invocation: true
 description: >-
-  Turns an answer into a one-page visual HTML explainer: the model writes a short Markdown draft and
-  the bundled CLI builds one page. Use it proactively and liberally in replies to the user, without being asked, whenever a
-  page would help the reader more than plain text, even if plain text would also work: any explanation
-  of how something works or how parts relate (flow, request path, architecture, code or folder
-  structure, state machine, lifecycle, history); any comparison, trade-off or decision with pros and
-  cons; any diagnosis, review or investigation, especially with several causes or findings to rank;
-  any answer with a table, a numbered or ranked list, steps, branches or several sections; or when the
-  user says "I don't get it / draw it / explain visually / 讲讲原理 / 没看懂 / 画个图". When in doubt, use it: a
-  page is quick and cheap to make. Also for explainer videos ("make a video", "做个视频") and for changing
-  its settings. Skip only for small talk, a trivial one-line answer, or when the user asks for plain
-  text.
+  Turns an answer into a one-page visual HTML explainer with the bundled CLI.
+  Invoke it manually when the user asks for a visual HTML page or to change its settings.
 ---
 
 # Answer me with HTML: answer a complex question with one HTML page
