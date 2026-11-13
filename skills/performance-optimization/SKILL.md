@@ -33,7 +33,7 @@ Measure before optimizing. Performance work without measurement is guessing — 
 1. MEASURE  → Establish baseline with real data
 2. IDENTIFY → Find the actual bottleneck (not assumed)
 3. FIX      → Address the specific bottleneck
-4. VERIFY   → Measure again, confirm improvement
+4. VERIFY   → Measure again; keep or revert
 5. GUARD    → Add monitoring or tests to prevent regression
 ```
 
@@ -289,6 +289,24 @@ app.use('/static', express.static('public', {
 res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
 ```
 
+### Step 4: Verify — Keep or Revert
+
+A fix is a hypothesis until it is measured again. Use the same command, conditions, and fixed budget as the baseline. A cold-cache baseline compared with a warm-cache result measures the environment, not the change.
+
+Change one thing at a time. Repeat the measurement and compare the delta with run-to-run variance; a change inside the noise is not an improvement.
+
+| Result vs. baseline | Action |
+|---|---|
+| Past the threshold and tests green | **Keep**; record before/after numbers |
+| Within measurement noise | **Revert** |
+| Worse | **Revert** |
+| Improved but a test failed | **Revert** |
+
+Correctness gates the metric. Do not claim a performance win by dropping required work, weakening validation, or changing tests.
+
+Keep a short ledger for kept and reverted attempts: idea, baseline, result, verdict, and reason. This prevents the same ineffective optimization from being repeated.
+
+
 ## Performance Budget
 
 Set budgets and enforce them:
@@ -314,7 +332,7 @@ npx lhci autorun
 
 ## See Also
 
-For detailed performance checklists, optimization commands, and anti-pattern reference, see `references/performance-checklist.md`.
+For detailed performance checklists, optimization commands, and anti-pattern reference, see `../../references/performance-checklist.md`.
 
 
 ## Common Rationalizations
@@ -348,3 +366,6 @@ After any performance-related change:
 - [ ] No N+1 queries in new data fetching code
 - [ ] Performance budget passes in CI (if configured)
 - [ ] Existing tests still pass (optimization didn't break behavior)
+- [ ] Verification reused the baseline command, conditions, and fixed measurement budget
+- [ ] Changes within noise, worse results, and test regressions were reverted
+- [ ] Kept and reverted attempts are recorded with baseline, result, verdict, and reason

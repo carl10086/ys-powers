@@ -9,6 +9,7 @@ Quick reference checklist for web application performance. Use alongside the `pe
 - [Frontend Checklist](#frontend-checklist)
 - [Backend Checklist](#backend-checklist)
 - [Measurement Commands](#measurement-commands)
+- [Verification and Reversion](#verification-and-reversion)
 - [Common Anti-Patterns](#common-anti-patterns)
 
 ## Core Web Vitals Targets
@@ -138,6 +139,17 @@ onINP(({ value, attribution }) => {
   console.log({ value, interactionTarget, inputDelay, processingDuration, presentationDelay });
 });
 ```
+
+## Verification and Reversion
+
+- [ ] Re-run the baseline command under the same conditions
+- [ ] Use the same fixed measurement budget: wall-clock, sample count, or request count
+- [ ] Change one variable at a time
+- [ ] Repeat the measurement and compare the delta with run-to-run variance
+- [ ] Keep only changes that beat the threshold and pass tests
+- [ ] Revert neutral, worse, or test-regressing changes
+- [ ] Record kept and reverted attempts with idea, baseline, result, verdict, and reason
+
 
 ## Common Anti-Patterns
 

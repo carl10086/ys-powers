@@ -217,6 +217,19 @@ The `range() !== 'unicast'` check covers loopback, link-local `169.254.169.254` 
 
 **Caveat — this still has a TOCTOU gap.** `fetch` resolves DNS again after the check, so an attacker using a short-TTL record can rebind to an internal IP between validation and connection. For high-risk surfaces, resolve once and connect to the pinned IP, or put a filtering agent in front (`request-filtering-agent` / `ssrf-req-filter`).
 
+### Destructive Operations on Derived Paths
+
+A delete, move, or overwrite is only as safe as the value naming its target. Values from payloads, configuration, job data, or another process's command line are untrusted until authorized.
+
+Before the operation, require all three:
+
+1. Resolve symlinks and verify the target is under an explicit allowlisted root.
+2. Require the target to be at least one level below that root; never operate on the root itself.
+3. Read ownership evidence before the operation and verify it against authenticated expected ownership.
+
+On refusal, log the rejected target and stop. Never fall back to a broader default path. `realpath` plus a later operation can still have a check/use race; use descriptor-based no-follow or beneath-root guarantees for high-risk operations.
+
+
 ## Input Validation Patterns
 
 ### Schema Validation at Boundaries
@@ -298,7 +311,7 @@ When you defer a fix, document the reason and set a review date.
 
 Do not assume npm or treat the nearest manifest as the install root. Apply this order:
 
-1. **Find the installation boundary and manager.** Use the workspace root that owns the lockfile, or an independent nested project only when it is outside that workspace. There, corroborate `packageManager` (when present), the lockfile, and CI; stop on disagreement or competing lockfiles. Pin the manager version and use the matrix in `references/security-checklist.md`.
+1. **Find the installation boundary and manager.** Use the workspace root that owns the lockfile, or an independent nested project only when it is outside that workspace. There, corroborate `packageManager` (when present), the lockfile, and CI; stop on disagreement or competing lockfiles. Pin the manager version and use the matrix in `../../references/security-checklist.md`.
 2. **Block dependency scripts before first execution.** Bootstrap with scripts disabled or a documented fail-closed policy, inspect the pending script source, approve only the minimum required packages, commit the policy, then verify with a clean frozen/immutable install. Never blanket-approve scripts.
 
 Audits only find known advisories; they do not catch a newly malicious or typosquatted package. Therefore:
@@ -308,6 +321,9 @@ Audits only find known advisories; they do not catch a newly malicious or typosq
 - **Review new dependencies, lockfile diffs, and script-policy changes together** — ownership, maintenance, release age, provenance, transitive graph, and typosquats such as `cross-env` vs `crossenv` (OWASP **A06**, **LLM03**).
 
 ## Rate Limiting
+
+When more than one process serves traffic, an in-memory limiter is not a shared limit: each instance can allow the full quota, and serverless instance replacement can reset counters. Back the limiter with a shared store so counters, windows, and TTLs are consistent across instances.
+
 
 ```typescript
 import rateLimit from 'express-rate-limit';
@@ -379,6 +395,15 @@ await runAllowlistedAction(intent.action, intent.params);
 container.textContent = await llm.reply(userMessage);
 ```
 
+### Personal Data Lifecycle
+
+Classify personal data when adding fields: non-personal, PII, or sensitive. Collect it only for a stated purpose, keep it out of telemetry where possible, and set a retention limit before storing it.
+
+Every personal-data store needs a working deletion path. Include primary databases, backups, caches, search indexes, and analytics copies. Support export, correction, and deletion rights where the applicable jurisdiction requires them.
+
+Sharing PII with an analytics, advertising, or LLM provider requires an auditable consent decision and an appropriate data-processing agreement. Make regional policy configurable instead of assuming one jurisdiction.
+
+
 ## Security Review Checklist
 
 ```markdown
@@ -386,6 +411,7 @@ container.textContent = await llm.reply(userMessage);
 - [ ] Passwords hashed with bcrypt/scrypt/argon2 (salt rounds ≥ 12)
 - [ ] Session tokens are httpOnly, secure, sameSite
 - [ ] Login has rate limiting
+- [ ] Login rate limiting uses a shared store when more than one instance serves traffic
 - [ ] Password reset tokens expire
 
 ### Authorization
@@ -399,10 +425,18 @@ container.textContent = await llm.reply(userMessage);
 - [ ] HTML output is encoded/escaped
 - [ ] Server-side URL fetches are allowlisted (no SSRF to internal services)
 
+### Destructive Operations
+- [ ] Derived targets resolve symlinks and stay under an allowlisted root
+- [ ] Target depth is below the root and ownership is verified before the operation
+- [ ] Refused targets are logged and the operation never falls back to a broader path
+
 ### Data
 - [ ] No secrets in code or version control
 - [ ] Sensitive fields excluded from API responses
 - [ ] PII encrypted at rest (if applicable)
+- [ ] Personal data is classified, minimized to a stated purpose, and has a retention limit
+- [ ] Deletion covers databases, backups, caches, search indexes, and analytics copies
+- [ ] Consent and a data-processing agreement exist before sharing PII with a third party
 
 ### Infrastructure
 - [ ] Security headers configured (CSP, HSTS, etc.)
@@ -422,7 +456,7 @@ container.textContent = await llm.reply(userMessage);
 ```
 ## See Also
 
-For detailed security checklists and pre-commit verification steps, see `references/security-checklist.md`.
+For detailed security checklists and pre-commit verification steps, see `../../references/security-checklist.md`.
 
 ## Common Rationalizations
 
@@ -449,6 +483,9 @@ For detailed security checklists and pre-commit verification steps, see `referen
 - Default-allowed install scripts at the dependency boundary (no per-package policy)
 - Forced `npm audit fix --force` upgrades that cross declared dependency ranges
 - Server fetches user-supplied URLs without an allowlist (SSRF)
+- Derived delete, move, or overwrite trusts a payload, config value, or process argument without root, depth, and ownership checks
+- An in-memory rate limiter protects a service with more than one instance
+- Personal data has no stated purpose, retention limit, or deletion path across copies
 - LLM/model output passed into a query, the DOM, a shell, or `eval`
 - Secrets, PII, or the full system prompt placed inside an LLM context window
 
@@ -463,5 +500,8 @@ After implementing security-relevant code:
 - [ ] Security headers present in response (check with browser DevTools)
 - [ ] Error responses don't expose internal details
 - [ ] Rate limiting active on auth endpoints
+- [ ] Derived destructive paths resolve symlinks and verify root, depth, and ownership before the operation
+- [ ] Rate limiting uses a shared store when more than one instance serves traffic
+- [ ] Personal data is classified, minimized, retained for a stated period, and deletable across copies
 - [ ] Server-side URL fetches validated against an allowlist (no SSRF)
 - [ ] LLM/model output validated and encoded before use (if AI features present)
