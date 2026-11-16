@@ -15,7 +15,11 @@
     "brainstorming": "removed",
     "html-anything": "removed",
     "writing-skills": "removed",
-    "show-me": "removed"
+    "show-me": "removed",
+    "code": "eli",
+    "doc": "eli",
+    "eli-code": "removed",
+    "eli-doc": "removed"
   },
   "agents": {
     "html-generator.md": "removed"
