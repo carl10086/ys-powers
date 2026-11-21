@@ -51,15 +51,9 @@ Matt Pocock 的工程级技能集，分 `engineering/`、`productivity/`、`misc
 
 ### humanlayer-skills/
 
-HumanLayer 的 Claude Code 插件仓库（5 个 skill：improve-claude-md、narrow-react-prop-types、build-iterated-agentic-loop、design-control-loop、show-me）。其中 show-me 未被搬运（原有自有副本已于 2026-11 移除，与 answer-me-with-html 能力重叠），视觉化表达由自有 `skills/answer-me-with-html/` 承担。
+HumanLayer 的 Claude Code 插件仓库（5 个 skill：improve-claude-md、narrow-react-prop-types、build-iterated-agentic-loop、design-control-loop、show-me）。其中 show-me 未被搬运（原有自有副本已于 2026-11 移除）；可视化表达由 `skills/eli/`、`skills/eli5/` 承担。
 
 **适用查阅**：想看 show-me 原版、或评估其余 4 个 skill 是否值得搬运时。
-
-### answer-me-with-html/
-
-把复杂回答渲染成单页离线 HTML 的 skill：模型只写扩展 Markdown draft，随包的单文件 CLI `am.mjs`（Node 20+、零依赖）负责布局/配色/图表。已逐字搬运为自有 `skills/answer-me-with-html/`（未做本地化改动），此目录保留为上游对照与更新来源。
-
-**适用查阅**：需要对照上游原版、评估新版本是否同步到 `skills/answer-me-with-html/` 时。
 
 ## 给 Claude 的工作约定
 
