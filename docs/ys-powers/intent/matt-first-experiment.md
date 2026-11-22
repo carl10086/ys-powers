@@ -59,8 +59,7 @@ rules/code.md
 - 实验分支长期独立，不进入 `master`。
 - Matt 的 Prompt 和 Skill 逻辑尽量保持原样。
 - 不针对 OMP 或 Claude 做额外流程分叉。
-- 只做必要的本地化：`.scratch/` → `.ys-powers/`、安装 manifest、同步记录和中文解释文档。
-- `.ys-powers/` 作为 Git 中持久化的 local tracker 状态。
+- 保持 Matt 原始的 `.scratch/` local markdown tracker 约定。
 - `refer/mattpocock-skills/` 作为只读上游参考，不直接修改。
 - 定期同步 Matt 上游，并记录本地必要差异。
 

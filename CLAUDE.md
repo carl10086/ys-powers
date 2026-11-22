@@ -37,7 +37,7 @@ Matt 的分包含义：
 
 允许的本地差异：
 
-- `.scratch/` → `.ys-powers/`
+- 保持 Matt 原始的 `.scratch/` local markdown tracker 约定
 - 安装器和本地 manifest
 - 上游同步记录
 - 中文解释文档
