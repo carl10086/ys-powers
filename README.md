@@ -1,248 +1,98 @@
 # ys-powers
 
-`ys-powers` 是一套用于增强 Claude Code 工作流的本地能力集，包含 **skills**（场景化行为技能）、**commands**（显式调用命令）、**agents**（专用子智能体）、**rules**（编码规范）四类配置。
+`ys-powers` 是以 Matt Pocock skills 为基础的本地工程能力集，只保留必要的 ys-powers 定制：`eli` 与项目级 `rules`。
+
+## 能力结构
+
+```text
+skills/
+├── engineering/    写代码的工程能力
+├── productivity/   通用工作流能力
+├── misc/           低频工具
+├── in-progress/    beta 能力
+├── deprecated/     上游保留的废弃能力
+└── eli/            ys-powers 的解释能力
+```
+
+Matt 的原始目录结构、frontmatter、调用策略和 `agents/openai.yaml` 保持不变。
+
+- `User-invoked`：用户显式调用
+- `Model-invoked`：模型按场景自动触发
+- `misc`：稳定但低频，保留在源目录但不默认安装
+- `in-progress`：公开 beta，保留在源目录但不默认安装
+- `deprecated`：上游保留，但不默认安装
+
+默认本地能力只安装：
+
+```text
+engineering
+productivity
+eli
+rules
+```
+
+Matt 的其他分包仍保留在源目录和 `refer/` 中，后续可通过安装配置显式启用。
+
+默认工程链由 Matt skills 自己的调用约束决定，不在本项目中重新实现：
+
+```text
+grill-with-docs
+→ grilling / domain-modeling
+→ to-spec
+→ to-tickets
+→ implement / implement-spec
+→ tdd
+→ code-review
+→ retro
+```
+
+## ys-powers 定制
+
+```text
+skills/eli/
+rules/code.md
+```
+
+其他旧版 `commands/`、`agents/`、`references/`、`hooks/` 已移除，不再与 Matt 流程并存。
 
 ## 安装
 
-### 前置依赖
-
-- **[uv](https://docs.astral.sh/uv/)** — Python 包管理器（安装脚本通过 `uv run --python 3.12` 执行）
-- **Python 3.12** — 由 uv 自动安装：`uv python install 3.12`
-
-若系统 Python 版本低于 3.10 且未安装 uv，运行安装命令时脚本会输出安装指引。
-
-ys-powers 提供两种安装方式，分别适用于不同场景：
-
-| 方式 | 命令 | 适用场景 |
-|------|------|----------|
-| **Global** | `make global-install` | 个人机器，所有项目共享同一套能力 |
-| **Local** | `make local-install [project-dir=/path]` | 特定项目，或需要项目独立配置 |
-
-### Global 安装（推荐）
+### 本地安装
 
 ```bash
-cd /path/to/ys-powers
+make local-install
+make local-install project-dir=/path/to/project
+```
+
+安装到 `<project>/.claude/`，适合当前实验和项目级验证。
+
+### 全局安装
+
+```bash
 make global-install
 ```
 
-将 skills/commands/agents/rules/hooks 复制到 `~/.claude/`，并自动注册 SessionStart hook 到 `~/.claude/settings.json`。安装后，**任何项目**启动 Claude Code 时都会自动加载 ys-powers 的能力。
+安装到 `~/.claude/`。当前实验阶段不要执行此命令；全局环境清理另行处理。
 
-### Local 安装
-
-```bash
-cd /path/to/ys-powers
-make local-install                  # 安装到当前目录
-make local-install project-dir=/path/to/project  # 安装到指定项目
-```
-
-将内容复制到 `<project>/.claude/`，并注册 hooks 到 `<project>/.claude/settings.local.json`。适用于：
-- 需要在特定项目使用定制版本
-- 团队共享同一套项目级配置
-- 避免全局安装影响其他项目
-
-### 安装策略
-
-| 目录 | 策略 | 说明 |
-|------|------|------|
-| `skills/`、`agents/` | 文件夹级全量覆盖 | 删除旧版本，复制新版本 |
-| `rules/`、`commands/`、`hooks/`、`references/` | 文件级同名覆盖 | 覆盖同名文件，保留目标独有文件 |
-| `hooks` 注册 | 合并去重 | 向 settings.json 追加 hooks，不覆盖用户已有配置 |
-
-### 路径兼容性
-
-Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项目目录，而非 `~/.claude/`**。因此：
-
-- **Hooks** 使用 `$HOME/.claude/...`（global）或 `${CLAUDE_PROJECT_DIR}/.claude/...`（local），由 shell 在运行时解析
-- **Skills** 内部使用 `./scripts/...` 相对路径，由 Claude Code 从 skill 文件所在目录解析
-- **Agents** 通过 `skill: <name>` 工具调用，不直接引用 skill 文件路径
-
-无需安装时修改任何文件内容，所有路径在运行时自解析。
-
-## 按场景速查
-
-不知道自己该用什么？按当前场景选择：
-
-| 我在做什么 | 推荐入手 |
-|-----------|---------|
-| 意图还不清楚，想先聊明白 | `/clarify-intent` |
-| 有一个模糊想法，想梳理成设计 | `/spec` → `explore-then-ask`、`spec-driven-development` |
-| 需求已明确，要拆任务 | `/ys-plan` |
-| 写代码/改逻辑 | `/build`（增量实现）或 `/refactor`（重构） |
-| 写 UI/前端 | `frontend-ui-engineering` [skill] 自动触发 |
-| 修 bug | `/test`（先写重现测试）→ `/build` |
-| 代码写完了，要审查 | `/ys-review` |
-| 准备发版 | `/ship` |
-| 提交代码 | `/gc`（完整 Git 流程）或 `/local-commit`（极简本地提交） |
-| 看不懂某段代码 | `/teach-code` |
-| 项目结构混乱，想理清楚 | `/doc-codebase` |
-
-## 典型工作流
-
-开发新功能的完整路径：
-
-```mermaid
-flowchart LR
-    A[/clarify-intent<br/>澄清/] --> B[/spec<br/>构思/]
-    B --> C[/ys-plan<br/>规划/]
-    C --> D[/build<br/>构建/]
-    D --> E[/ys-review<br/>审查/]
-    E --> F[/ship<br/>交付/]
-
-    D -.异常调试.-> G[debugging]
-    D -.查文档实现.-> H[source-driven]
-    D -.优化上下文.-> I[context-eng]
-    E -.随时提交.-> J[/gc/]
-    F -.记录经验.-> K[/sop-add/]
-```
-
-**主线**（实线）：澄清 → 构思 → 规划 → 构建 → 审查 → 交付  
-**支撑**（虚线）：构建、审查、交付阶段按需触发的横向能力，非强制步骤
-
-**可选步骤**：`/review-spec`（spec 质量审查）、`/ys-plan`（小改动可跳过）、`/test`（bug 修复或显式 TDD 时单独调用）详见 `commands/clarify-intent.md`。
-
-## 简化依赖关系
-
-README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖关系以各 command 和 skill 的当前内容为准。
-
-```mermaid
-flowchart LR
-    subgraph Commands["显式 commands"]
-        clarify["/clarify-intent"]
-        spec["/spec"]
-        ysPlan["/ys-plan"]
-        build["/build"]
-        test["/test"]
-        review["/ys-review"]
-        simplify["/code-simplify"]
-        ship["/ship"]
-        wskill["/wskill"]
-        refactor["/refactor"]
-        git["/gc · /local-commit · /s2m"]
-        docs["/doc-codebase · /easy-analysis · /teach-code · /sop-add"]
-    end
-
-    subgraph Skills["核心 skills"]
-        interview["interview-me"]
-        explore["explore-then-ask"]
-        specdev["spec-driven-development"]
-        planning["planning-and-task-breakdown"]
-        incremental["incremental-implementation"]
-        tdd["test-driven-development"]
-        browser["browser-testing-with-devtools"]
-        quality["code-review-and-quality"]
-        codesimp["code-simplification"]
-        shipping["shipping-and-launch"]
-        writing["writing-great-skills"]
-        debug["debugging-and-error-recovery"]
-    end
-
-    clarify --> interview
-    spec --> explore
-    spec --> specdev
-    ysPlan --> planning
-    build --> incremental
-    build --> tdd
-    build -.失败时.-> debug
-    test --> tdd
-    test -.浏览器相关.-> browser
-    review --> quality
-    simplify --> codesimp
-    ship --> shipping
-    wskill --> explore
-    wskill --> writing
-    refactor --> tdd
-```
-
-自包含 commands（`/gc`、`/local-commit`、`/s2m`、`/doc-codebase`、`/easy-analysis`、`/teach-code`、`/sop-add`）主要把完整流程写在 command 内部，不显式委托某个 skill。
-
-## 能力分类速览
-
-| 类型 | 数量 | 调用方式 | 核心代表 |
-|------|------|----------|----------|
-| 显式命令 | 21 | 直接输入 `/command` | `/clarify-intent` `/spec` `/ys-plan` `/build` |
-| 行为技能 | 30 | 场景自动触发 | `idea-refine` `test-driven-development` |
-| 子智能体 | 3 | 自动指派 | `code-reviewer` |
-| 编码规范 | 1 | 自动生效 | `code.md` |
-
-### 显式命令（`/command`）
-
-直接输入使用，按开发阶段分组：
-
-| 阶段 | 命令 |
-|------|------|
-| 意图澄清 | `/clarify-intent` |
-| 构思与规划 | `/spec` `/ys-plan` |
-| 构建与验证 | `/build` `/test` |
-| 审查与优化 | `/ys-review` `/refactor` `/code-simplify` |
-| 交付与提交 | `/ship` `/gc` `/local-commit` |
-| 辅助 | `/sop-add` `/s2m` `/doc-codebase` `/teach-code` `/easy-analysis` |
-
-### 行为技能（自动触发）
-
-在对应场景自动应用：
-
-**构思与规划** — `idea-refine` · `explore-then-ask` · `spec-driven-development` · `planning-and-task-breakdown`
-
-**构建** — `incremental-implementation` · `frontend-ui-engineering` · `api-and-interface-design`
-
-**验证** — `test-driven-development` · `browser-testing-with-devtools`
-
-**审查** — `code-review-and-quality` · `security-and-hardening` · `performance-optimization`
-
-**交付** — `shipping-and-launch` · `ci-cd-and-automation` · `git-workflow-and-versioning`
-
-**维护** — `code-simplification` · `debugging-and-error-recovery` · `documentation-and-adrs` · `deprecation-and-migration`
-
-**支撑** — `using-agent-skills`（元技能）· `context-engineering` · `source-driven-development` · `sop-search` · `writing-great-skills`
-
-### 子智能体（Agent）
-
-- `code-reviewer` — 五维度审查（正确性、可读性、架构、安全、性能）
-- `security-auditor` — 漏洞检测与加固
-- `test-engineer` — 测试策略与覆盖率
-
-### 编码规范
-
-- `code.md` — 先思考再编码、简化优先、精准修改、不随意重构
-
-## 目录结构
-
-```
-ys-powers/
-├── skills/      # 30 个场景化行为技能
-├── commands/    # 25 个显式调用命令
-├── agents/      # 3 个专用子智能体
-├── rules/       # 编码规范与行为约束
-├── install/     # 安装到任意项目 .claude/ 的脚本
-└── docs/        # 项目内部文档与架构说明
-```
-
-## 使用示例
-
-开发新功能时，通常按此顺序调用：
+### 更新与卸载
 
 ```bash
-# 0. 意图还不清楚时先澄清（可选）
-/clarify-intent
-
-# 1. 先写 spec
-/spec
-
-# 2. 拆任务（小改动可跳过）
-/ys-plan
-
-# 3. 逐个实现
-/build
-
-# 4. 补测试或修 bug（可选，/build 已覆盖日常测试）
-/test
-
-# 5. 审查
-/ys-review
-
-# 6. 提交
-/gc
-
-# 7. 上线检查
-/ship
+make update-local
+make update-global
+make uninstall-local
+make uninstall-global
 ```
+
+安装器只管理 `skills/` 和 `rules/`，不再注入旧 hooks，也不再安装 commands、agents 或 references。
+
+## 上游来源
+
+`refer/mattpocock-skills/` 是只读的 Matt 上游参考。不要直接修改其中内容。
+
+同步上游后，更新当前分支的 `skills/`，保留必要的本地差异，并在实验记录中说明差异。
+
+## 实验记录
+
+当前方案：`docs/ys-powers/intent/matt-first-experiment.md`
+
+目标：使用真实中等规模代码任务验证 Matt 完整能力，而不是提前判断 Matt 必然优于旧 ys-powers。

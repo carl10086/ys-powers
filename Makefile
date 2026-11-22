@@ -3,7 +3,7 @@
 YS_POWERS_ROOT := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PYTHON := uv run --python 3.12 python
 
-.PHONY: help global-install local-install update-global update-local uninstall-global uninstall-local opencli-install opencli-uninstall
+.PHONY: help global-install local-install update-global update-local uninstall-global uninstall-local
 
 help:
 	@echo "ys-powers Makefile"
@@ -18,10 +18,6 @@ help:
 	@echo "  make update-local      更新本地安装"
 	@echo "  make uninstall-global  卸载全局安装"
 	@echo "  make uninstall-local   卸载本地安装"
-	@echo "  make opencli-install   安装 opencli skills 到当前项目"
-	@echo "  make opencli-install project-dir=/path/to/project"
-	@echo "                         安装 opencli skills 到指定项目"
-	@echo "  make opencli-uninstall 卸载 opencli skills"
 	@echo ""
 	@echo "快捷变量："
 	@echo "  project-dir= 或 p=     指定目标项目目录（local 范围）"
@@ -31,9 +27,8 @@ help:
 	@echo "  且该项目存在 .claude/settings.local.json，则自动卸载当前项目"
 	@echo ""
 	@echo "安装策略："
-	@echo "  global: skills/commands/agents/rules/hooks 复制到 ~/.claude/"
-	@echo "  local:  同上，但复制到 <project-dir>/.claude/"
-	@echo "  hooks 注入 settings.json (global) 或 settings.local.json (local)"
+	@echo "  global: skills/rules 复制到 ~/.claude/"
+	@echo "  local:  skills/rules 复制到 <project-dir>/.claude/"
 
 global-install:
 	$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install global
@@ -71,20 +66,3 @@ uninstall-local:
 		$(PYTHON) $(YS_POWERS_ROOT)/install/install.py uninstall local; \
 	fi
 
-opencli-install:
-	@if [ -n "$(project-dir)" ]; then \
-		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py install $(project-dir); \
-	elif [ -n "$(p)" ]; then \
-		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py install $(p); \
-	else \
-		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py install .; \
-	fi
-
-opencli-uninstall:
-	@if [ -n "$(project-dir)" ]; then \
-		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py uninstall $(project-dir); \
-	elif [ -n "$(p)" ]; then \
-		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py uninstall $(p); \
-	else \
-		$(PYTHON) $(YS_POWERS_ROOT)/install/opencli-skills.py uninstall .; \
-	fi

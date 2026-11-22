@@ -1,120 +1,61 @@
 # CLAUDE.md
 
-`ys-powers` 是一套用于增强 Claude Code 工作流的本地能力集，封装了 skills、rules、commands 三类配置以及一键安装到任意项目 `.claude/` 的脚本。
+`ys-powers` 是以 Matt Pocock skills 为基础的本地工程能力集。
 
-## 顶层目录速览
+## 目录
 
-- `skills/` — Claude Code 技能定义
-- `rules/` — 项目级或通用编码规范
-- `commands/` — 工作流命令手册
-- `sop/` — 标准操作流程
-- `install/local-install.py` — 把上面三类能力安装到目标项目 `.claude/` 的脚本（详细策略见 `README.md`）
-- `docs/` — 项目内部文档（详见下节）
-- `refer/` — **只读** 第三方参考项目（详见下节）
+- `skills/` — Matt 的完整 skill 分包，以及 ys-powers 的 `eli`
+- `rules/` — 保留的项目级编码规则
+- `install/` — 本地与全局安装器
+- `docs/` — 实验意图、迁移说明和解释文档
+- `refer/mattpocock-skills/` — 只读的 Matt 上游参考
 
-## docs/ 项目内部文档
+## Skills 分包
 
-按主题划分子目录，每个子目录聚焦一个话题：
-
-`docs/ARCHITECTURE.md` — `/doc-codebase` 生成的当前项目架构地图
-`docs/gstack/` — gstack 项目的能力借鉴与集成分析
-`docs/share/` — ys-powers 整体介绍与分享文档
-工作流命令默认将产物写入使用项目的 `docs/ys-powers/`；本仓库不保留该产物目录。
-
-## refer/ 第三方参考项目
-
-`refer/` 存放第三方开源工程项目，用于借鉴方法论和对比设计。**Claude 不应修改其中任何文件**，只能读取用于学习/对比/取灵感。如果发现某个 skill/command 值得搬运，应在主项目 `skills/` 或 `commands/` 下重写，而不是直接复制粘贴。
-
-### agent-skills/
-
-工程级 AI 编码技能集，围绕 `/spec /plan /build /test /review /ship` 六命令的开发生命周期组织，关键词是阶段化与 quality gate。
-
-**适用查阅**：设计 spec→plan→build 流水线、需要看工程化质量门 skills 时。
-
-### superpowers/
-
-Jesse Vincent 的完整软件开发方法论，强调真正的 red/green TDD、subagent-driven-development、YAGNI 与 DRY。
-
-**适用查阅**：找 TDD、子智能体协作、计划执行类 skills 的标杆实现时。
-
-### get-shit-done/
-
-轻量元提示与 spec 驱动开发系统，目标是缓解 context rot，跨多家 CLI 兼容（Claude Code / Codex / Cursor / Windsurf 等）。
-
-**适用查阅**：想看更轻量的、跨平台的 spec-driven 设计时。
-
-### skills/
-
-Matt Pocock 的工程级技能集，分 `engineering/`、`productivity/`、`misc/` 等桶。核心 idea 是领域驱动上下文：`CONTEXT.md` 维护通用语言词典，`docs/adr/` 记录架构决策，所有 skill 共享这块知识基板。
-
-**适用查阅**：找领域建模（`domain-modeling`）、架构词汇（`codebase-design`）、TDD/调试（`tdd`、`diagnosing-bugs`）、工作流（`grill-with-docs`、`to-prd`、`implement`）时。ys-powers 的 `skills/domain-modeling/` 直接参考其 `engineering/domain-modeling/`，由 `skills/explore-then-ask/` 在 grilling 阶段触发。
-
-### humanlayer-skills/
-
-HumanLayer 的 Claude Code 插件仓库（5 个 skill：improve-claude-md、narrow-react-prop-types、build-iterated-agentic-loop、design-control-loop、show-me）。其中 show-me 未被搬运（原有自有副本已于 2026-11 移除）；可视化表达由 `skills/eli/`、`skills/eli5/` 承担。
-
-**适用查阅**：想看 show-me 原版、或评估其余 4 个 skill 是否值得搬运时。
-
-## 给 Claude 的工作约定
-
-- `refer/` 下文件**只读**：不要 edit、不要删除、不要重排。
-- 借鉴 `refer/` 内容时，应在 ys-powers 自有目录中重写，而非搬运。
-- `install/local-install.py` 的覆盖策略详见 `README.md`，本文件不重复说明。
-
-## 撰写 Skills / Commands 的强制约束
-
-**新建或重大修改 `skills/` 与 `commands/` 下文件前，必须先阅读 [`skills/writing-great-skills/SKILL.md`](skills/writing-great-skills/SKILL.md)。**
-
-- `skills/` 下的 SKILL.md 与子文件：遵循 predictability、trigger-focused description、information hierarchy、progressive disclosure、single source of truth、no-op pruning。
-- `commands/` 下的命令手册：保持 focused workflow；steps 必须可执行并有 completion criterion；不要复制 skill/reference 正文。
-- 小幅微调（typo、措辞、单条 bullet）不强制重读；但凡涉及结构、段落、frontmatter 变更必须先核对。
-
-## STALE-FILE-CLEANUP
-
-`install/install.py` 对 commands/rules/hooks/references 目录使用「文件级同名覆盖」策略。当源侧文件重命名（如 `review.md` → `ys-review.md`）或删除时，目标项目中的旧名文件不会自动消失，导致残留。
-
-### renames.json
-
-`install/renames.json` 记录文件重命名/删除映射，用于安装时自动清理目标侧 stale 文件。
-
-```json
-{
-  "commands": {
-    "review.md": "ys-review.md",
-    "plan.md": "ys-plan.md",
-    "html.md": "removed"
-  },
-  "rules": {},
-  "hooks": {},
-  "references": {},
-  "skills": {
-    "brainstorming": "removed"
-  },
-  "agents": {
-    "html-generator.md": "removed"
-  }
-}
+```text
+skills/engineering/
+skills/productivity/
+skills/misc/
+skills/in-progress/
+skills/deprecated/
+skills/eli/
 ```
 
-格式：按目录分组，键为旧文件名，值为新文件名；删除操作将值写为 `"removed"`（清理逻辑只看键，目录或文件均可删）。
+保持 Matt 原始目录结构、frontmatter、调用策略和每个 skill 的 `agents/openai.yaml`。不要把 skill 平铺、重命名或重新实现。
 
-### AI 维护义务
+Matt 的分包含义：
 
-每次在 commands / rules / hooks / references / skills / agents 目录下执行文件重命名（rename）或删除（delete）操作后：
+- `engineering`：日常代码工程能力
+- `productivity`：通用工作流能力
+- `misc`：稳定但低频的工具
+- `in-progress`：公开 beta 能力
+- `deprecated`：上游保留的废弃能力
+- `eli`：ys-powers 的本地能力
 
-1. **必须**更新 `install/renames.json`，重命名添加 `"旧名": "新名"` 映射，删除添加 `"旧名": "removed"`
-2. **必须**在 commit message 中注明 renames.json 的变更
-3. 由 human review 确认映射是否正确
+## 本地化边界
 
-### 示例
+允许的本地差异：
 
-已记录的映射：
+- `.scratch/` → `.ys-powers/`
+- 安装器和本地 manifest
+- 上游同步记录
+- 中文解释文档
+- `skills/eli/`
+- `rules/code.md`
 
-| 目录 | 旧文件名 | 新文件名 |
-|------|----------|----------|
-| commands | review.md | ys-review.md |
-| commands | plan.md | ys-plan.md |
-| commands | html.md | removed |
-| skills | brainstorming | removed |
-| skills | html-anything | removed |
-| agents | html-generator.md | removed |
+不要针对 OMP 或 Claude 另做两套 prompt 流程。不要修改 `refer/mattpocock-skills/`。
+
+## 安装
+
+```bash
+make local-install
+make local-install project-dir=/path/to/project
+```
+
+实验阶段只使用 local install。不要操作全局 `~/.claude/`，除非用户明确要求进行全局迁移。
+
+安装器只安装 `skills/engineering`、`skills/productivity`、`skills/eli` 和 `rules/`；`misc`、`in-progress`、`deprecated` 保留在源目录但不默认安装。
+
+## 实验方案
+
+完整意图记录在 `docs/ys-powers/intent/matt-first-experiment.md`。先用真实代码任务验证 Matt 完整能力，再决定后续定制。

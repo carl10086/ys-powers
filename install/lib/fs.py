@@ -117,7 +117,6 @@ def install_folder_level(source_dir: Path, target_dir: Path) -> bool:
     try:
         # 确保目标目录存在
         target_dir.mkdir(parents=True, exist_ok=True)
-
         # 遍历源目录中的所有项目
         for source_item in source_dir.iterdir():
             # 防止路径遍历：跳过包含路径分隔符或以 . 开头的名称

@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matt Pocock skills：Prompt 与 Skill 如何驱动写代码</title>
+  <style>
+    :root {
+      --bg: #f7f7f2;
+      --panel: #fff;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d9dde5;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --green: #15803d;
+      --green-soft: #eaf8ee;
+      --orange: #c2410c;
+      --orange-soft: #fff1e8;
+      --purple: #7e22ce;
+      --purple-soft: #f4eaff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+    main { max-width: 1120px; margin: 0 auto; padding: 42px 24px 80px; }
+    h1 { max-width: 850px; margin: 0 0 14px; font-size: clamp(32px, 5vw, 60px); line-height: 1.08; letter-spacing: -0.04em; }
+    h2 { margin: 0 0 16px; font-size: 28px; line-height: 1.2; }
+    h3 { margin: 0 0 8px; font-size: 20px; }
+    p { margin: 8px 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+    .lede { max-width: 820px; color: var(--muted); font-size: 19px; }
+    .notice, .panel, .skill, .move { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 8px 28px rgba(31,41,55,.05); }
+    .notice { margin: 28px 0; padding: 22px 26px; border-left: 8px solid var(--blue); }
+    .notice strong { color: var(--blue); }
+    .section { margin-top: 56px; }
+    .section-intro { color: var(--muted); max-width: 820px; margin-bottom: 20px; }
+    svg { display: block; width: 100%; height: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; }
+    svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: var(--ink); }
+    .skill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+    .skill { padding: 20px; }
+    .skill.user { border-top: 6px solid var(--blue); }
+    .skill.model { border-top: 6px solid var(--green); }
+    .skill.support { border-top: 6px solid var(--purple); }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+    .badge.user { color: var(--blue); background: var(--blue-soft); }
+    .badge.model { color: var(--green); background: var(--green-soft); }
+    .badge.support { color: var(--purple); background: var(--purple-soft); }
+    .path { display: block; margin: 10px 0 14px; color: var(--muted); font-size: 12px; word-break: break-word; }
+    .skill ul { margin: 10px 0 0; padding-left: 20px; }
+    blockquote { margin: 14px 0 0; padding: 12px 14px; color: #344054; background: #f8fafc; border-left: 3px solid var(--line); font-size: 14px; }
+    .moves { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .move { padding: 20px; }
+    .move .number { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 12px; border-radius: 50%; color: white; background: var(--orange); font-weight: 800; }
+    .footer { margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); }
+    .catalog { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .catalog-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .catalog-card h3 { margin: 8px 0 4px; font-size: 18px; }
+    .catalog-card p { margin: 5px 0; }
+    .catalog-card .when { color: var(--muted); font-size: 14px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .tag.entry { color: var(--blue); background: var(--blue-soft); }
+    .tag.auto { color: var(--green); background: var(--green-soft); }
+    .tag.beta { color: var(--orange); background: var(--orange-soft); }
+    .tag.tool { color: var(--purple); background: var(--purple-soft); }
+    .catalog-note { margin: 16px 0; padding: 16px 18px; background: #fffaf0; border: 1px solid #f2d6a2; border-radius: 14px; }
+    @media (max-width: 680px) { main { padding: 28px 16px 60px; } .notice, .panel, .skill, .move { border-radius: 14px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Matt Pocock 的 Prompt 与 Skill，究竟干了什么</h1>
+    <p class="lede">这不是 Matt 与 ys-powers 的比较页。它只解释：Matt 如何把“我要写一个功能”变成一组可以理解、拆分、实现、审查和恢复的工作。</p>
+  </header>
+
+  <div class="notice">
+    <strong>阅读重点：</strong>不要把这些 skill 当成一串命令。Matt 真正设计的是一套“上下文如何流动、决策何时发生、代码任务如何被领取和完成”的 Prompt 协议。
+  </div>
+
+  <section class="section">
+    <h2>一张图：Prompt 如何驱动写代码</h2>
+    <p class="section-intro">蓝色是用户主动启动的流程入口，绿色是实现过程中被调用的底层能力，紫色是持续维护和反馈。</p>
+    <svg viewBox="0 0 1100 470" role="img" aria-label="Matt Pocock skills 的工作流">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L9,3 z" fill="#667085" />
+        </marker>
+      </defs>
+      <rect x="36" y="42" width="190" height="82" rx="16" fill="#eaf1ff" stroke="#2563eb" stroke-width="2" />
+      <text x="131" y="75" text-anchor="middle" font-size="20" font-weight="700">grill-with-docs</text>
+      <text x="131" y="103" text-anchor="middle" font-size="14">启动 grilling + domain-modeling</text>
+
+      <line x1="226" y1="83" x2="286" y2="83" stroke="#667085" stroke-width="2" marker-end="url(#arrow)" />
+      <rect x="294" y="42" width="190" height="82" rx="16" fill="#eaf1ff" stroke="#2563eb" stroke-width="2" />
+      <text x="389" y="75" text-anchor="middle" font-size="20" font-weight="700">to-spec</text>
+      <text x="389" y="103" text-anchor="middle" font-size="14">把已讨论内容固化为 spec</text>
+
+      <line x1="484" y1="83" x2="544" y2="83" stroke="#667085" stroke-width="2" marker-end="url(#arrow)" />
+      <rect x="552" y="42" width="190" height="82" rx="16" fill="#eaf1ff" stroke="#2563eb" stroke-width="2" />
+      <text x="647" y="75" text-anchor="middle" font-size="20" font-weight="700">to-tickets</text>
+      <text x="647" y="103" text-anchor="middle" font-size="14">spec → vertical slices</text>
+
+      <line x1="742" y1="83" x2="802" y2="83" stroke="#667085" stroke-width="2" marker-end="url(#arrow)" />
+      <rect x="810" y="42" width="250" height="82" rx="16" fill="#eaf1ff" stroke="#2563eb" stroke-width="2" />
+      <text x="935" y="75" text-anchor="middle" font-size="20" font-weight="700">implement-spec</text>
+      <text x="935" y="103" text-anchor="middle" font-size="14">读取 task graph 并调度实现</text>
+
+      <rect x="120" y="190" width="240" height="86" rx="16" fill="#eaf8ee" stroke="#15803d" stroke-width="2" />
+      <text x="240" y="224" text-anchor="middle" font-size="20" font-weight="700">tdd</text>
+      <text x="240" y="252" text-anchor="middle" font-size="14">在 public seam 做 red → green</text>
+
+      <rect x="430" y="190" width="240" height="86" rx="16" fill="#eaf8ee" stroke="#15803d" stroke-width="2" />
+      <text x="550" y="224" text-anchor="middle" font-size="20" font-weight="700">code-review</text>
+      <text x="550" y="252" text-anchor="middle" font-size="14">Standards 与 Spec 分开审查</text>
+
+      <rect x="740" y="190" width="240" height="86" rx="16" fill="#f4eaff" stroke="#7e22ce" stroke-width="2" />
+      <text x="860" y="224" text-anchor="middle" font-size="20" font-weight="700">retro</text>
+      <text x="860" y="252" text-anchor="middle" font-size="14">把本次失败变成环境改进</text>
+
+      <line x1="935" y1="124" x2="860" y2="190" stroke="#667085" stroke-width="2" marker-end="url(#arrow)" />
+      <line x1="810" y1="124" x2="550" y2="190" stroke="#667085" stroke-width="2" marker-end="url(#arrow)" />
+      <line x1="810" y1="124" x2="240" y2="190" stroke="#667085" stroke-width="2" marker-end="url(#arrow)" />
+
+      <rect x="150" y="350" width="800" height="70" rx="16" fill="#fff1e8" stroke="#c2410c" stroke-width="2" />
+      <text x="550" y="382" text-anchor="middle" font-size="20" font-weight="700">核心结果：不是一份长说明，而是可领取、可验证、可恢复的代码工作</text>
+      <text x="550" y="406" text-anchor="middle" font-size="14">spec → tickets → blocking edges → fresh context → integration branch → review</text>
+    </svg>
+  </section>
+
+  <section class="section">
+    <h2>第一层：他怎样讨论问题</h2>
+    <div class="skill-grid">
+      <article class="skill user">
+        <span class="badge user">用户入口</span>
+        <h3>grill-with-docs</h3>
+        <span class="path">skills/engineering/grill-with-docs/SKILL.md</span>
+        <p><strong>它自己不负责提问。</strong>它只是规定：调用 <code>grilling</code> 和 <code>domain-modeling</code>。</p>
+        <blockquote>Call the Skill tool twice, for "grilling" and "domain-modeling".</blockquote>
+        <p>作用：把“讨论方案”和“维护领域语言”绑定在同一入口。</p>
+      </article>
+
+      <article class="skill model">
+        <span class="badge model">底层 Prompt</span>
+        <h3>grilling</h3>
+        <span class="path">skills/productivity/grilling/SKILL.md</span>
+        <p>它把访谈变成一棵 <strong>design tree</strong>，只问当前已经具备前置条件的问题。</p>
+        <ul>
+          <li>每轮计算 frontier；</li>
+          <li>每个问题附 recommended answer；</li>
+          <li>环境事实由 agent 查询；</li>
+          <li>设计决定由用户确认；</li>
+          <li>所有分支走完才结束。</li>
+        </ul>
+        <blockquote>Ask the whole frontier in one round. Then wait for the user's answers.</blockquote>
+        <p>作用：避免一次问错顺序，导致后面的设计建立在未确认的假设上。</p>
+      </article>
+
+      <article class="skill model">
+        <span class="badge model">底层 Prompt</span>
+        <h3>domain-modeling</h3>
+        <span class="path">skills/engineering/domain-modeling/SKILL.md</span>
+        <p>它不负责写实现方案，而是负责把项目中的词变准确。</p>
+        <ul>
+          <li>发现术语与 glossary 冲突时立即指出；</li>
+          <li>把模糊词变成 canonical term；</li>
+          <li>用具体场景测试概念边界；</li>
+          <li>对照代码检查说法是否真实；</li>
+          <li>只有满足三个条件才创建 ADR。</li>
+        </ul>
+        <p>作用：让 spec、ticket、test 使用同一套业务语言。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>第二层：他怎样把讨论变成 spec 和任务</h2>
+    <div class="skill-grid">
+      <article class="skill user">
+        <span class="badge user">用户入口</span>
+        <h3>to-spec</h3>
+        <span class="path">skills/engineering/to-spec/SKILL.md</span>
+        <p><strong>它不再访谈。</strong>它假设前面的讨论已经完成，只负责综合和发布。</p>
+        <ul>
+          <li>先理解代码库；</li>
+          <li>寻找最高层、最少的测试 seam；</li>
+          <li>让用户确认 seam；</li>
+          <li>按固定模板写 spec；</li>
+          <li>发布到 issue tracker，并标记 <code>ready-for-agent</code>。</li>
+        </ul>
+        <blockquote>no interview, just synthesis of what you've already discussed.</blockquote>
+        <p>作用：把“我们已经决定的东西”变成可交接的事实。</p>
+      </article>
+
+      <article class="skill user">
+        <span class="badge user">用户入口</span>
+        <h3>to-tickets</h3>
+        <span class="path">skills/engineering/to-tickets/SKILL.md</span>
+        <p>它不把 spec 横向拆成“先数据库、再 API、再 UI”，而是切成完整的 <strong>tracer-bullet vertical slices</strong>。</p>
+        <ul>
+          <li>每个 ticket 都能独立 demo 或验证；</li>
+          <li>每个 ticket 适合一个 fresh context；</li>
+          <li>每个 ticket 标出 <code>Blocked by</code>；</li>
+          <li>先让用户审核粒度和依赖；</li>
+          <li>审核后才发布 ticket。</li>
+        </ul>
+        <blockquote>The tickets are not a list of steps. They are a task graph.</blockquote>
+        <p>作用：让“下一件能做什么”变成系统状态，而不是模型记忆。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>第三层：他怎样让 agent 写代码</h2>
+    <div class="skill-grid">
+      <article class="skill user">
+        <span class="badge user">用户入口</span>
+        <h3>implement</h3>
+        <span class="path">skills/engineering/implement/SKILL.md</span>
+        <ul>
+          <li>读取 spec 或 ticket；</li>
+          <li>调用 <code>tdd</code>；</li>
+          <li>持续 typecheck 和单测；</li>
+          <li>最后跑完整测试；</li>
+          <li>调用 <code>code-review</code>；</li>
+          <li>提交当前 branch。</li>
+        </ul>
+        <p>作用：把实现流程写成固定协议，减少“写完代码就结束”。</p>
+      </article>
+
+      <article class="skill user">
+        <span class="badge user">用户入口</span>
+        <h3>implement-spec</h3>
+        <span class="path">skills/engineering/implement-spec/SKILL.md</span>
+        <p>它是调度器，不是普通的“开始写代码”。</p>
+        <ul>
+          <li>读取 spec 和 task graph；</li>
+          <li>找出当前 frontier；</li>
+          <li>每个 ticket 启动 fresh implementer；</li>
+          <li>每个 implementer 使用独立 worktree；</li>
+          <li>由 merger 合并到 integration branch；</li>
+          <li>frontier 变化后继续启动新任务；</li>
+          <li>全部完成后统一 code review。</li>
+        </ul>
+        <blockquote>Start every subagent with a fresh context window.</blockquote>
+        <p>作用：把多个 ticket 变成可调度的并行工作，而不是把所有任务塞进一个上下文。</p>
+      </article>
+
+      <article class="skill model">
+        <span class="badge model">底层 Prompt</span>
+        <h3>tdd</h3>
+        <span class="path">skills/engineering/tdd/SKILL.md</span>
+        <ul>
+          <li>只从 public interface 观察行为；</li>
+          <li>测试 seam 必须提前确认；</li>
+          <li>先 red，再 green；</li>
+          <li>一次只做一个 slice；</li>
+          <li>重构不放在 red-green 循环里。</li>
+        </ul>
+        <blockquote>One slice at a time. One seam, one test, one minimal implementation.</blockquote>
+        <p>作用：约束模型不要先批量写测试或先做大规模实现。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>第四层：他怎样审查结果</h2>
+    <div class="skill-grid">
+      <article class="skill model">
+        <span class="badge model">底层 Prompt</span>
+        <h3>code-review</h3>
+        <span class="path">skills/engineering/code-review/SKILL.md</span>
+        <p>它刻意把 review 拆成两个互不覆盖的轴：</p>
+        <ul>
+          <li><strong>Standards：</strong>代码是否符合仓库规范；</li>
+          <li><strong>Spec：</strong>代码是否实现了原始需求。</li>
+        </ul>
+        <p>两个 fresh subagent 并行审查，最后并排报告。</p>
+        <blockquote>Do not merge or rerank findings.</blockquote>
+        <p>作用：防止“代码很漂亮”掩盖了“需求做错了”，也防止“功能做对了”掩盖了规范问题。</p>
+      </article>
+
+      <article class="skill support">
+        <span class="badge support">反馈 Prompt</span>
+        <h3>retro</h3>
+        <span class="path">skills/engineering/retro/SKILL.md</span>
+        <p>它复盘的不是人的感受，而是 agent 环境应该如何改进。</p>
+        <ul>
+          <li>Navigation：是否难以找到正确文件；</li>
+          <li>Automated checks：是否缺少可自动发现的检查；</li>
+          <li>Coding standards：是否需要新规则；</li>
+          <li>Tool economy：工具调用是否浪费；</li>
+          <li>No-ops：是否存在不改变行为的指令；</li>
+          <li>Information access：是否缺少关键信息。</li>
+        </ul>
+        <p>作用：把一次实现中的问题，转成下一次运行环境的改进。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Matt 实际做的五个设计动作</h2>
+    <div class="moves">
+      <article class="move"><div class="number">1</div><h3>把讨论变成设计树</h3><p>不按感觉连续提问，而是只推进当前 frontier。</p></article>
+      <article class="move"><div class="number">2</div><h3>把决定变成 spec</h3><p><code>to-spec</code> 不重新发散，只综合已经确认的内容。</p></article>
+      <article class="move"><div class="number">3</div><h3>把 spec 变成 task graph</h3><p>ticket 有依赖、有状态、有可领取的 frontier。</p></article>
+      <article class="move"><div class="number">4</div><h3>把实现隔离</h3><p>fresh context、worktree、integration branch 分开上下文和代码变更。</p></article>
+      <article class="move"><div class="number">5</div><h3>把错误反馈回环境</h3><p><code>code-review</code> 找问题，<code>retro</code> 修改未来的工作方式。</p></article>
+    </div>
+  </section>
+  <section class="section">
+    <h2>完整 Skill 视图：不是都要执行</h2>
+    <p class="section-intro">Matt 把 skill 分成“主流程入口”“模型按需调用”“用户遇到特殊任务时调用”和“实验/独立工具”。它们不是一条固定长链。</p>
+    <div class="catalog-note">
+      <strong>读取方法：</strong>先走核心代码流程；只有当前任务满足“什么时候用”条件，才加入下面的分支。<code>setup-matt-pocock-skills</code> 是一次性初始化，不是每个功能都重复运行。
+    </div>
+
+    <h3>Engineering：用户主动启动</h3>
+    <div class="catalog">
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>ask-matt</h3><p>根据当前情况路由到合适的 Matt skill。</p><p class="when">什么时候用：不知道该走哪个流程时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>grill-with-docs</h3><p>组合启动 <code>grilling</code> 与 <code>domain-modeling</code>。</p><p class="when">什么时候用：开始讨论一个新方案或设计时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>setup-matt-pocock-skills</h3><p>配置 tracker、triage labels、GLOSSARY 和 ADR 布局。</p><p class="when">什么时候用：每个 repo 第一次启用 Matt 时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>to-spec</h3><p>把已经讨论清楚的内容综合成 spec，并发布到 tracker。</p><p class="when">什么时候用：设计决策已经确认后。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>to-tickets</h3><p>把 spec 拆成 vertical-slice tickets 和 blocking edges。</p><p class="when">什么时候用：spec 已经可以交给 agent 实现后。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>implement</h3><p>实现单个 spec 或 ticket，完成测试、review 和 commit。</p><p class="when">什么时候用：处理一个具体 ticket 时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>implement-spec</h3><p>读取整个 task graph，调度多个 ticket 到 integration branch。</p><p class="when">什么时候用：完整实现一个包含多个 ticket 的 spec 时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>wayfinder</h3><p>为巨大且路线不清的工作建立 map 和 decision tickets。</p><p class="when">什么时候用：工作超过一个 session，且还不知道完整路线时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>triage</h3><p>把 issue 从待分类状态推进到可交给 agent 或 human 的状态。</p><p class="when">什么时候用：issue 来源杂乱、不能直接实现时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>improve-codebase-architecture</h3><p>扫描代码库，生成架构改进 HTML 报告，再选择一个方向讨论。</p><p class="when">什么时候用：主动改善既有架构，而不是实现单个功能时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>retro</h3><p>复盘 agent 环境、导航、检查、工具和规则。</p><p class="when">什么时候用：一次 coding session 完成后。</p></article>
+    </div>
+
+    <h3>Engineering：模型按需调用</h3>
+    <div class="catalog">
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>grilling</h3><p>用 design tree、frontier 和 recommended answer 推进决策。</p><p class="when">由 <code>grill-with-docs</code> 或其他设计流程调用。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>domain-modeling</h3><p>校准术语、边界、GLOSSARY 和 ADR。</p><p class="when">出现新概念、术语冲突或架构决定时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>tdd</h3><p>在确认的 public seam 上执行 red → green → 最小实现。</p><p class="when">实现功能或修 bug，需要测试先行时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>codebase-design</h3><p>设计 deep module、接口、seam 和模块边界。</p><p class="when">测试 seam 或模块接口本身不清楚时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>code-review</h3><p>并行检查 Standards 和 Spec 两条独立轴。</p><p class="when">实现完成、审查 branch 或 diff 时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>diagnosing-bugs</h3><p>复现、缩小、假设、instrument、修复、回归测试。</p><p class="when">bug 难以复现，或性能回退无法直接定位时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>research</h3><p>查高可信外部资料，并把结论保存为 cited Markdown。</p><p class="when">实现依赖第三方 API、框架或外部事实时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>prototype</h3><p>制作一次性原型验证 UI、逻辑或状态模型。</p><p class="when">文字讨论无法判断设计是否可行时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>pr</h3><p>整理 PR body、前后证据、merge risk 和 blast radius。</p><p class="when">代码完成并准备提交 PR 时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>wizard</h3><p>生成只让人执行必要步骤的交互式 bash wizard。</p><p class="when">凭证、第三方控制台或一次性 cutover 必须由人完成时。</p></article>
+    </div>
+
+    <h3>Productivity：上下文和沟通</h3>
+    <div class="catalog">
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>grill-me</h3><p>用户主动启动的完整 grilling 入口。</p><p class="when">想明确要求一轮完整设计访谈时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>handoff</h3><p>把当前会话压缩成交接文档。</p><p class="when">换 agent、换 session 或上下文即将耗尽时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>teach</h3><p>在多次 session 中教授一个 skill 或概念。</p><p class="when">需要系统学习，而不是解决单个代码任务时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>to-questionnaire</h3><p>把无法独立回答的决定整理成问卷。</p><p class="when">关键答案必须由另一个人异步提供时。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>wait-what</h3><p>检测用户没有理解后，用更直白的方式重新解释。</p><p class="when">用户明确表示没听懂或概念没有落地时。</p></article>
+      <article class="catalog-card"><span class="tag auto">模型按需</span><h3>writing-for-agents</h3><p>规定 skill、CLAUDE.md、AGENTS.md 等 agent 文档如何写。</p><p class="when">创建或修改 agent-facing 文档时。</p></article>
+    </div>
+
+    <h3>In-progress：实验性 skill</h3>
+    <div class="catalog">
+      <article class="catalog-card"><span class="tag beta">Beta</span><h3>chief-of-staff</h3><p>为长期目标协调多个 subagent。</p><p class="when">长时间、多线程目标需要专门协调时。</p></article>
+      <article class="catalog-card"><span class="tag beta">Beta</span><h3>claude-handoff</h3><p>把当前对话交给后台 agent 继续执行。</p><p class="when">需要立即切换到 fresh background agent 时。</p></article>
+      <article class="catalog-card"><span class="tag beta">Beta</span><h3>loop-me</h3><p>在 workspace 中多 session 反复讨论 workflow spec。</p><p class="when">工作流本身需要长期迭代时。</p></article>
+      <article class="catalog-card"><span class="tag beta">Beta</span><h3>software-factory</h3><p>为软件工厂定义任务和服务的共同语言。</p><p class="when">设计自动化软件生产系统时。</p></article>
+      <article class="catalog-card"><span class="tag beta">Beta</span><h3>setup-ts-deep-modules</h3><p>用 dependency-cruiser 约束 TypeScript deep modules。</p><p class="when">专门治理 TypeScript 包边界时。</p></article>
+      <article class="catalog-card"><span class="tag beta">Beta</span><h3>writing-fragments / writing-beats / writing-shape</h3><p>分别收集片段、组织文章 beats、逐段塑造文章。</p><p class="when">写作工作流，不属于代码交付。</p></article>
+    </div>
+
+    <h3>Misc：独立工具</h3>
+    <div class="catalog">
+      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>git-guardrails-claude-code</h3><p>用 hooks 阻止危险 Git 命令。</p><p class="when">需要额外 Git 安全护栏时。</p></article>
+      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>setup-pre-commit</h3><p>配置 Husky、lint-staged、格式化、类型检查和测试。</p><p class="when">需要建立 pre-commit 质量门禁时。</p></article>
+      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>migrate-to-shoehorn</h3><p>迁移 TypeScript 测试中的类型断言写法。</p><p class="when">专门进行 shoehorn 迁移时。</p></article>
+      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>scaffold-exercises</h3><p>生成练习题、答案和讲解目录。</p><p class="when">维护教学练习内容时。</p></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>一句话理解 Matt</h2>
+    <div class="notice">
+      Matt 不是主要在写“更多开发规范”；他是在用 Prompt 定义一套<strong>状态传递协议</strong>：什么已经决定、什么被谁阻塞、什么可以开始、什么证据证明完成、什么问题要反馈到环境。
+    </div>
+  </section>
+
+  <footer class="footer">
+    来源文件均来自 <code>refer/mattpocock-skills</code>；本页面解释 Prompt 的职责和行为，不代表已经决定迁移或重写 <code>ys-powers</code>。
+  </footer>
+</main>
+</body>
+</html>
