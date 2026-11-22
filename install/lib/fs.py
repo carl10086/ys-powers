@@ -147,6 +147,60 @@ def install_folder_level(source_dir: Path, target_dir: Path) -> bool:
         return False
 
 
+def install_skill_bucket(source_dir: Path, target_dir: Path) -> bool:
+    """将 Matt 的分包目录安装为 Claude 可发现的扁平 skill 目录。"""
+    try:
+        target_dir.mkdir(parents=True, exist_ok=True)
+        for source_item in source_dir.iterdir():
+            if (
+                not source_item.is_dir()
+                or "/" in source_item.name
+                or "\\" in source_item.name
+                or source_item.name.startswith(".")
+            ):
+                continue
+            target_item = target_dir / source_item.name
+            if target_item.exists():
+                if target_item.is_dir():
+                    shutil.rmtree(target_item)
+                else:
+                    target_item.unlink()
+            shutil.copytree(source_item, target_item)
+        return True
+    except PermissionError as e:
+        print(f"    错误: 权限不足 - {e}", file=sys.stderr)
+        return False
+    except Exception as e:
+        print(f"    错误: 复制过程中发生错误 - {e}", file=sys.stderr)
+        return False
+
+
+def uninstall_skill_bucket(source_dir: Path, target_dir: Path) -> bool:
+    """卸载一个 Matt 分包已安装的扁平 skill 目录。"""
+    if not target_dir.exists():
+        return True
+    try:
+        for source_item in source_dir.iterdir():
+            if (
+                not source_item.is_dir()
+                or "/" in source_item.name
+                or "\\" in source_item.name
+                or source_item.name.startswith(".")
+            ):
+                continue
+            target_item = target_dir / source_item.name
+            if target_item.is_dir() and not target_item.is_symlink():
+                shutil.rmtree(target_item)
+            elif target_item.exists():
+                target_item.unlink()
+        return True
+    except PermissionError as e:
+        print(f"    错误: 权限不足 - {e}", file=sys.stderr)
+        return False
+    except Exception as e:
+        print(f"    错误: 删除过程中发生错误 - {e}", file=sys.stderr)
+        return False
+
 def install_file_level(source_dir: Path, target_dir: Path) -> bool:
     """
     文件级同名覆盖策略
@@ -183,7 +237,7 @@ def install_directory(
         source_name: 源目录名（相对于项目根目录）
         target_dir: 目标目录（如 ~/.claude/ 或 ./.claude/）
         target_name: 目标子目录名（如 skills, rules）
-        strategy: 复制策略 ('folder' 或 'file')
+        strategy: 复制策略 ('folder'、'file' 或 'skill-bucket')
 
     Returns:
         是否安装成功
@@ -206,10 +260,23 @@ def install_directory(
     cleanup_stale_files(project_root, source_name, target_subdir)
 
     # 收集变更（在安装前，基于当前源和目标状态）
-    changes = _collect_changes(source_dir, target_subdir)
+    if strategy == "skill-bucket":
+        changes = [
+            (
+                "A" if not (target_subdir / item.name).exists() else "M",
+                item.name,
+            )
+            for item in source_dir.iterdir()
+            if item.is_dir() and not item.name.startswith(".")
+        ]
+    else:
+        changes = _collect_changes(source_dir, target_subdir)
 
     # 根据策略执行复制
-    if strategy == "folder":
+    if strategy == "skill-bucket":
+        strategy_desc = "扁平 skill 安装"
+        success = install_skill_bucket(source_dir, target_subdir)
+    elif strategy == "folder":
         strategy_desc = "文件夹级全量覆盖"
         success = install_folder_level(source_dir, target_subdir)
     elif strategy == "file":
@@ -269,6 +336,14 @@ def uninstall_directory(
     if not source_dir.exists():
         print(f"✗ {source_name.capitalize()} 源目录不存在，跳过卸载", file=sys.stderr)
         return False
+    if strategy == "skill-bucket":
+        success = uninstall_skill_bucket(source_dir, target_subdir)
+        if success:
+            print(f"✓ {source_name.capitalize()} 卸载成功")
+        else:
+            print(f"✗ {source_name.capitalize()} 卸载失败", file=sys.stderr)
+        return success
+
 
     all_ok = True
 

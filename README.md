@@ -32,6 +32,7 @@ rules
 ```
 
 Matt 的其他分包仍保留在源目录和 `refer/` 中，后续可通过安装配置显式启用。
+源目录保留 Matt 的分包结构；安装到项目 `.claude/skills/` 时，安装器会把选中的 skill 扁平化到一级目录，确保 Claude 能发现每个 `SKILL.md`。这只改变安装布局，不改变 skill 内容。
 
 默认工程链由 Matt skills 自己的调用约束决定，不在本项目中重新实现：
 

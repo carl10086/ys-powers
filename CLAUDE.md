@@ -22,6 +22,7 @@ skills/eli/
 ```
 
 保持 Matt 原始目录结构、frontmatter、调用策略和每个 skill 的 `agents/openai.yaml`。不要把 skill 平铺、重命名或重新实现。
+源目录保持分包；安装器针对本地 `.claude/skills/` 做一级扁平化，因为本地 Claude skill 发现只读取直接子目录。扁平化不修改 skill 内容。
 
 Matt 的分包含义：
 
