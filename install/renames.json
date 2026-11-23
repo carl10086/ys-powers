@@ -47,7 +47,6 @@
     "code-review-and-quality": "removed",
     "deprecation-and-migration": "removed",
     "frontend-ui-engineering": "removed",
-    "domain-modeling": "removed",
     "spec-driven-development": "removed",
     "test-driven-development": "removed",
     "using-agent-skills": "removed",
@@ -81,5 +80,8 @@
     "simplify-ignore-test.sh": "removed",
     "simplify-ignore.sh": "removed"
   },
-  "rules": {}
+  "rules": {
+    "code.md": "removed",
+    "context7.md": "removed"
+  }
 }

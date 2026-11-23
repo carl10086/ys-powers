@@ -1,80 +1,71 @@
 # CLAUDE.md
 
-`ys-powers` 是以 Matt Pocock skills 为基础的本地工程能力集。
+`ys-powers` 是一套以 Matt Pocock skills 为基础的本地 coding workflow。
 
 ## 目录
 
-- `skills/` — Matt 的完整 skill 分包，以及 ys-powers 的 `eli`
-- `rules/` — 保留的项目级编码规则
+- `skills/` — 当前使用的 Matt skill 分包与本地 `eli`
 - `install/` — 本地与全局安装器
-- `docs/` — 实验意图、迁移说明和解释文档
-- `refer/mattpocock-skills/` — 只读的 Matt 上游参考
+- `docs/` — 当前配置、使用说明和历史记录
+- `refer/` — 只读的上游参考仓库
 
-## Skills 分包
+当前使用的 skill 目录只有：
 
 ```text
 skills/engineering/
 skills/productivity/
-skills/misc/
-skills/in-progress/
-skills/deprecated/
 skills/eli/
 ```
 
-保持 Matt 原始目录结构、frontmatter、调用策略和每个 skill 的 `agents/openai.yaml`。不要把 skill 平铺、重命名或重新实现。
-源目录保持分包；安装器针对本地 `.claude/skills/` 做一级扁平化，因为本地 Claude skill 发现只读取直接子目录。扁平化不修改 skill 内容。
+`deprecated/`、`in-progress/`、`misc/` 不属于当前使用范围。不要为了保持旧目录形状重新加入它们。
 
-Matt 的分包含义：
+## 保持 Matt 的边界
 
-- `engineering`：日常代码工程能力
-- `productivity`：通用工作流能力
-- `misc`：稳定但低频的工具
-- `in-progress`：公开 beta 能力
-- `deprecated`：上游保留的废弃能力
-- `eli`：ys-powers 的本地能力
+保持 Matt 原始 skill 的目录结构、frontmatter、Prompt、调用策略和每个 skill 的 `agents/openai.yaml`。不要平铺、重命名或重新实现 Matt 的 skill。
 
-## 本地化边界
+本地允许的差异仅包括：
 
-允许的本地差异：
+- 安装器和本地 manifest；
+- 上游同步记录；
+- 中文解释文档；
+- `skills/eli/`；
+- 面向本地运行时的必要适配。
 
-- 保持 Matt 原始的 `.scratch/` local markdown tracker 约定
-- 安装器和本地 manifest
-- 上游同步记录
-- 中文解释文档
-- `skills/eli/`
-- `rules/code.md`
-
-不要针对 OMP 或 Claude 另做两套 prompt 流程。不要修改 `refer/mattpocock-skills/`。
+不要修改 `refer/` 下的上游参考内容，也不要为 OMP 和 Claude 维护两套 Prompt 流程。
 
 ## 安装
 
 ```bash
 make local-install
 make local-install project-dir=/path/to/project
+make global-install
 ```
 
-实验阶段只使用 local install。不要操作全局 `~/.claude/`，除非用户明确要求进行全局迁移。
+`project-dir` 是 Make 变量，不是 `make` 选项。安装器只安装当前三个 skill 分包，不自动安装或创建 `AGENTS.md`、`CLAUDE.md`、`docs/agents/` 或 `rules/`。这些项目级文件由 `setup-matt-pocock-skills` 在目标项目内按选择生成。
 
-安装器只安装 `skills/engineering`、`skills/productivity`、`skills/eli` 和 `rules/`；`misc`、`in-progress`、`deprecated` 保留在源目录但不默认安装。
+`make global-install` 会更新 `~/.claude/`，并清理安装器登记的旧版 `commands/`、`agents/`、`references/`、`hooks/`、`rules/` 目标。涉及用户全局环境时，先确认目标范围。
 
-## 实验方案
+## 核心 workflow
 
-完整意图记录在 `docs/ys-powers/intent/matt-first-experiment.md`。先用真实代码任务验证 Matt 完整能力，再决定后续定制。
+```text
+grill-with-docs → to-spec → to-tickets → implement → code-review
+```
 
-## Agent skills
+复杂并行实现可以把 `implement` 换成 `implement-spec`。这只是推荐链路，不是自动流水线；每一步结束后由用户或 agent 根据产物决定是否继续调用下一个 skill。`grill-with-docs` 不会自动调用 `to-spec`。
 
-### Issue tracker
+## 项目级配置
 
-Issues and specs live in GitHub Issues; use the `gh` CLI. See `docs/agents/issue-tracker.md`.
+第一次在项目中使用 Matt engineering skills 时调用 `setup-matt-pocock-skills`。它按顺序处理：
 
-### Triage labels
+1. 可选的中文技术文档写作规则；
+2. issue tracker；
+3. 安装了 `triage` 时的 triage labels；
+4. domain docs 布局。
 
-Use the default five canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+当前项目级配置在 `docs/agents/`。如果启用文档语言规则，新写或新修改的项目技术文档以中文为主；technical terms、domain 定义、code identifiers、file paths、commands 和配置值保留 English。历史文档不翻译、不重写。
 
-### Domain docs
+## 历史版本
 
-Use the single-context layout: root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
-
-### Documentation language
-
-Write project documentation in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
+- `1.0.0`：旧版 ys-powers。
+- `matt-powers-baseline`：Matt workflow 切换基线。
+- `2.0.0`：Matt-first workflow 的正式 release，待当前实现和文档验证完成后创建。

@@ -27,8 +27,8 @@ help:
 	@echo "  且该项目存在 .claude/settings.local.json，则自动卸载当前项目"
 	@echo ""
 	@echo "安装策略："
-	@echo "  global: skills/rules 复制到 ~/.claude/"
-	@echo "  local:  skills/rules 复制到 <project-dir>/.claude/"
+	@echo "  global: skills 复制到 ~/.claude/，并清理已登记旧能力"
+	@echo "  local:  skills 复制到 <project-dir>/.claude/，并清理已登记旧能力"
 
 global-install:
 	$(PYTHON) $(YS_POWERS_ROOT)/install/install.py install global

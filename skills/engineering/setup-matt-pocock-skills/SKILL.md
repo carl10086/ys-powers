@@ -47,11 +47,7 @@ The rule is:
 ```markdown
 ### Documentation language
 
-Write new and modified technical documentation in Chinese.
-
-Preserve English technical terms, canonical domain terms, code, identifiers, paths, commands, fixed fields, and status values.
-
-Do not rewrite existing documentation.
+Write project documentation in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
 ```
 
 
@@ -132,7 +128,7 @@ When Section A was answered **yes**, append this sub-block:
 ```markdown
 ### Documentation language
 
-Write new and modified technical documentation in Chinese. Preserve English technical terms, canonical domain terms, code, identifiers, paths, commands, fixed fields, and status values. Do not rewrite existing documentation.
+Write project documentation in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
 ```
 
 When Section C ran on GitHub or GitLab, create each configured label the tracker lacks (`gh label create` / `glab label create`).

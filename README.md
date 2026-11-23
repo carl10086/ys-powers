@@ -1,99 +1,121 @@
 # ys-powers
 
-`ys-powers` 是以 Matt Pocock skills 为基础的本地工程能力集，只保留必要的 ys-powers 定制：`eli` 与项目级 `rules`。
+`ys-powers` 是一套以 Matt Pocock skills 为基础的本地 coding workflow。
 
-## 能力结构
+当前主线按 `2.0.0` 设计：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，只保留必要的本地定制与安装能力。
+
+## 当前目录
 
 ```text
 skills/
-├── engineering/    写代码的工程能力
-├── productivity/   通用工作流能力
-├── misc/           低频工具
-├── in-progress/    beta 能力
-├── deprecated/     上游保留的废弃能力
-└── eli/            ys-powers 的解释能力
+├── engineering/   代码工程主流程与按需工程能力
+├── productivity/  上下文、沟通与文档能力
+└── eli/           ys-powers 本地 HTML 解释能力
+
+install/           本地与全局安装器
+docs/              当前说明、安装配置与历史记录
+refer/             只读的上游参考仓库
 ```
 
-Matt 的原始目录结构、frontmatter、调用策略和 `agents/openai.yaml` 保持不变。
-
-- `User-invoked`：用户显式调用
-- `Model-invoked`：模型按场景自动触发
-- `misc`：稳定但低频，保留在源目录但不默认安装
-- `in-progress`：公开 beta，保留在源目录但不默认安装
-- `deprecated`：上游保留，但不默认安装
-
-默认本地能力只安装：
-
-```text
-engineering
-productivity
-eli
-rules
-```
-
-Matt 的其他分包仍保留在源目录和 `refer/` 中，后续可通过安装配置显式启用。
-源目录保留 Matt 的分包结构；安装到项目 `.claude/skills/` 时，安装器会把选中的 skill 扁平化到一级目录，确保 Claude 能发现每个 `SKILL.md`。这只改变安装布局，不改变 skill 内容。
-
-默认工程链由 Matt skills 自己的调用约束决定，不在本项目中重新实现：
-
-```text
-grill-with-docs
-→ grilling / domain-modeling
-→ to-spec
-→ to-tickets
-→ implement / implement-spec
-→ tdd
-→ code-review
-→ retro
-```
-
-## ys-powers 定制
-
-```text
-skills/eli/
-rules/code.md
-```
-
-其他旧版 `commands/`、`agents/`、`references/`、`hooks/` 已移除，不再与 Matt 流程并存。
+`deprecated/`、`in-progress/`、`misc/` 不属于当前使用范围，也不再放在 `skills/` 中。
 
 ## 安装
 
-### 本地安装
+### 当前项目
 
 ```bash
 make local-install
 make local-install project-dir=/path/to/project
 ```
 
-安装到 `<project>/.claude/`，适合当前实验和项目级验证。
+不要写成 `make local-install --project-dir=...`；`project-dir` 是 Make 变量，不是 `make` 选项。
 
-### 全局安装
+安装目标是：
+
+```text
+<project>/.claude/skills/
+```
+
+`engineering/` 与 `productivity/` 会按 Matt 的运行时发现方式安装到同一个 `skills/` 目录；`eli` 保持独立目录。安装器不会自动创建项目的 `AGENTS.md`、`CLAUDE.md` 或 `docs/agents/`，这些由 `setup-matt-pocock-skills` 在项目内按选择生成。
+
+### 全局环境
 
 ```bash
 make global-install
-```
-
-安装到 `~/.claude/`。当前实验阶段不要执行此命令；全局环境清理另行处理。
-
-### 更新与卸载
-
-```bash
-make update-local
 make update-global
-make uninstall-local
 make uninstall-global
 ```
 
-安装器只管理 `skills/` 和 `rules/`，不再注入旧 hooks，也不再安装 commands、agents 或 references。
+全局安装会更新 `~/.claude/`，并按安装器登记的 legacy targets 清理旧版 `commands/`、`agents/`、`references/`、`hooks/`、`rules/` 等内容。执行前确认这是期望的全局迁移。
 
-## 上游来源
+## 核心 workflow
 
-`refer/mattpocock-skills/` 是只读的 Matt 上游参考。不要直接修改其中内容。
+常规代码任务：
 
-同步上游后，更新当前分支的 `skills/`，保留必要的本地差异，并在实验记录中说明差异。
+```text
+grill-with-docs
+  → to-spec
+  → to-tickets
+  → implement
+  → code-review
+```
 
-## 实验记录
+多个 ticket 的复杂实现：
 
-当前方案：`docs/ys-powers/intent/matt-first-experiment.md`
+```text
+grill-with-docs
+  → to-spec
+  → to-tickets
+  → implement-spec
+  → code-review
+```
 
-目标：使用真实中等规模代码任务验证 Matt 完整能力，而不是提前判断 Matt 必然优于旧 ys-powers。
+这不是自动流水线。每个 skill 完成后，用户或 agent 根据当前产物决定是否继续调用下一个 skill；`grill-with-docs` 不会自动调用 `to-spec`，`implement` 与 `implement-spec` 也可以手动选择。
+
+按需分支：
+
+- `wayfinder`：目标很大、路线不清，先建立 decision-ticket map。
+- `research`：需要外部 primary sources 时保存 cited Markdown。
+- `prototype`：用 throwaway code 验证 state model、logic 或 UI。
+- `codebase-design`：设计 deep module、interface、seam 和 adapter。
+- `diagnosing-bugs`：复现、定位、修复并验证 bug。
+- `browser-testing-with-devtools`：有前端项目时，代码完成后手动做真实浏览器端到端验证。
+- `pr`：整理 PR body、证据和 merge risk。
+- `retro`：复盘本次 coding session。
+
+## 项目初始化
+
+第一次在项目中使用 Matt engineering skills 时，调用：
+
+```text
+setup-matt-pocock-skills
+```
+
+它会按顺序处理：
+
+1. 可选的中文技术文档写作规则；
+2. issue tracker；
+3. triage labels（仅安装了 `triage` 时）；
+4. domain docs 布局。
+
+无远端或明确选择本地时，issue tracker 使用 `.scratch/`；存在 GitHub remote 时 setup 会推荐 GitHub，也可以手动选择 GitHub、GitLab 或其他工作流。初始化只执行一次；后续只有切换配置或从头重建时才需要重新执行。
+
+## 文档规则
+
+新写或新修改的项目技术文档以中文为主；`domain` 定义、technical terms、code identifiers、file paths、commands 和配置值保留 English。历史文档不因启用该规则而翻译或重写。
+
+当前项目的 active configuration 位于：
+
+```text
+docs/agents/
+```
+
+`docs/share/`、`docs/gstack/`、`docs/workflow/specs/`、`docs/ys-powers/intent/` 和旧的同步记录属于历史材料，不作为当前安装或 workflow 的事实入口。
+
+## 版本与上游
+
+- `1.0.0`：旧版 ys-powers。
+- `matt-powers-baseline`：切换到 Matt workflow 前的迁移基线，不是正式 release。
+- `2.0.0`：Matt-first workflow 的正式 release，待当前安装器、文档和验证完成后创建。
+
+不要修改 `refer/` 下的上游参考内容。需要更新时，先同步上游，再审查本地允许的差异。

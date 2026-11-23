@@ -29,8 +29,8 @@ if sys.version_info < (3, 10):
 import argparse
 from pathlib import Path
 
-from lib.config import DIRECTORIES
-from lib.fs import install_directory, uninstall_directory
+from lib.config import DIRECTORIES, GLOBAL_LEGACY_TARGETS
+from lib.fs import cleanup_stale_files, install_directory, uninstall_directory
 
 
 def get_project_root() -> Path:
@@ -83,8 +83,8 @@ def _validate_uninstall(target_dir: Path, scope: str) -> bool:
         print(f"✗ 目标目录不存在: {target_dir}", file=sys.stderr)
         return False
 
-    # 检查是否有 ys-powers 的 skills 或 rules
-    indicators = ["skills", "rules"]
+    # 检查是否有 ys-powers 的 skills
+    indicators = ["skills"]
     found_any = any((target_dir / name).exists() for name in indicators)
 
     if not found_any:
@@ -96,9 +96,12 @@ def _validate_uninstall(target_dir: Path, scope: str) -> bool:
 
 
 def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
-    """执行安装或更新。"""
-    all_ok = True
+    """执行安装或更新，并清理全局已登记的旧版能力。"""
+    if scope == "global":
+        for source_name, target_name in GLOBAL_LEGACY_TARGETS.items():
+            cleanup_stale_files(project_root, source_name, target_dir / target_name)
 
+    all_ok = True
     for source_name, (target_name, strategy) in DIRECTORIES.items():
         if not install_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False

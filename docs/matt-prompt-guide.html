@@ -315,7 +315,7 @@
   </section>
   <section class="section">
     <h2>完整 Skill 视图：不是都要执行</h2>
-    <p class="section-intro">Matt 把 skill 分成“主流程入口”“模型按需调用”“用户遇到特殊任务时调用”和“实验/独立工具”。它们不是一条固定长链。</p>
+    <p class="section-intro">当前只解释正在使用的三类 skill：主流程入口、模型按需调用和 productivity 能力。它们不是一条固定长链。</p>
     <div class="catalog-note">
       <strong>读取方法：</strong>先走核心代码流程；只有当前任务满足“什么时候用”条件，才加入下面的分支。<code>setup-matt-pocock-skills</code> 是一次性初始化，不是每个功能都重复运行。
     </div>
@@ -333,6 +333,7 @@
       <article class="catalog-card"><span class="tag entry">用户入口</span><h3>triage</h3><p>把 issue 从待分类状态推进到可交给 agent 或 human 的状态。</p><p class="when">什么时候用：issue 来源杂乱、不能直接实现时。</p></article>
       <article class="catalog-card"><span class="tag entry">用户入口</span><h3>improve-codebase-architecture</h3><p>扫描代码库，生成架构改进 HTML 报告，再选择一个方向讨论。</p><p class="when">什么时候用：主动改善既有架构，而不是实现单个功能时。</p></article>
       <article class="catalog-card"><span class="tag entry">用户入口</span><h3>retro</h3><p>复盘 agent 环境、导航、检查、工具和规则。</p><p class="when">什么时候用：一次 coding session 完成后。</p></article>
+      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>browser-testing-with-devtools</h3><p>使用真实浏览器和 DevTools MCP 验证前端实现的用户流程、网络请求、console、响应式布局和运行时状态。</p><p class="when">什么时候用：前端代码完成后，手动进行端到端验证时。</p></article>
     </div>
 
     <h3>Engineering：模型按需调用</h3>
@@ -359,23 +360,6 @@
       <article class="catalog-card"><span class="tag auto">模型按需</span><h3>writing-for-agents</h3><p>规定 skill、CLAUDE.md、AGENTS.md 等 agent 文档如何写。</p><p class="when">创建或修改 agent-facing 文档时。</p></article>
     </div>
 
-    <h3>In-progress：实验性 skill</h3>
-    <div class="catalog">
-      <article class="catalog-card"><span class="tag beta">Beta</span><h3>chief-of-staff</h3><p>为长期目标协调多个 subagent。</p><p class="when">长时间、多线程目标需要专门协调时。</p></article>
-      <article class="catalog-card"><span class="tag beta">Beta</span><h3>claude-handoff</h3><p>把当前对话交给后台 agent 继续执行。</p><p class="when">需要立即切换到 fresh background agent 时。</p></article>
-      <article class="catalog-card"><span class="tag beta">Beta</span><h3>loop-me</h3><p>在 workspace 中多 session 反复讨论 workflow spec。</p><p class="when">工作流本身需要长期迭代时。</p></article>
-      <article class="catalog-card"><span class="tag beta">Beta</span><h3>software-factory</h3><p>为软件工厂定义任务和服务的共同语言。</p><p class="when">设计自动化软件生产系统时。</p></article>
-      <article class="catalog-card"><span class="tag beta">Beta</span><h3>setup-ts-deep-modules</h3><p>用 dependency-cruiser 约束 TypeScript deep modules。</p><p class="when">专门治理 TypeScript 包边界时。</p></article>
-      <article class="catalog-card"><span class="tag beta">Beta</span><h3>writing-fragments / writing-beats / writing-shape</h3><p>分别收集片段、组织文章 beats、逐段塑造文章。</p><p class="when">写作工作流，不属于代码交付。</p></article>
-    </div>
-
-    <h3>Misc：独立工具</h3>
-    <div class="catalog">
-      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>git-guardrails-claude-code</h3><p>用 hooks 阻止危险 Git 命令。</p><p class="when">需要额外 Git 安全护栏时。</p></article>
-      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>setup-pre-commit</h3><p>配置 Husky、lint-staged、格式化、类型检查和测试。</p><p class="when">需要建立 pre-commit 质量门禁时。</p></article>
-      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>migrate-to-shoehorn</h3><p>迁移 TypeScript 测试中的类型断言写法。</p><p class="when">专门进行 shoehorn 迁移时。</p></article>
-      <article class="catalog-card"><span class="tag tool">独立工具</span><h3>scaffold-exercises</h3><p>生成练习题、答案和讲解目录。</p><p class="when">维护教学练习内容时。</p></article>
-    </div>
   </section>
 
   <section class="section">
@@ -386,7 +370,7 @@
   </section>
 
   <footer class="footer">
-    来源文件均来自 <code>refer/mattpocock-skills</code>；本页面解释 Prompt 的职责和行为，不代表已经决定迁移或重写 <code>ys-powers</code>。
+    来源文件均来自 <code>refer/mattpocock-skills</code>；本页面解释当前 Matt-first workflow 的 Prompt 职责和行为。实际安装范围以根目录 <code>skills/</code> 与 <code>README.md</code> 为准。
   </footer>
 </main>
 </body>
