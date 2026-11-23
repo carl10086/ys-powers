@@ -95,22 +95,36 @@ evidence, a prototype, a diagnosis, or a validated browser result that you can
 then bring back to the main workflow; they do not silently trigger another
 skill.
 
-## 项目初始化
+## Quick start
 
-第一次在项目中使用 Matt engineering skills 时，调用 `setup-matt-pocock-skills`。安装器会将当前 skills 安装到 `<project>/.claude/skills/`。
+### 1. Install the skills
+
+Run one of the Makefile targets from this repository:
 
 ```bash
+# Install for the current project
 make local-install
+
+# Install into a specific project
 make local-install project-dir=/path/to/project
+
+# Install globally for your user
+make global-install
 ```
 
-## 当前目录
+These commands install the current supported skill sets. The `project-dir`
+value is a Make variable; do not pass it as a positional argument.
 
-```text
-skills/engineering/   主流程与按需工程能力
-skills/productivity/  上下文、沟通与文档能力
-skills/eli/           本地 HTML 解释能力
-install/              本地与全局安装器
-```
+### 2. Set up each project once
 
-`deprecated/`、`in-progress/`、`misc/` 不属于当前使用范围；`refer/` 是只读的上游参考仓库。
+In the target project, run `setup-matt-pocock-skills` once before using the
+engineering skills. It configures the project context that the skills share.
+
+The setup flow can optionally enable a documentation-language rule: write new
+or modified technical documentation as Chinese-first prose, while preserving
+English technical terms, domain names, code identifiers, file paths, commands,
+and configuration values. Existing documents are not rewritten.
+
+After setup, choose a skill from the workflow diagrams above based on the
+artifact or situation you have now. The diagrams are a menu, not an automatic
+chain.
