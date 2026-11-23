@@ -60,3 +60,21 @@ make local-install project-dir=/path/to/project
 ## 实验方案
 
 完整意图记录在 `docs/ys-powers/intent/matt-first-experiment.md`。先用真实代码任务验证 Matt 完整能力，再决定后续定制。
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues; use the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default five canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use the single-context layout: root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
+
+### Documentation language
+
+Write project documentation in Chinese. Keep technical terms, code identifiers, file paths, and command names in English.
