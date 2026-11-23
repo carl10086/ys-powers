@@ -1,121 +1,121 @@
 # ys-powers
 
-`ys-powers` 是一套以 Matt Pocock skills 为基础的本地 coding workflow。
+`ys-powers` 为 coding agent 提供一套以 Matt Pocock skills 为基础、由用户掌控的本地 workflow。
 
-当前主线按 `2.0.0` 设计：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，只保留必要的本地定制与安装能力。
+## 2.0.0：以 Matt 为核心的 workflow
 
-## 当前目录
+当前 release 是 `2.0.0` Matt-first workflow：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，只加入必要的本地安装与解释能力。
 
-```text
-skills/
-├── engineering/   代码工程主流程与按需工程能力
-├── productivity/  上下文、沟通与文档能力
-└── eli/           ys-powers 本地 HTML 解释能力
+### Skill 分层
 
-install/           本地与全局安装器
-docs/              当前说明、安装配置与历史记录
-refer/             只读的上游参考仓库
+```mermaid
+flowchart LR
+    U[用户入口<br/>grill-with-docs<br/>to-spec / to-tickets] --> E[按需工程能力<br/>implement / implement-spec<br/>code-review]
+    E --> S[辅助能力<br/>productivity / eli]
 ```
 
-`deprecated/`、`in-progress/`、`misc/` 不属于当前使用范围，也不再放在 `skills/` 中。
+- **用户入口**：从问题澄清、spec 到 tickets，形成可执行的任务上下文。
+- **按需工程能力**：根据当前产物选择实现、复杂 ticket 实现或 code review。
+- **辅助能力**：提供上下文、沟通、文档与本地 HTML 解释能力。
 
-## 安装
+以上是能力分层，不是自动调用链；每一步都由用户或 agent 根据当前产物决定是否继续。
+当前安装内容对应以下源目录：
 
-### 当前项目
+- `skills/engineering`：工程实现与 code review skills。
+- `skills/productivity`：生产力与任务上下文 skills。
+- `skills/eli`：ys-powers 本地解释与辅助 skills。
+
+### 阅读顺序
+
+1. 先看上面的 Skill 分层，确认任务处于哪一层。
+2. 从用户入口开始，按当前产物选择下一个 skill。
+3. 需要工程处理时，再进入按需工程能力；辅助能力按需要补充。
+
+### 主流程
+
+```text
+grill-with-docs → to-spec → to-tickets → implement → code-review
+```
+
+复杂 ticket 可将 `implement` 替换为 `implement-spec`。这两条路径都需要显式选择，不会自动触发下一个 skill。
+
+### 场景导航
+
+根据当前已有的产物或遇到的问题选择下一个 skill；这些图是选择菜单，不是自动调用链。
+
+#### 普通功能
+
+```mermaid
+flowchart LR
+    A[功能需求] --> B[grill-with-docs<br/>澄清术语和约束]
+    B --> C{是否需要书面 spec？}
+    C -->|需要，手动调用| D[to-spec]
+    C -->|不需要| E{是否已有可执行 tickets？}
+    D --> E
+    E -->|有，手动调用| F[to-tickets]
+    E -->|已有 tickets| G[implement]
+    F --> G
+    G --> H[code-review]
+```
+
+`grill-with-docs` 只负责澄清想法并记录决策，**不会**自动调用 `to-spec`；当当前结果需要 spec 时再手动调用 `to-spec`，当 spec 需要转成可执行工作时再手动调用 `to-tickets`。
+
+#### 多 ticket 实现
+
+```mermaid
+flowchart LR
+    A[多个相关 tickets<br/>或较大的实现任务] --> B{是否需要统一的<br/>实现计划？}
+    B -->|需要，手动调用| C[implement-spec]
+    B -->|不需要| D[implement]
+    C --> E[实现 tickets]
+    D --> E
+    E --> F[code-review]
+```
+
+`implement-spec` 用于协调多个 tickets，是一个明确的手动选择；`to-tickets` 或 `grill-with-docs` 都不会自动调用它。
+
+#### 按需分支
+
+```mermaid
+flowchart TD
+    A[当前情况] --> B{什么阻碍了进展？}
+    B -->|目标太大或不清晰| C[wayfinder<br/>把决策拆成 tickets]
+    B -->|答案依赖外部资料| D[research<br/>收集带引用的证据]
+    B -->|设计或行为不确定| E[prototype<br/>验证方案]
+    B -->|现有行为出错| F[diagnosing-bugs<br/>复现并缩小范围]
+    B -->|需要验证浏览器流程| G[browser-testing-with-devtools<br/>驱动并检查真实页面]
+    C --> H[带着新产物回到主流程]
+    D --> H
+    E --> H
+    F --> H
+    G --> H
+```
+
+这些分支只在对应场景出现时手动调用。它们会产出证据、prototype、bug diagnosis 或 browser validation result，再带回主流程；不会静默触发其他 skill。
+
+## 快速开始
+
+### 1. 安装 skills
+
+在本仓库目录执行以下 Makefile target：
 
 ```bash
+# 当前项目
 make local-install
+
+# 指定项目
 make local-install project-dir=/path/to/project
-```
 
-不要写成 `make local-install --project-dir=...`；`project-dir` 是 Make 变量，不是 `make` 选项。
-
-安装目标是：
-
-```text
-<project>/.claude/skills/
-```
-
-`engineering/` 与 `productivity/` 会按 Matt 的运行时发现方式安装到同一个 `skills/` 目录；`eli` 保持独立目录。安装器不会自动创建项目的 `AGENTS.md`、`CLAUDE.md` 或 `docs/agents/`，这些由 `setup-matt-pocock-skills` 在项目内按选择生成。
-
-### 全局环境
-
-```bash
+# 全局安装
 make global-install
-make update-global
-make uninstall-global
 ```
 
-全局安装会更新 `~/.claude/`，并按安装器登记的 legacy targets 清理旧版 `commands/`、`agents/`、`references/`、`hooks/`、`rules/` 等内容。执行前确认这是期望的全局迁移。
+这些命令会安装当前支持的 skill 分组。`project-dir` 是 Make 变量，不要把它作为位置参数传入。
 
-## 核心 workflow
+### 2. 每个项目只需 setup 一次
 
-常规代码任务：
+在目标项目中先执行一次 `setup-matt-pocock-skills`，然后再使用 engineering skills。它会配置各个 skill 共享的项目上下文。
 
-```text
-grill-with-docs
-  → to-spec
-  → to-tickets
-  → implement
-  → code-review
-```
+setup 流程可以选择启用文档语言规则：新写或修改的技术文档以中文为主，同时保留 English technical terms、domain names、code identifiers、file paths、commands 和 configuration values。已有文档不会被重写。
 
-多个 ticket 的复杂实现：
-
-```text
-grill-with-docs
-  → to-spec
-  → to-tickets
-  → implement-spec
-  → code-review
-```
-
-这不是自动流水线。每个 skill 完成后，用户或 agent 根据当前产物决定是否继续调用下一个 skill；`grill-with-docs` 不会自动调用 `to-spec`，`implement` 与 `implement-spec` 也可以手动选择。
-
-按需分支：
-
-- `wayfinder`：目标很大、路线不清，先建立 decision-ticket map。
-- `research`：需要外部 primary sources 时保存 cited Markdown。
-- `prototype`：用 throwaway code 验证 state model、logic 或 UI。
-- `codebase-design`：设计 deep module、interface、seam 和 adapter。
-- `diagnosing-bugs`：复现、定位、修复并验证 bug。
-- `browser-testing-with-devtools`：有前端项目时，代码完成后手动做真实浏览器端到端验证。
-- `pr`：整理 PR body、证据和 merge risk。
-- `retro`：复盘本次 coding session。
-
-## 项目初始化
-
-第一次在项目中使用 Matt engineering skills 时，调用：
-
-```text
-setup-matt-pocock-skills
-```
-
-它会按顺序处理：
-
-1. 可选的中文技术文档写作规则；
-2. issue tracker；
-3. triage labels（仅安装了 `triage` 时）；
-4. domain docs 布局。
-
-无远端或明确选择本地时，issue tracker 使用 `.scratch/`；存在 GitHub remote 时 setup 会推荐 GitHub，也可以手动选择 GitHub、GitLab 或其他工作流。初始化只执行一次；后续只有切换配置或从头重建时才需要重新执行。
-
-## 文档规则
-
-新写或新修改的项目技术文档以中文为主；`domain` 定义、technical terms、code identifiers、file paths、commands 和配置值保留 English。历史文档不因启用该规则而翻译或重写。
-
-当前项目的 active configuration 位于：
-
-```text
-docs/agents/
-```
-
-`docs/share/`、`docs/gstack/`、`docs/workflow/specs/`、`docs/ys-powers/intent/` 和旧的同步记录属于历史材料，不作为当前安装或 workflow 的事实入口。
-
-## 版本与上游
-
-- `1.0.0`：旧版 ys-powers。
-- `matt-powers-baseline`：切换到 Matt workflow 前的迁移基线，不是正式 release。
-- `2.0.0`：Matt-first workflow 的正式 release，待当前安装器、文档和验证完成后创建。
-
-不要修改 `refer/` 下的上游参考内容。需要更新时，先同步上游，再审查本地允许的差异。
+完成 setup 后，根据上面的 workflow 图，按照当前已有的产物或遇到的问题选择 skill。图示是选择菜单，不是自动调用链。
