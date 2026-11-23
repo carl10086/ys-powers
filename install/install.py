@@ -3,12 +3,12 @@
 ys-powers unified installer
 
 Usage:
-    python install/install.py install global [--with-hooks]
-    python install/install.py install local [--target <path>] [--with-hooks]
-    python install/install.py update global [--with-hooks]
-    python install/install.py update local [--target <path>] [--with-hooks]
-    python install/install.py uninstall global [--with-hooks]
-    python install/install.py uninstall local [--target <path>] [--with-hooks]
+    python install/install.py install global
+    python install/install.py install local [--target <path>]
+    python install/install.py update global
+    python install/install.py update local [--target <path>]
+    python install/install.py uninstall global
+    python install/install.py uninstall local [--target <path>]
 """
 
 import sys
@@ -29,9 +29,8 @@ if sys.version_info < (3, 10):
 import argparse
 from pathlib import Path
 
-from lib.config import DIRECTORIES
-from lib.fs import install_directory, uninstall_directory
-from lib.hooks import inject_hooks, remove_hooks
+from lib.config import DIRECTORIES, GLOBAL_LEGACY_TARGETS
+from lib.fs import cleanup_stale_files, install_directory, uninstall_directory
 
 
 def get_project_root() -> Path:
@@ -84,8 +83,8 @@ def _validate_uninstall(target_dir: Path, scope: str) -> bool:
         print(f"✗ 目标目录不存在: {target_dir}", file=sys.stderr)
         return False
 
-    # 检查是否有 ys-powers 的痕迹（至少 skills 或 hooks 目录存在）
-    indicators = ["skills", "hooks", "settings.local.json" if scope == "local" else "settings.json"]
+    # 检查是否有 ys-powers 的 skills
+    indicators = ["skills"]
     found_any = any((target_dir / name).exists() for name in indicators)
 
     if not found_any:
@@ -96,22 +95,21 @@ def _validate_uninstall(target_dir: Path, scope: str) -> bool:
     return True
 
 
-def do_install(project_root: Path, target_dir: Path, scope: str, with_hooks: bool) -> bool:
-    """执行安装或更新。"""
-    all_ok = True
+def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
+    """执行安装或更新，并清理全局已登记的旧版能力。"""
+    if scope == "global":
+        for source_name, target_name in GLOBAL_LEGACY_TARGETS.items():
+            cleanup_stale_files(project_root, source_name, target_dir / target_name)
 
+    all_ok = True
     for source_name, (target_name, strategy) in DIRECTORIES.items():
         if not install_directory(project_root, source_name, target_dir, target_name, strategy):
-            all_ok = False
-
-    if with_hooks:
-        if not inject_hooks(project_root, target_dir, scope):
             all_ok = False
 
     return all_ok
 
 
-def do_uninstall(project_root: Path, target_dir: Path, scope: str, with_hooks: bool) -> bool:
+def do_uninstall(project_root: Path, target_dir: Path, scope: str) -> bool:
     """执行卸载。"""
     all_ok = True
 
@@ -119,11 +117,8 @@ def do_uninstall(project_root: Path, target_dir: Path, scope: str, with_hooks: b
         if not uninstall_directory(project_root, source_name, target_dir, target_name, strategy):
             all_ok = False
 
-    if with_hooks:
-        if not remove_hooks(project_root, target_dir, scope):
-            all_ok = False
-
     return all_ok
+
 
 
 def main() -> int:
@@ -134,18 +129,17 @@ def main() -> int:
                         help="global (~/.claude/) or local (./.claude/)")
     parser.add_argument("-p", "--target", type=Path, default=None,
                         help="target project directory (local scope only)")
-    parser.add_argument("--with-hooks", action="store_true", default=False,
-                        help="also inject/remove hooks configuration (default: False)")
     args = parser.parse_args()
 
     project_root = get_project_root()
 
-    # 守卫：确认自定位正确
-    guard_file = project_root / "skills" / "using-agent-skills" / "SKILL.md"
+    # 守卫：确认 Matt skills 源目录
+    guard_file = project_root / "skills" / "engineering" / "setup-matt-pocock-skills" / "SKILL.md"
     if not guard_file.exists():
-        print(f"✗ 无法定位 ys-powers 源目录: {project_root}", file=sys.stderr)
+        print(f"✗ 无法定位 Matt skills 源目录: {project_root}", file=sys.stderr)
         print("  请确保从 ys-powers 仓库内运行此脚本。", file=sys.stderr)
         return 1
+
 
     # local scope 自动检测：未指定 --target 且当前目录不是 ys-powers 本身时
     auto_detected = None
@@ -164,11 +158,11 @@ def main() -> int:
     print()
 
     if args.action in ("install", "update"):
-        success = do_install(project_root, target_dir, args.scope, args.with_hooks)
+        success = do_install(project_root, target_dir, args.scope)
     elif args.action == "uninstall":
         if not _validate_uninstall(target_dir, args.scope):
             return 1
-        success = do_uninstall(project_root, target_dir, args.scope, args.with_hooks)
+        success = do_uninstall(project_root, target_dir, args.scope)
     else:
         # argparse 已限制 choices，此处不会到达
         parser.print_help()

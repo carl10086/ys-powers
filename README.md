@@ -1,248 +1,121 @@
 # ys-powers
 
-`ys-powers` 是一套用于增强 Claude Code 工作流的本地能力集，包含 **skills**（场景化行为技能）、**commands**（显式调用命令）、**agents**（专用子智能体）、**rules**（编码规范）四类配置。
+`ys-powers` 是一套以 Matt Pocock skills 为基础的本地 coding workflow。
+
+当前主线按 `2.0.0` 设计：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，只保留必要的本地定制与安装能力。
+
+## 当前目录
+
+```text
+skills/
+├── engineering/   代码工程主流程与按需工程能力
+├── productivity/  上下文、沟通与文档能力
+└── eli/           ys-powers 本地 HTML 解释能力
+
+install/           本地与全局安装器
+docs/              当前说明、安装配置与历史记录
+refer/             只读的上游参考仓库
+```
+
+`deprecated/`、`in-progress/`、`misc/` 不属于当前使用范围，也不再放在 `skills/` 中。
 
 ## 安装
 
-### 前置依赖
-
-- **[uv](https://docs.astral.sh/uv/)** — Python 包管理器（安装脚本通过 `uv run --python 3.12` 执行）
-- **Python 3.12** — 由 uv 自动安装：`uv python install 3.12`
-
-若系统 Python 版本低于 3.10 且未安装 uv，运行安装命令时脚本会输出安装指引。
-
-ys-powers 提供两种安装方式，分别适用于不同场景：
-
-| 方式 | 命令 | 适用场景 |
-|------|------|----------|
-| **Global** | `make global-install` | 个人机器，所有项目共享同一套能力 |
-| **Local** | `make local-install [project-dir=/path]` | 特定项目，或需要项目独立配置 |
-
-### Global 安装（推荐）
+### 当前项目
 
 ```bash
-cd /path/to/ys-powers
+make local-install
+make local-install project-dir=/path/to/project
+```
+
+不要写成 `make local-install --project-dir=...`；`project-dir` 是 Make 变量，不是 `make` 选项。
+
+安装目标是：
+
+```text
+<project>/.claude/skills/
+```
+
+`engineering/` 与 `productivity/` 会按 Matt 的运行时发现方式安装到同一个 `skills/` 目录；`eli` 保持独立目录。安装器不会自动创建项目的 `AGENTS.md`、`CLAUDE.md` 或 `docs/agents/`，这些由 `setup-matt-pocock-skills` 在项目内按选择生成。
+
+### 全局环境
+
+```bash
 make global-install
+make update-global
+make uninstall-global
 ```
 
-将 skills/commands/agents/rules/hooks 复制到 `~/.claude/`，并自动注册 SessionStart hook 到 `~/.claude/settings.json`。安装后，**任何项目**启动 Claude Code 时都会自动加载 ys-powers 的能力。
+全局安装会更新 `~/.claude/`，并按安装器登记的 legacy targets 清理旧版 `commands/`、`agents/`、`references/`、`hooks/`、`rules/` 等内容。执行前确认这是期望的全局迁移。
 
-### Local 安装
+## 核心 workflow
 
-```bash
-cd /path/to/ys-powers
-make local-install                  # 安装到当前目录
-make local-install project-dir=/path/to/project  # 安装到指定项目
+常规代码任务：
+
+```text
+grill-with-docs
+  → to-spec
+  → to-tickets
+  → implement
+  → code-review
 ```
 
-将内容复制到 `<project>/.claude/`，并注册 hooks 到 `<project>/.claude/settings.local.json`。适用于：
-- 需要在特定项目使用定制版本
-- 团队共享同一套项目级配置
-- 避免全局安装影响其他项目
+多个 ticket 的复杂实现：
 
-### 安装策略
-
-| 目录 | 策略 | 说明 |
-|------|------|------|
-| `skills/`、`agents/` | 文件夹级全量覆盖 | 删除旧版本，复制新版本 |
-| `rules/`、`commands/`、`hooks/`、`references/` | 文件级同名覆盖 | 覆盖同名文件，保留目标独有文件 |
-| `hooks` 注册 | 合并去重 | 向 settings.json 追加 hooks，不覆盖用户已有配置 |
-
-### 路径兼容性
-
-Global install 后的核心挑战：**Claude Code 运行时的 CWD 是用户项目目录，而非 `~/.claude/`**。因此：
-
-- **Hooks** 使用 `$HOME/.claude/...`（global）或 `${CLAUDE_PROJECT_DIR}/.claude/...`（local），由 shell 在运行时解析
-- **Skills** 内部使用 `./scripts/...` 相对路径，由 Claude Code 从 skill 文件所在目录解析
-- **Agents** 通过 `skill: <name>` 工具调用，不直接引用 skill 文件路径
-
-无需安装时修改任何文件内容，所有路径在运行时自解析。
-
-## 按场景速查
-
-不知道自己该用什么？按当前场景选择：
-
-| 我在做什么 | 推荐入手 |
-|-----------|---------|
-| 意图还不清楚，想先聊明白 | `/clarify-intent` |
-| 有一个模糊想法，想梳理成设计 | `/spec` → `explore-then-ask`、`spec-driven-development` |
-| 需求已明确，要拆任务 | `/ys-plan` |
-| 写代码/改逻辑 | `/build`（增量实现）或 `/refactor`（重构） |
-| 写 UI/前端 | `frontend-ui-engineering` [skill] 自动触发 |
-| 修 bug | `/test`（先写重现测试）→ `/build` |
-| 代码写完了，要审查 | `/ys-review` |
-| 准备发版 | `/ship` |
-| 提交代码 | `/gc`（完整 Git 流程）或 `/local-commit`（极简本地提交） |
-| 看不懂某段代码 | `/teach-code` |
-| 项目结构混乱，想理清楚 | `/doc-codebase` |
-
-## 典型工作流
-
-开发新功能的完整路径：
-
-```mermaid
-flowchart LR
-    A[/clarify-intent<br/>澄清/] --> B[/spec<br/>构思/]
-    B --> C[/ys-plan<br/>规划/]
-    C --> D[/build<br/>构建/]
-    D --> E[/ys-review<br/>审查/]
-    E --> F[/ship<br/>交付/]
-
-    D -.异常调试.-> G[debugging]
-    D -.查文档实现.-> H[source-driven]
-    D -.优化上下文.-> I[context-eng]
-    E -.随时提交.-> J[/gc/]
-    F -.记录经验.-> K[/sop-add/]
+```text
+grill-with-docs
+  → to-spec
+  → to-tickets
+  → implement-spec
+  → code-review
 ```
 
-**主线**（实线）：澄清 → 构思 → 规划 → 构建 → 审查 → 交付  
-**支撑**（虚线）：构建、审查、交付阶段按需触发的横向能力，非强制步骤
+这不是自动流水线。每个 skill 完成后，用户或 agent 根据当前产物决定是否继续调用下一个 skill；`grill-with-docs` 不会自动调用 `to-spec`，`implement` 与 `implement-spec` 也可以手动选择。
 
-**可选步骤**：`/review-spec`（spec 质量审查）、`/ys-plan`（小改动可跳过）、`/test`（bug 修复或显式 TDD 时单独调用）详见 `commands/clarify-intent.md`。
+按需分支：
 
-## 简化依赖关系
+- `wayfinder`：目标很大、路线不清，先建立 decision-ticket map。
+- `research`：需要外部 primary sources 时保存 cited Markdown。
+- `prototype`：用 throwaway code 验证 state model、logic 或 UI。
+- `codebase-design`：设计 deep module、interface、seam 和 adapter。
+- `diagnosing-bugs`：复现、定位、修复并验证 bug。
+- `browser-testing-with-devtools`：有前端项目时，代码完成后手动做真实浏览器端到端验证。
+- `pr`：整理 PR body、证据和 merge risk。
+- `retro`：复盘本次 coding session。
 
-README 只展示使用者需要的入口关系：command 是你输入的入口，skill 是背后执行的方法论。完整依赖关系以各 command 和 skill 的当前内容为准。
+## 项目初始化
 
-```mermaid
-flowchart LR
-    subgraph Commands["显式 commands"]
-        clarify["/clarify-intent"]
-        spec["/spec"]
-        ysPlan["/ys-plan"]
-        build["/build"]
-        test["/test"]
-        review["/ys-review"]
-        simplify["/code-simplify"]
-        ship["/ship"]
-        wskill["/wskill"]
-        refactor["/refactor"]
-        git["/gc · /local-commit · /s2m"]
-        docs["/doc-codebase · /easy-analysis · /teach-code · /sop-add"]
-    end
+第一次在项目中使用 Matt engineering skills 时，调用：
 
-    subgraph Skills["核心 skills"]
-        interview["interview-me"]
-        explore["explore-then-ask"]
-        specdev["spec-driven-development"]
-        planning["planning-and-task-breakdown"]
-        incremental["incremental-implementation"]
-        tdd["test-driven-development"]
-        browser["browser-testing-with-devtools"]
-        quality["code-review-and-quality"]
-        codesimp["code-simplification"]
-        shipping["shipping-and-launch"]
-        writing["writing-great-skills"]
-        debug["debugging-and-error-recovery"]
-    end
-
-    clarify --> interview
-    spec --> explore
-    spec --> specdev
-    ysPlan --> planning
-    build --> incremental
-    build --> tdd
-    build -.失败时.-> debug
-    test --> tdd
-    test -.浏览器相关.-> browser
-    review --> quality
-    simplify --> codesimp
-    ship --> shipping
-    wskill --> explore
-    wskill --> writing
-    refactor --> tdd
+```text
+setup-matt-pocock-skills
 ```
 
-自包含 commands（`/gc`、`/local-commit`、`/s2m`、`/doc-codebase`、`/easy-analysis`、`/teach-code`、`/sop-add`）主要把完整流程写在 command 内部，不显式委托某个 skill。
+它会按顺序处理：
 
-## 能力分类速览
+1. 可选的中文技术文档写作规则；
+2. issue tracker；
+3. triage labels（仅安装了 `triage` 时）；
+4. domain docs 布局。
 
-| 类型 | 数量 | 调用方式 | 核心代表 |
-|------|------|----------|----------|
-| 显式命令 | 21 | 直接输入 `/command` | `/clarify-intent` `/spec` `/ys-plan` `/build` |
-| 行为技能 | 30 | 场景自动触发 | `idea-refine` `test-driven-development` |
-| 子智能体 | 3 | 自动指派 | `code-reviewer` |
-| 编码规范 | 1 | 自动生效 | `code.md` |
+无远端或明确选择本地时，issue tracker 使用 `.scratch/`；存在 GitHub remote 时 setup 会推荐 GitHub，也可以手动选择 GitHub、GitLab 或其他工作流。初始化只执行一次；后续只有切换配置或从头重建时才需要重新执行。
 
-### 显式命令（`/command`）
+## 文档规则
 
-直接输入使用，按开发阶段分组：
+新写或新修改的项目技术文档以中文为主；`domain` 定义、technical terms、code identifiers、file paths、commands 和配置值保留 English。历史文档不因启用该规则而翻译或重写。
 
-| 阶段 | 命令 |
-|------|------|
-| 意图澄清 | `/clarify-intent` |
-| 构思与规划 | `/spec` `/ys-plan` |
-| 构建与验证 | `/build` `/test` |
-| 审查与优化 | `/ys-review` `/refactor` `/code-simplify` |
-| 交付与提交 | `/ship` `/gc` `/local-commit` |
-| 辅助 | `/sop-add` `/s2m` `/doc-codebase` `/teach-code` `/easy-analysis` |
+当前项目的 active configuration 位于：
 
-### 行为技能（自动触发）
-
-在对应场景自动应用：
-
-**构思与规划** — `idea-refine` · `explore-then-ask` · `spec-driven-development` · `planning-and-task-breakdown`
-
-**构建** — `incremental-implementation` · `frontend-ui-engineering` · `api-and-interface-design`
-
-**验证** — `test-driven-development` · `browser-testing-with-devtools`
-
-**审查** — `code-review-and-quality` · `security-and-hardening` · `performance-optimization`
-
-**交付** — `shipping-and-launch` · `ci-cd-and-automation` · `git-workflow-and-versioning`
-
-**维护** — `code-simplification` · `debugging-and-error-recovery` · `documentation-and-adrs` · `deprecation-and-migration`
-
-**支撑** — `using-agent-skills`（元技能）· `context-engineering` · `source-driven-development` · `sop-search` · `writing-great-skills`
-
-### 子智能体（Agent）
-
-- `code-reviewer` — 五维度审查（正确性、可读性、架构、安全、性能）
-- `security-auditor` — 漏洞检测与加固
-- `test-engineer` — 测试策略与覆盖率
-
-### 编码规范
-
-- `code.md` — 先思考再编码、简化优先、精准修改、不随意重构
-
-## 目录结构
-
-```
-ys-powers/
-├── skills/      # 30 个场景化行为技能
-├── commands/    # 25 个显式调用命令
-├── agents/      # 3 个专用子智能体
-├── rules/       # 编码规范与行为约束
-├── install/     # 安装到任意项目 .claude/ 的脚本
-└── docs/        # 项目内部文档与架构说明
+```text
+docs/agents/
 ```
 
-## 使用示例
+`docs/share/`、`docs/gstack/`、`docs/workflow/specs/`、`docs/ys-powers/intent/` 和旧的同步记录属于历史材料，不作为当前安装或 workflow 的事实入口。
 
-开发新功能时，通常按此顺序调用：
+## 版本与上游
 
-```bash
-# 0. 意图还不清楚时先澄清（可选）
-/clarify-intent
+- `1.0.0`：旧版 ys-powers。
+- `matt-powers-baseline`：切换到 Matt workflow 前的迁移基线，不是正式 release。
+- `2.0.0`：Matt-first workflow 的正式 release，待当前安装器、文档和验证完成后创建。
 
-# 1. 先写 spec
-/spec
-
-# 2. 拆任务（小改动可跳过）
-/ys-plan
-
-# 3. 逐个实现
-/build
-
-# 4. 补测试或修 bug（可选，/build 已覆盖日常测试）
-/test
-
-# 5. 审查
-/ys-review
-
-# 6. 提交
-/gc
-
-# 7. 上线检查
-/ship
-```
+不要修改 `refer/` 下的上游参考内容。需要更新时，先同步上游，再审查本地允许的差异。
