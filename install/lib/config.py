@@ -5,7 +5,8 @@
 DIRECTORIES = {
     "skills/engineering": ("skills", "skill-bucket"),
     "skills/productivity": ("skills", "skill-bucket"),
-    "skills/eli": ("skills/eli", "folder")
+    "skills/eli": ("skills/eli", "folder"),
+    "skills/eli5": ("skills/eli5", "folder")
 }
 
 # global install/update 时清理旧版 ys-powers 在目标目录留下的已登记能力。
