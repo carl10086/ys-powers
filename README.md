@@ -1,22 +1,22 @@
 # ys-powers
 
-`ys-powers` 为 coding agent 提供一套以 Matt Pocock skills 为基础、可由用户掌控的本地 workflow。
+`ys-powers` 为 coding agent 提供一套以 Matt Pocock skills 为基础、由用户掌控的本地 workflow。
 
-## 2.0.0 Matt-first workflow
+## 2.0.0：以 Matt 为核心的 workflow
 
 当前 release 是 `2.0.0` Matt-first workflow：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，只加入必要的本地安装与解释能力。
 
-### Skill layers
+### Skill 分层
 
 ```mermaid
 flowchart LR
-    U[用户入口<br/>grill-with-docs<br/>to-spec / to-tickets] --> E[按需 engineering<br/>implement / implement-spec<br/>code-review]
-    E --> S[supporting skills<br/>productivity / eli]
+    U[用户入口<br/>grill-with-docs<br/>to-spec / to-tickets] --> E[按需工程能力<br/>implement / implement-spec<br/>code-review]
+    E --> S[辅助能力<br/>productivity / eli]
 ```
 
 - **用户入口**：从问题澄清、spec 到 tickets，形成可执行的任务上下文。
-- **按需 engineering**：根据当前产物选择实现、复杂 ticket 实现或 review。
-- **supporting skills**：提供上下文、沟通、文档与本地 HTML 解释能力。
+- **按需工程能力**：根据当前产物选择实现、复杂 ticket 实现或 code review。
+- **辅助能力**：提供上下文、沟通、文档与本地 HTML 解释能力。
 
 以上是能力分层，不是自动调用链；每一步都由用户或 agent 根据当前产物决定是否继续。
 当前安装内容对应以下源目录：
@@ -27,11 +27,11 @@ flowchart LR
 
 ### 阅读顺序
 
-1. 先看上面的 skill layers，确认任务处于哪一层。
+1. 先看上面的 Skill 分层，确认任务处于哪一层。
 2. 从用户入口开始，按当前产物选择下一个 skill。
-3. 需要工程处理时，再进入按需 engineering；supporting skills 按需要补充。
+3. 需要工程处理时，再进入按需工程能力；辅助能力按需要补充。
 
-### Main workflow
+### 主流程
 
 ```text
 grill-with-docs → to-spec → to-tickets → implement → code-review
@@ -39,97 +39,83 @@ grill-with-docs → to-spec → to-tickets → implement → code-review
 
 复杂 ticket 可将 `implement` 替换为 `implement-spec`。这两条路径都需要显式选择，不会自动触发下一个 skill。
 
-### Scenario navigation
+### 场景导航
 
-Choose the next skill from the artifact or situation you have now; the diagrams
-are a menu, not an automatic chain.
+根据当前已有的产物或遇到的问题选择下一个 skill；这些图是选择菜单，不是自动调用链。
 
-#### Ordinary feature
+#### 普通功能
 
 ```mermaid
 flowchart LR
-    A[Idea or feature request] --> B[grill-with-docs<br/>clarify terms and constraints]
-    B --> C{Need a written spec?}
-    C -->|yes, choose it| D[to-spec]
-    C -->|no| E{Have executable tickets?}
+    A[功能需求] --> B[grill-with-docs<br/>澄清术语和约束]
+    B --> C{是否需要书面 spec？}
+    C -->|需要，手动调用| D[to-spec]
+    C -->|不需要| E{是否已有可执行 tickets？}
     D --> E
-    E -->|yes, choose it| F[to-tickets]
-    E -->|already have them| G[implement]
+    E -->|有，手动调用| F[to-tickets]
+    E -->|已有 tickets| G[implement]
     F --> G
     G --> H[code-review]
 ```
 
-`grill-with-docs` only sharpens the idea and records decisions. It does **not**
-automatically call `to-spec`; choose `to-spec` when the current situation needs
-a spec, and choose `to-tickets` when the spec needs to become executable work.
+`grill-with-docs` 只负责澄清想法并记录决策，**不会**自动调用 `to-spec`；当当前结果需要 spec 时再手动调用 `to-spec`，当 spec 需要转成可执行工作时再手动调用 `to-tickets`。
 
-#### Multi-ticket implementation
+#### 多 ticket 实现
 
 ```mermaid
 flowchart LR
-    A[Several related tickets<br/>or a large implementation] --> B{Need a shared<br/>implementation plan?}
-    B -->|yes, choose it| C[implement-spec]
-    B -->|no| D[implement]
-    C --> E[Implement tickets]
+    A[多个相关 tickets<br/>或较大的实现任务] --> B{是否需要统一的<br/>实现计划？}
+    B -->|需要，手动调用| C[implement-spec]
+    B -->|不需要| D[implement]
+    C --> E[实现 tickets]
     D --> E
     E --> F[code-review]
 ```
 
-`implement-spec` is an explicit choice for coordinating multiple tickets; it
-is not a replacement that `to-tickets` or `grill-with-docs` invokes for you.
+`implement-spec` 用于协调多个 tickets，是一个明确的手动选择；`to-tickets` 或 `grill-with-docs` 都不会自动调用它。
 
-#### On-demand branches
+#### 按需分支
 
 ```mermaid
 flowchart TD
-    A[Current situation] --> B{What is blocking progress?}
-    B -->|goal is too large or unclear| C[wayfinder<br/>map decisions into tickets]
-    B -->|answer depends on external sources| D[research<br/>gather cited evidence]
-    B -->|uncertain design or risky behavior| E[prototype<br/>test an approach]
-    B -->|existing behavior is broken| F[diagnosing-bugs<br/>reproduce and isolate]
-    B -->|need to validate a browser workflow| G[browser-testing-with-devtools<br/>drive and inspect the real page]
-    C --> H[Return to the main flow<br/>with the new artifact]
+    A[当前情况] --> B{什么阻碍了进展？}
+    B -->|目标太大或不清晰| C[wayfinder<br/>把决策拆成 tickets]
+    B -->|答案依赖外部资料| D[research<br/>收集带引用的证据]
+    B -->|设计或行为不确定| E[prototype<br/>验证方案]
+    B -->|现有行为出错| F[diagnosing-bugs<br/>复现并缩小范围]
+    B -->|需要验证浏览器流程| G[browser-testing-with-devtools<br/>驱动并检查真实页面]
+    C --> H[带着新产物回到主流程]
     D --> H
     E --> H
     F --> H
     G --> H
 ```
 
-These branches are selected when their situation applies. They produce
-evidence, a prototype, a diagnosis, or a validated browser result that you can
-then bring back to the main workflow; they do not silently trigger another
-skill.
+这些分支只在对应场景出现时手动调用。它们会产出证据、prototype、bug diagnosis 或 browser validation result，再带回主流程；不会静默触发其他 skill。
 
-## Quick start
+## 快速开始
 
-### 1. Install the skills
+### 1. 安装 skills
 
-Run one of the Makefile targets from this repository:
+在本仓库目录执行以下 Makefile target：
 
 ```bash
-# Install for the current project
+# 当前项目
 make local-install
 
-# Install into a specific project
+# 指定项目
 make local-install project-dir=/path/to/project
 
-# Install globally for your user
+# 全局安装
 make global-install
 ```
 
-These commands install the current supported skill sets. The `project-dir`
-value is a Make variable; do not pass it as a positional argument.
+这些命令会安装当前支持的 skill 分组。`project-dir` 是 Make 变量，不要把它作为位置参数传入。
 
-### 2. Set up each project once
+### 2. 每个项目只需 setup 一次
 
-In the target project, run `setup-matt-pocock-skills` once before using the
-engineering skills. It configures the project context that the skills share.
+在目标项目中先执行一次 `setup-matt-pocock-skills`，然后再使用 engineering skills。它会配置各个 skill 共享的项目上下文。
 
-The setup flow can optionally enable a documentation-language rule: write new
-or modified technical documentation as Chinese-first prose, while preserving
-English technical terms, domain names, code identifiers, file paths, commands,
-and configuration values. Existing documents are not rewritten.
+setup 流程可以选择启用文档语言规则：新写或修改的技术文档以中文为主，同时保留 English technical terms、domain names、code identifiers、file paths、commands 和 configuration values。已有文档不会被重写。
 
-After setup, choose a skill from the workflow diagrams above based on the
-artifact or situation you have now. The diagrams are a menu, not an automatic
-chain.
+完成 setup 后，根据上面的 workflow 图，按照当前已有的产物或遇到的问题选择 skill。图示是选择菜单，不是自动调用链。
