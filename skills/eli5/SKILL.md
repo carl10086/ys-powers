@@ -1,6 +1,6 @@
 ---
 name: eli5
-description: Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
+description: 用适合五岁孩子理解的简单语言解释主题，使用具体、友好的儿童熟悉类比和大图、少文字的 HTML artifact。仅手动调用：/eli5 [topic]。
 argument-hint: "[topic]"
 disable-model-invocation: true
 ---

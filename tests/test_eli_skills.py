@@ -26,6 +26,8 @@ class EliSkillsTest(unittest.TestCase):
         self.assertIn("name: eli5\n", eli5_metadata)
         self.assertIn("disable-model-invocation: true", eli_metadata)
         self.assertIn("disable-model-invocation: true", eli5_metadata)
+        self.assertIn("不使用比喻", eli_metadata)
+        self.assertIn("类比", eli5_metadata)
         self.assertIn(".eli/", eli.read_text(encoding="utf-8"))
         self.assertIn(".eli5/", eli5.read_text(encoding="utf-8"))
         self.assertNotIn(".eli5/", eli.read_text(encoding="utf-8"))

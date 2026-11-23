@@ -1,6 +1,6 @@
 ---
 name: eli
-description: 用图解释代码、文档或架构。仅手动调用：/eli [topic]。
+description: 用图解释代码、文档或架构，面向完全不了解主题的人；坚持使用真实结构和中文伪代码，不使用比喻。仅手动调用：/eli [topic]。
 argument-hint: "[topic]"
 disable-model-invocation: true
 ---
