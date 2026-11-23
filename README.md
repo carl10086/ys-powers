@@ -19,6 +19,11 @@ flowchart LR
 - **supporting skills**：提供上下文、沟通、文档与本地 HTML 解释能力。
 
 以上是能力分层，不是自动调用链；每一步都由用户或 agent 根据当前产物决定是否继续。
+当前安装内容对应以下源目录：
+
+- `skills/engineering`：工程实现与 code review skills。
+- `skills/productivity`：生产力与任务上下文 skills。
+- `skills/eli`：ys-powers 本地解释与辅助 skills。
 
 ### 阅读顺序
 
