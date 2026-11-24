@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>research skill：把外部事实变成可引用证据</title>
+  <style>
+    :root {
+      --ink: #172126;
+      --muted: #647177;
+      --paper: #f3f6f1;
+      --card: #fbfcf8;
+      --line: #cfd9d3;
+      --teal: #087f78;
+      --teal-soft: #dff2ec;
+      --rust: #b75435;
+      --rust-soft: #f6e4da;
+      --yellow: #e4ad3d;
+      --navy: #183a4a;
+      --shadow: 0 14px 34px rgba(23, 33, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(8,127,120,.035) 1px, transparent 1px) 0 0 / 32px 32px,
+        var(--paper);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--teal); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+    code, .eyebrow, .path, .quote { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 88px; }
+    header { max-width: 900px; padding: 34px 0 26px; }
+    .eyebrow { margin: 0 0 14px; color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { max-width: 850px; margin: 0; color: var(--navy); font-family: Georgia, "Times New Roman", serif; font-size: clamp(42px, 7vw, 82px); line-height: .98; letter-spacing: -.055em; }
+    .lede { max-width: 760px; margin: 24px 0 0; color: var(--muted); font-size: clamp(18px, 2.4vw, 23px); line-height: 1.45; }
+    .thesis { display: grid; grid-template-columns: 1.25fr .75fr; gap: 18px; margin: 26px 0 50px; }
+    .thesis-main, .fact-card, .panel, .source-card, .boundary, .example { background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .thesis-main { padding: 28px 30px; border-left: 8px solid var(--teal); }
+    .thesis-main h2 { margin: 0 0 10px; font-size: 24px; }
+    .thesis-main p { margin: 0; font-size: 18px; }
+    .fact-card { padding: 24px; }
+    .fact-card .big { display: block; color: var(--rust); font-family: Georgia, serif; font-size: 48px; line-height: 1; }
+    .fact-card p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 62px; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+    h2 { margin: 0; color: var(--navy); font-family: Georgia, serif; font-size: clamp(28px, 4vw, 42px); letter-spacing: -.035em; }
+    h3 { margin: 0 0 8px; color: var(--navy); font-size: 20px; }
+    .section-note { max-width: 620px; margin: 12px 0 22px; color: var(--muted); }
+    .rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 28px; position: relative; }
+    .rail::before { content: ""; position: absolute; top: 28px; left: 11%; right: 11%; border-top: 2px dashed var(--teal); }
+    .step { position: relative; padding: 0 14px; text-align: center; }
+    .step-dot { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 15px; border: 3px solid var(--teal); border-radius: 50%; color: white; background: var(--teal); font-family: Georgia, serif; font-size: 23px; font-weight: 700; }
+    .step strong { display: block; color: var(--navy); }
+    .step span { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; }
+    .ledger { display: grid; gap: 14px; margin-top: 25px; }
+    .ledger-row { display: grid; grid-template-columns: 82px 1fr 1fr; gap: 18px; align-items: start; padding: 20px 22px; background: var(--card); border: 1px solid var(--line); }
+    .ledger-row .line { color: var(--rust); font-family: Georgia, serif; font-size: 25px; font-weight: 700; }
+    .ledger-row p { margin: 0; }
+    .ledger-row .meaning { color: var(--muted); }
+    .source-grid, .boundary-grid, .file-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+    .source-card, .boundary, .panel, .example { padding: 22px; }
+    .source-card { border-top: 5px solid var(--teal); }
+    .source-card:nth-child(2) { border-top-color: var(--rust); }
+    .source-card:nth-child(3) { border-top-color: var(--yellow); }
+    .source-card p, .boundary p, .panel p { margin: 7px 0 0; color: var(--muted); font-size: 15px; }
+    .quote { margin: 16px 0 0; padding: 12px 14px; color: var(--navy); background: var(--teal-soft); border-left: 3px solid var(--teal); font-size: 13px; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 24px; }
+    .panel h3 { display: flex; align-items: center; gap: 9px; }
+    .mark { display: inline-grid; place-items: center; width: 27px; height: 27px; border-radius: 7px; color: white; background: var(--teal); font-size: 14px; }
+    .mark.rust { background: var(--rust); }
+    ul { margin: 13px 0 0; padding-left: 21px; }
+    li + li { margin-top: 7px; }
+    .file-grid { grid-template-columns: repeat(2, 1fr); }
+    .path { display: block; color: var(--teal); font-size: 13px; overflow-wrap: anywhere; }
+    .file-grid p { margin: 9px 0 0; color: var(--muted); font-size: 14px; }
+    .example { margin-top: 24px; border: 0; color: #eef7f3; background: var(--navy); }
+    .example h3 { color: white; }
+    .example p { color: #c9dcd7; }
+    pre { margin: 16px 0 0; padding: 17px; overflow-x: auto; border: 1px solid rgba(255,255,255,.16); background: rgba(0,0,0,.2); color: #d9f0e9; font: 13px/1.7 "SFMono-Regular", Consolas, monospace; }
+    .boundary { border-left: 5px solid var(--rust); }
+    .boundary strong { color: var(--rust); }
+    footer { margin-top: 62px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    @media (max-width: 760px) {
+      main { padding: 28px 16px 60px; }
+      .thesis, .split { grid-template-columns: 1fr; }
+      .rail { grid-template-columns: 1fr 1fr; gap: 24px 0; }
+      .rail::before { display: none; }
+      .ledger-row { grid-template-columns: 54px 1fr; }
+      .ledger-row .meaning { grid-column: 2; }
+      .source-grid, .boundary-grid, .file-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Engineering skill / evidence workflow</p>
+    <h1>research：把外部事实变成可引用证据</h1>
+    <p class="lede">这是对当前仓库中 <code>research</code> skill 的整体导览：它不负责替你做决定，而是把“需要查资料”的部分交给一个独立上下文，并留下能被后续工作复用的研究笔记。</p>
+  </header>
+
+  <section class="thesis" aria-label="核心结论">
+    <div class="thesis-main">
+      <h2>一句话读懂</h2>
+      <p><strong>先委托阅读，再带着证据回来。</strong> research 的交付物不是一段聊天回答，而是仓库中的一个 Markdown 文件；每个结论都应能回溯到拥有该事实的 primary source。</p>
+    </div>
+    <div class="fact-card">
+      <span class="big">12</span>
+      <p><code>SKILL.md</code> 只有 12 行正文。它不是复杂工具，而是一条很窄、很明确的行为协议。</p>
+    </div>
+  </section>
+
+  <section class="section" id="flow">
+    <div class="section-head"><h2>它实际做什么</h2><span class="eyebrow">the handoff</span></div>
+    <p class="section-note">四个动作构成完整闭环。关键不是“搜索”，而是把阅读工作隔离出来，同时把来源和结论一起保存。</p>
+    <div class="rail">
+      <div class="step"><div class="step-dot">1</div><strong>启动</strong><span>fresh-context<br>background agent</span></div>
+      <div class="step"><div class="step-dot">2</div><strong>调查</strong><span>围绕问题读取<br>primary sources</span></div>
+      <div class="step"><div class="step-dot">3</div><strong>追溯</strong><span>每条 claim 回到<br>事实拥有者</span></div>
+      <div class="step"><div class="step-dot">4</div><strong>落档</strong><span>单个带引用的<br>Markdown 文件</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="anatomy">
+    <div class="section-head"><h2>逐段拆解 SKILL.md</h2><span class="eyebrow">the contract</span></div>
+    <div class="ledger">
+      <div class="ledger-row"><div class="line">01</div><p><strong>Spin up a background agent</strong><br>研究必须交给一个新的 background agent，并使用 fresh context。</p><p class="meaning">含义：主对话可以继续推进，不把所有阅读过程塞进当前上下文。</p></div>
+      <div class="ledger-row"><div class="line">02</div><p><strong>Investigate against primary sources</strong><br>优先 official docs、source code、specs、first-party APIs。</p><p class="meaning">含义：不是找一篇“讲过它”的二手文章，而是回到真正拥有规则或事实的来源。</p></div>
+      <div class="ledger-row"><div class="line">03</div><p><strong>Write findings to a single Markdown file</strong><br>结果集中写入一个 Markdown 文件，并为每个 claim 标注来源。</p><p class="meaning">含义：研究结果成为可引用、可带入后续流程的 repo artifact，而不是一次性消息。</p></div>
+      <div class="ledger-row"><div class="line">04</div><p><strong>Match the repository convention</strong><br>优先使用仓库已有的研究笔记目录；没有约定时选择合理位置并说明。</p><p class="meaning">含义：文件放置也是交付的一部分，不能只生成内容而忽略仓库结构。</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="sources">
+    <div class="section-head"><h2>primary source 为什么重要</h2><span class="eyebrow">the evidence rule</span></div>
+    <p class="section-note">研究质量的核心不是链接数量，而是来源与事实之间的距离。来源越接近事实拥有者，后续判断越容易审计。</p>
+    <div class="source-grid">
+      <article class="source-card"><h3>Official docs</h3><p>产品或平台官方维护的行为、配置和 API 说明。</p><div class="quote">适合确认“官方承诺支持什么”。</div></article>
+      <article class="source-card"><h3>Source code</h3><p>实现本身，尤其适合核对文档没有说清的边界行为。</p><div class="quote">适合确认“实际代码如何运行”。</div></article>
+      <article class="source-card"><h3>Specs / first-party API</h3><p>规范、协议和拥有该 API 的一方提供的接口材料。</p><div class="quote">适合确认“规则由谁定义”。</div></article>
+    </div>
+  </section>
+
+  <section class="section" id="boundaries">
+    <div class="section-head"><h2>它不负责什么</h2><span class="eyebrow">the boundary</span></div>
+    <div class="boundary-grid">
+      <article class="boundary"><h3><strong>不是最终决策器</strong></h3><p>它收集事实，不替用户选择方案。研究结果可以进入后续的 grilling 或 spec 流程。</p></article>
+      <article class="boundary"><h3><strong>不是一次性聊天答案</strong></h3><p>核心产物是仓库里的单个 Markdown 文件，因此可以被复读、引用和交接。</p></article>
+      <article class="boundary"><h3><strong>不是二手资料汇编</strong></h3><p>“有人这样解释过”不够。每个结论都要尽量回到拥有该事实的原始来源。</p></article>
+    </div>
+    <div class="split">
+      <article class="panel"><h3><span class="mark">→</span> 与主流程的关系</h3><p><code>research</code> 是按需分支：当答案依赖外部资料时使用。它产生证据后，再把材料带回主流程，而不是自动跳到下一步。</p><ul><li>外部事实不确定 → <code>research</code></li><li>想法和术语需要澄清 → <code>grill-with-docs</code></li><li>事实已足够，需要落成 spec → <code>to-spec</code></li></ul></article>
+      <article class="panel"><h3><span class="mark rust">≠</span> 与 grill-with-docs 的差异</h3><p><code>research</code> 解决“世界上真实情况是什么”；<code>grill-with-docs</code> 解决“我们要做什么、为什么这样做、哪些决策已经确认”。</p><div class="quote">research 提供证据；grill-with-docs 负责共同理解与决策。</div></article>
+    </div>
+  </section>
+
+  <section class="section" id="files">
+    <div class="section-head"><h2>当前仓库中的文件地图</h2><span class="eyebrow">the local shape</span></div>
+    <div class="file-grid">
+      <article class="panel"><span class="path">skills/engineering/research/SKILL.md</span><p>源目录中的 skill 正文，当前阅读的主对象。</p></article>
+      <article class="panel"><span class="path">skills/engineering/research/agents/openai.yaml</span><p>展示元数据：display name 为 <code>Research</code>，描述为 <code>Research from high-trust sources</code>。</p></article>
+      <article class="panel"><span class="path">.claude/skills/engineering/research/</span><p>本地安装镜像。当前内容与源目录一致。</p></article>
+      <article class="panel"><span class="path">refer/mattpocock-skills/skills/engineering/research/</span><p>上游只读参考。当前内容与源目录一致，符合 Matt-first 约束。</p></article>
+      <article class="panel"><span class="path">skills/engineering/README.md</span><p>将 <code>research</code> 列为 Model-invoked engineering skill，并说明其产物。</p></article>
+      <article class="panel"><span class="path">README.md</span><p>把它放在“答案依赖外部资料”的按需分支中。</p></article>
+    </div>
+  </section>
+
+  <section class="section" id="example">
+    <div class="section-head"><h2>一个正确的使用形状</h2><span class="eyebrow">the artifact</span></div>
+    <div class="example">
+      <h3>问题：某个第三方 API 的行为是否支持我们的方案？</h3>
+      <p>research 不直接在聊天里拍板，而是生成一个可交接的研究笔记：</p>
+      <pre># API 行为研究
+
+## 结论
+- 该 API 在条件 X 下支持行为 Y。
+
+## 证据
+- 官方文档：链接 + 相关章节
+- 源代码 / first-party API：链接 + 具体位置
+
+## 未决问题
+- 官方资料没有说明条件 Z，需要 prototype 或进一步验证。</pre>
+      <p>这个文件随后可以作为 <code>grill-with-docs</code> 的事实输入，帮助团队讨论真正的产品和工程选择。</p>
+    </div>
+  </section>
+
+  <footer>
+    <strong>来源：</strong>
+    <a href="../skills/engineering/research/SKILL.md">skills/engineering/research/SKILL.md</a> ·
+    <a href="../skills/engineering/README.md">skills/engineering/README.md</a> ·
+    <a href="../skills/engineering/ask-matt/SKILL.md">skills/engineering/ask-matt/SKILL.md</a> ·
+    <a href="../README.md">README.md</a>
+    <br>
+    页面定位：解释当前仓库中的 <code>research</code> skill；不修改 skill 本身，也不替代实际 research 任务。
+  </footer>
+</main>
+</body>
+</html>
