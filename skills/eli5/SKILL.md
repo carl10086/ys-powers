@@ -1,6 +1,6 @@
 ---
 name: eli5
-description: 用适合五岁孩子理解的简单语言解释主题，使用具体、友好的儿童熟悉类比和大图、少文字的 HTML artifact。仅手动调用：/eli5 [topic]。
+description: Explain topics to a five-year-old using simple language, concrete child-friendly analogies, big pictures, and few words in a self-contained HTML artifact. Manual invocation only: /eli5 [topic].
 argument-hint: "[topic]"
 disable-model-invocation: true
 ---
