@@ -16,8 +16,8 @@ def metadata(skill_path: Path) -> str:
 
 class EliSkillsTest(unittest.TestCase):
     def test_metadata_and_output_directories_are_distinct(self):
-        eli = ROOT / "skills" / "eli" / "SKILL.md"
-        eli5 = ROOT / "skills" / "eli5" / "SKILL.md"
+        eli = ROOT / "skills" / "local" / "eli" / "SKILL.md"
+        eli5 = ROOT / "skills" / "local" / "eli5" / "SKILL.md"
 
         eli_metadata = metadata(eli)
         eli5_metadata = metadata(eli5)

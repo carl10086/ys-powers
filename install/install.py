@@ -94,12 +94,53 @@ def _validate_uninstall(target_dir: Path, scope: str) -> bool:
 
     return True
 
+def _validate_skill_sources(project_root: Path) -> bool:
+    """安装前验证所有 skill bucket，并拒绝跨来源的同名 skill。"""
+    sources: dict[str, list[Path]] = {}
+    valid = True
+
+    for source_name, (_, strategy) in DIRECTORIES.items():
+        source_dir = project_root / source_name
+        if strategy != "skill-bucket":
+            print(f"✗ 不支持的安装策略: {source_name} ({strategy})", file=sys.stderr)
+            valid = False
+            continue
+        if not source_dir.is_dir():
+            print(f"✗ Skill source 目录不存在: {source_dir}", file=sys.stderr)
+            valid = False
+            continue
+
+        for item in source_dir.iterdir():
+            if item.is_dir() and not item.name.startswith("."):
+                sources.setdefault(item.name, []).append(item)
+
+    collisions = {
+        name: paths
+        for name, paths in sources.items()
+        if len(paths) > 1
+    }
+    if collisions:
+        print("✗ 检测到跨来源的同名 skill:", file=sys.stderr)
+        for name, paths in sorted(collisions.items()):
+            print(f"  {name}:", file=sys.stderr)
+            for path in paths:
+                print(f"    - {path}", file=sys.stderr)
+        valid = False
+
+    return valid
+
+
 
 def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
-    """执行安装或更新，并清理全局已登记的旧版能力。"""
+    """验证全部来源后安装，并清理已登记的旧版能力。"""
+    if not _validate_skill_sources(project_root):
+        return False
+
+    cleanup_stale_files(project_root, "skills", target_dir / "skills")
     if scope == "global":
         for source_name, target_name in GLOBAL_LEGACY_TARGETS.items():
-            cleanup_stale_files(project_root, source_name, target_dir / target_name)
+            if source_name != "skills":
+                cleanup_stale_files(project_root, source_name, target_dir / target_name)
 
     all_ok = True
     for source_name, (target_name, strategy) in DIRECTORIES.items():
@@ -133,10 +174,10 @@ def main() -> int:
 
     project_root = get_project_root()
 
-    # 守卫：确认 Matt skills 源目录
-    guard_file = project_root / "skills" / "engineering" / "setup-matt-pocock-skills" / "SKILL.md"
+    # 守卫：确认 Matt skills source tree
+    guard_file = project_root / "skills" / "matt" / "engineering" / "setup-matt-pocock-skills" / "SKILL.md"
     if not guard_file.exists():
-        print(f"✗ 无法定位 Matt skills 源目录: {project_root}", file=sys.stderr)
+        print(f"✗ 无法定位 Matt skills source tree: {project_root}", file=sys.stderr)
         print("  请确保从 ys-powers 仓库内运行此脚本。", file=sys.stderr)
         return 1
 
