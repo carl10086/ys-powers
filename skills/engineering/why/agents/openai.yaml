@@ -1,0 +1,5 @@
+interface:
+  display_name: "Why"
+  short_description: "Explain design rationale from repository history"
+policy:
+  allow_implicit_invocation: false
