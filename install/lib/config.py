@@ -1,12 +1,11 @@
-"""共享配置：目录映射与安装策略"""
+"""共享配置：skill 来源与安装目标"""
 
-# 当前只安装 Matt 的 skills 与 ys-powers 的 eli。旧版 rules 不再自动安装。
-# 格式: 源目录名 -> (目标子目录名, 策略)
+# Source 目录按来源分层；runtime 一律扁平安装到 .claude/skills/<skill-name>/。
 DIRECTORIES = {
-    "skills/engineering": ("skills", "skill-bucket"),
-    "skills/productivity": ("skills", "skill-bucket"),
-    "skills/eli": ("skills/eli", "folder"),
-    "skills/eli5": ("skills/eli5", "folder")
+    "skills/matt/engineering": ("skills", "skill-bucket"),
+    "skills/matt/productivity": ("skills", "skill-bucket"),
+    "skills/pstack": ("skills", "skill-bucket"),
+    "skills/local": ("skills", "skill-bucket"),
 }
 
 # global install/update 时清理旧版 ys-powers 在目标目录留下的已登记能力。

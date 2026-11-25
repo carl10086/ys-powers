@@ -4,7 +4,7 @@
 
 ## 2.0.0：以 Matt 为核心的 workflow
 
-当前 release 是 `2.0.0` Matt-first workflow：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，只加入必要的本地安装与解释能力。
+当前 release 是 `2.0.0` Matt-first workflow：保留 Matt 的 skill 内容、frontmatter、调用策略和 `agents/openai.yaml`，并按来源隔离 Matt、pstack 与 local skills。
 
 ### Skill 分层
 
@@ -19,11 +19,14 @@ flowchart LR
 - **辅助能力**：提供上下文、沟通、文档与本地 HTML 解释能力。
 
 以上是能力分层，不是自动调用链；每一步都由用户或 agent 根据当前产物决定是否继续。
-当前安装内容对应以下源目录：
+当前 source tree 按来源组织，安装时统一扁平复制到 `.claude/skills/<skill-name>/`：
 
-- `skills/engineering`：工程实现与 code review skills。
-- `skills/productivity`：生产力与任务上下文 skills。
-- `skills/eli`：ys-powers 本地解释与辅助 skills。
+- `skills/matt/engineering`：Matt engineering skills。
+- `skills/matt/productivity`：Matt productivity skills。
+- `skills/pstack`：从 Cursor pstack 独立引入或改编的 skills。
+- `skills/local`：ys-powers 直接维护的 skills。
+
+不同来源出现同名 skill 时，installer 会在复制前失败，不按目录顺序静默覆盖。各来源的 upstream、pinned commit 与同步边界记录在对应目录的 `README.md`。
 
 ### 阅读顺序
 

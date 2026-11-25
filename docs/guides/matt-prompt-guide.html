@@ -139,7 +139,7 @@
       <article class="skill user">
         <span class="badge user">用户入口</span>
         <h3>grill-with-docs</h3>
-        <span class="path">skills/engineering/grill-with-docs/SKILL.md</span>
+        <span class="path">skills/matt/engineering/grill-with-docs/SKILL.md</span>
         <p><strong>它自己不负责提问。</strong>它只是规定：调用 <code>grilling</code> 和 <code>domain-modeling</code>。</p>
         <blockquote>Call the Skill tool twice, for "grilling" and "domain-modeling".</blockquote>
         <p>作用：把“讨论方案”和“维护领域语言”绑定在同一入口。</p>
@@ -148,7 +148,7 @@
       <article class="skill model">
         <span class="badge model">底层 Prompt</span>
         <h3>grilling</h3>
-        <span class="path">skills/productivity/grilling/SKILL.md</span>
+        <span class="path">skills/matt/productivity/grilling/SKILL.md</span>
         <p>它把访谈变成一棵 <strong>design tree</strong>，只问当前已经具备前置条件的问题。</p>
         <ul>
           <li>每轮计算 frontier；</li>
@@ -164,7 +164,7 @@
       <article class="skill model">
         <span class="badge model">底层 Prompt</span>
         <h3>domain-modeling</h3>
-        <span class="path">skills/engineering/domain-modeling/SKILL.md</span>
+        <span class="path">skills/matt/engineering/domain-modeling/SKILL.md</span>
         <p>它不负责写实现方案，而是负责把项目中的词变准确。</p>
         <ul>
           <li>发现术语与 glossary 冲突时立即指出；</li>
@@ -184,7 +184,7 @@
       <article class="skill user">
         <span class="badge user">用户入口</span>
         <h3>to-spec</h3>
-        <span class="path">skills/engineering/to-spec/SKILL.md</span>
+        <span class="path">skills/matt/engineering/to-spec/SKILL.md</span>
         <p><strong>它不再访谈。</strong>它假设前面的讨论已经完成，只负责综合和发布。</p>
         <ul>
           <li>先理解代码库；</li>
@@ -200,7 +200,7 @@
       <article class="skill user">
         <span class="badge user">用户入口</span>
         <h3>to-tickets</h3>
-        <span class="path">skills/engineering/to-tickets/SKILL.md</span>
+        <span class="path">skills/matt/engineering/to-tickets/SKILL.md</span>
         <p>它不把 spec 横向拆成“先数据库、再 API、再 UI”，而是切成完整的 <strong>tracer-bullet vertical slices</strong>。</p>
         <ul>
           <li>每个 ticket 都能独立 demo 或验证；</li>
@@ -221,7 +221,7 @@
       <article class="skill user">
         <span class="badge user">用户入口</span>
         <h3>implement</h3>
-        <span class="path">skills/engineering/implement/SKILL.md</span>
+        <span class="path">skills/matt/engineering/implement/SKILL.md</span>
         <ul>
           <li>读取 spec 或 ticket；</li>
           <li>调用 <code>tdd</code>；</li>
@@ -236,7 +236,7 @@
       <article class="skill user">
         <span class="badge user">用户入口</span>
         <h3>implement-spec</h3>
-        <span class="path">skills/engineering/implement-spec/SKILL.md</span>
+        <span class="path">skills/matt/engineering/implement-spec/SKILL.md</span>
         <p>它是调度器，不是普通的“开始写代码”。</p>
         <ul>
           <li>读取 spec 和 task graph；</li>
@@ -254,7 +254,7 @@
       <article class="skill model">
         <span class="badge model">底层 Prompt</span>
         <h3>tdd</h3>
-        <span class="path">skills/engineering/tdd/SKILL.md</span>
+        <span class="path">skills/matt/engineering/tdd/SKILL.md</span>
         <ul>
           <li>只从 public interface 观察行为；</li>
           <li>测试 seam 必须提前确认；</li>
@@ -274,7 +274,7 @@
       <article class="skill model">
         <span class="badge model">底层 Prompt</span>
         <h3>code-review</h3>
-        <span class="path">skills/engineering/code-review/SKILL.md</span>
+        <span class="path">skills/matt/engineering/code-review/SKILL.md</span>
         <p>它刻意把 review 拆成两个互不覆盖的轴：</p>
         <ul>
           <li><strong>Standards：</strong>代码是否符合仓库规范；</li>
@@ -288,7 +288,7 @@
       <article class="skill support">
         <span class="badge support">反馈 Prompt</span>
         <h3>retro</h3>
-        <span class="path">skills/engineering/retro/SKILL.md</span>
+        <span class="path">skills/matt/engineering/retro/SKILL.md</span>
         <p>它复盘的不是人的感受，而是 agent 环境应该如何改进。</p>
         <ul>
           <li>Navigation：是否难以找到正确文件；</li>
@@ -314,8 +314,8 @@
     </div>
   </section>
   <section class="section">
-    <h2>完整 Skill 视图：不是都要执行</h2>
-    <p class="section-intro">当前只解释正在使用的三类 skill：主流程入口、模型按需调用和 productivity 能力。它们不是一条固定长链。</p>
+    <h2>Matt Skill 视图：不是都要执行</h2>
+    <p class="section-intro">这里只解释 Matt source 中的三类 skill：主流程入口、模型按需调用和 productivity 能力。它们不是一条固定长链。</p>
     <div class="catalog-note">
       <strong>读取方法：</strong>先走核心代码流程；只有当前任务满足“什么时候用”条件，才加入下面的分支。<code>setup-matt-pocock-skills</code> 是一次性初始化，不是每个功能都重复运行。
     </div>
@@ -333,7 +333,6 @@
       <article class="catalog-card"><span class="tag entry">用户入口</span><h3>triage</h3><p>把 issue 从待分类状态推进到可交给 agent 或 human 的状态。</p><p class="when">什么时候用：issue 来源杂乱、不能直接实现时。</p></article>
       <article class="catalog-card"><span class="tag entry">用户入口</span><h3>improve-codebase-architecture</h3><p>扫描代码库，生成架构改进 HTML 报告，再选择一个方向讨论。</p><p class="when">什么时候用：主动改善既有架构，而不是实现单个功能时。</p></article>
       <article class="catalog-card"><span class="tag entry">用户入口</span><h3>retro</h3><p>复盘 agent 环境、导航、检查、工具和规则。</p><p class="when">什么时候用：一次 coding session 完成后。</p></article>
-      <article class="catalog-card"><span class="tag entry">用户入口</span><h3>browser-testing-with-devtools</h3><p>使用真实浏览器和 DevTools MCP 验证前端实现的用户流程、网络请求、console、响应式布局和运行时状态。</p><p class="when">什么时候用：前端代码完成后，手动进行端到端验证时。</p></article>
     </div>
 
     <h3>Engineering：模型按需调用</h3>

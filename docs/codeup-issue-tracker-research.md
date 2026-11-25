@@ -13,7 +13,7 @@
 
 ### 本仓库 tracker contract
 
-本仓库 setup skill 目前内置 GitHub、GitLab 和 local Markdown，其他 tracker 以 freeform prose 写入 `docs/agents/issue-tracker.md`；GitHub/GitLab 依赖各自官方 CLI，local tracker 依赖文件约定。[setup skill](../skills/engineering/setup-matt-pocock-skills/SKILL.md)；[GitHub template](../skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md)；[GitLab template](../skills/engineering/setup-matt-pocock-skills/issue-tracker-gitlab.md)；[local template](../skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md)
+本仓库 setup skill 目前内置 GitHub、GitLab 和 local Markdown，其他 tracker 以 freeform prose 写入 `docs/agents/issue-tracker.md`；GitHub/GitLab 依赖各自官方 CLI，local tracker 依赖文件约定。[setup skill](../skills/matt/engineering/setup-matt-pocock-skills/SKILL.md)；[GitHub template](../skills/matt/engineering/setup-matt-pocock-skills/issue-tracker-github.md)；[GitLab template](../skills/matt/engineering/setup-matt-pocock-skills/issue-tracker-gitlab.md)；[local template](../skills/matt/engineering/setup-matt-pocock-skills/issue-tracker-local.md)
 
 从三个 template 与本仓库当前配置中提取出的最小 contract 为：
 
@@ -137,7 +137,7 @@ aliyun devops --help
 
 ### 现在能否支持
 
-**能，但应选择 `Other` / custom tracker，并把名称写成“Yunxiao Projex + Codeup”，而不是“Codeup Issues”。** setup skill 已允许其他 tracker 使用 freeform prose，因此无需先修改 skill 即可记录工作流。[setup skill](../skills/engineering/setup-matt-pocock-skills/SKILL.md)
+**能，但应选择 `Other` / custom tracker，并把名称写成“Yunxiao Projex + Codeup”，而不是“Codeup Issues”。** setup skill 已允许其他 tracker 使用 freeform prose，因此无需先修改 skill 即可记录工作流。[setup skill](../skills/matt/engineering/setup-matt-pocock-skills/SKILL.md)
 
 建议当前接入分两层：
 

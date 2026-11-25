@@ -148,7 +148,7 @@ def install_folder_level(source_dir: Path, target_dir: Path) -> bool:
 
 
 def install_skill_bucket(source_dir: Path, target_dir: Path) -> bool:
-    """将 Matt 的分包目录安装为 Claude 可发现的扁平 skill 目录。"""
+    """将一个来源目录安装为 Claude 可发现的扁平 skill 目录。"""
     try:
         target_dir.mkdir(parents=True, exist_ok=True)
         for source_item in source_dir.iterdir():
@@ -176,7 +176,7 @@ def install_skill_bucket(source_dir: Path, target_dir: Path) -> bool:
 
 
 def uninstall_skill_bucket(source_dir: Path, target_dir: Path) -> bool:
-    """卸载一个 Matt 分包已安装的扁平 skill 目录。"""
+    """卸载一个来源目录已安装的扁平 skills。"""
     if not target_dir.exists():
         return True
     try:
