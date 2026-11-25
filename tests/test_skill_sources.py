@@ -19,7 +19,7 @@ SPEC.loader.exec_module(INSTALLER)
 
 
 class SkillSourcesTest(unittest.TestCase):
-    def test_collision_fails_before_target_is_created(self):
+    def test_collision_fails_before_existing_target_is_modified(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "source"
             target_dir = Path(temp_dir) / "target" / ".claude"
@@ -27,6 +27,13 @@ class SkillSourcesTest(unittest.TestCase):
             second = project_root / "skills" / "second" / "duplicate"
             first.mkdir(parents=True)
             second.mkdir(parents=True)
+
+            legacy_marker = target_dir / "skills" / "engineering" / "marker.txt"
+            unrelated = target_dir / "skills" / "unrelated" / "SKILL.md"
+            legacy_marker.parent.mkdir(parents=True)
+            unrelated.parent.mkdir(parents=True)
+            legacy_marker.write_text("legacy\n", encoding="utf-8")
+            unrelated.write_text("keep me\n", encoding="utf-8")
 
             directories = {
                 "skills/first": ("skills", "skill-bucket"),
@@ -38,7 +45,8 @@ class SkillSourcesTest(unittest.TestCase):
                     installed = INSTALLER.do_install(project_root, target_dir, "local")
 
             self.assertFalse(installed)
-            self.assertFalse(target_dir.exists())
+            self.assertEqual(legacy_marker.read_text(encoding="utf-8"), "legacy\n")
+            self.assertEqual(unrelated.read_text(encoding="utf-8"), "keep me\n")
             self.assertIn("duplicate", stderr.getvalue())
             self.assertIn(str(first), stderr.getvalue())
             self.assertIn(str(second), stderr.getvalue())
@@ -71,11 +79,40 @@ class SkillSourcesTest(unittest.TestCase):
             self.assertTrue((skills / "ask-matt" / "SKILL.md").is_file())
             self.assertTrue((skills / "why" / "SKILL.md").is_file())
             self.assertTrue((skills / "eli" / "SKILL.md").is_file())
-            self.assertFalse((skills / "matt").exists())
-            self.assertFalse((skills / "pstack").exists())
-            self.assertFalse((skills / "local").exists())
             self.assertFalse(old_engineering.exists())
             self.assertFalse(old_productivity.exists())
+
+    def test_uninstall_removes_old_source_buckets(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project = Path(temp_dir)
+            skills = project / ".claude" / "skills"
+            old_engineering = skills / "engineering"
+            old_productivity = skills / "productivity"
+            unrelated = skills / "unrelated" / "SKILL.md"
+            old_engineering.mkdir(parents=True)
+            old_productivity.mkdir(parents=True)
+            unrelated.parent.mkdir(parents=True)
+            unrelated.write_text("keep me\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(INSTALLER_PATH),
+                    "uninstall",
+                    "local",
+                    "--target",
+                    str(project),
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse(old_engineering.exists())
+            self.assertFalse(old_productivity.exists())
+            self.assertEqual(unrelated.read_text(encoding="utf-8"), "keep me\n")
 
 
 if __name__ == "__main__":

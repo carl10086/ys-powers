@@ -151,7 +151,8 @@ def do_install(project_root: Path, target_dir: Path, scope: str) -> bool:
 
 
 def do_uninstall(project_root: Path, target_dir: Path, scope: str) -> bool:
-    """执行卸载。"""
+    """卸载 active skills，并清理已登记的旧版 skill 目录。"""
+    cleanup_stale_files(project_root, "skills", target_dir / "skills")
     all_ok = True
 
     for source_name, (target_name, strategy) in DIRECTORIES.items():
