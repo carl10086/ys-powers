@@ -86,15 +86,13 @@ flowchart TD
     B -->|答案依赖外部资料| D[research<br/>收集带引用的证据]
     B -->|设计或行为不确定| E[prototype<br/>验证方案]
     B -->|现有行为出错| F[diagnosing-bugs<br/>复现并缩小范围]
-    B -->|需要验证浏览器流程| G[browser-testing-with-devtools<br/>驱动并检查真实页面]
     C --> H[带着新产物回到主流程]
     D --> H
     E --> H
     F --> H
-    G --> H
 ```
 
-这些分支只在对应场景出现时手动调用。它们会产出证据、prototype、bug diagnosis 或 browser validation result，再带回主流程；不会静默触发其他 skill。
+这些分支只在对应场景出现时手动调用。它们会产出证据、prototype 或 bug diagnosis，再带回主流程；不会静默触发其他 skill。
 
 ## 快速开始
 

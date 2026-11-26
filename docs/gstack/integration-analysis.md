@@ -78,10 +78,10 @@
 | 维度 | 详情 |
 |------|------|
 | **gstack 做法** | 打开真实浏览器 → 找 bug → 原子修复 → 回归验证 → 生成回归测试。 |
-| **ys-powers 现状** | `browser-testing-with-devtools` 是**观察工具**（截图、DOM 检查、控制台分析），无自主修复和回归测试生成闭环。 |
+| **ys-powers 现状** | OMP runtime 已提供 browser 与 Chrome DevTools MCP，可驱动真实浏览器并读取 DOM、console、network 与 performance 数据；仓库不再维护重复的 local browser skill。[运行时说明](../omp/devtools-mcp-integration.md) |
 | **为什么值得关心** | 把浏览器测试从"人看报告"升级为"AI 闭环修复"，对前端项目有明确增益。 |
-| **为什么不是 P0** | 实现较重（需 Playwright 或 headless browser），且 `browser-testing-with-devtools` 已覆盖 80% 场景。 |
-| **集成建议** | 中期项目。先调研 Playwright MCP 的可行性；若可行，扩展 `browser-testing-with-devtools` 的"修复 + 回归测试"分支。 |
+| **为什么不是 P0** | 现有 runtime 已覆盖 browser driving 与 evidence collection；缺口是修复和回归测试 workflow，不是 browser driver。 |
+| **集成建议** | 中期项目。基于现有 runtime tools 设计独立 QA workflow，不恢复重复的 local browser skill。 |
 
 #### 6. 工程复盘：`/retro`
 

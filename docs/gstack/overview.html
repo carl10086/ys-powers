@@ -985,7 +985,7 @@ graph LR
         <div class="card-body">
           <p><strong>gstack 做法：</strong>打开真实浏览器 → 找 bug → 原子修复 → 回归验证 → 生成回归测试。</p>
           <p><strong>为什么值得关心：</strong>把浏览器测试从"人看报告"升级为"AI 闭环修复"，对前端项目有明确增益。</p>
-          <p><strong>为什么不是 P0：</strong>实现较重（需 Playwright 或 headless browser），且 browser-testing-with-devtools 已覆盖 80% 场景。</p>
+          <p><strong>为什么不是 P0：</strong>OMP runtime 已覆盖 browser driving 与 evidence collection；缺口是修复和回归测试 workflow，不是 browser driver。</p>
         </div>
       </div>
 
@@ -1185,7 +1185,7 @@ graph LR
       <div class="timeline-item pending">
         <div class="timeline-title">Phase 3：浏览器闭环（待定）</div>
         <div class="timeline-meta">视需求验证</div>
-        <div class="timeline-body">调研 Playwright MCP 可行性，评估是否扩展 browser-testing-with-devtools 的"修复 + 回归测试"分支。高投入，需明确 ROI。</div>
+        <div class="timeline-body">基于 OMP browser 与 Chrome DevTools MCP 评估独立 QA workflow。不要恢复重复的 local browser skill。高投入，需明确 ROI。</div>
       </div>
     </div>
 

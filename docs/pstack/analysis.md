@@ -260,7 +260,7 @@ maintainer 先运行旧 check，再从 sync commit 逐 commit 阅读 covered cod
 
 它比“再加一个 review prompt”更可能给长期收益。该 skill 先 interview repo 而不是 user，确定真实 surface、launch、drive、evidence 与 isolation；生成 Launch / Doctor / Drive / Evidence / Cleanup contract 和 feature map；交付前必须完整走一遍并确认 cleanup 没删 evidence。[create-verification-skill](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
 
-与 `browser-testing-with-devtools`、`diagnosing-bugs` 的 overlap 很高，但独特增量是把一次性控制方法固化为可复用、agent-readable 的 repo capability。最小 eval 不应生成 `.cursor/skills/`，而应测试“能否从现有项目资料生成并实际跑通一份 runtime-neutral verification runbook”。风险是 feature map drift，因此必须连同 source-wave + one live pass 的 maintenance idea 一起评价。[maintain-verification-skill](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
+与 OMP browser、Chrome DevTools MCP、`diagnosing-bugs` 的 overlap 很高，但独特增量是把一次性控制方法固化为可复用、agent-readable 的 repo capability。最小 eval 不应生成 `.cursor/skills/`，而应测试“能否从现有项目资料生成并实际跑通一份 runtime-neutral verification runbook”。风险是 feature map drift，因此必须连同 source-wave + one live pass 的 maintenance idea 一起评价。[OMP browser runtime](../omp/devtools-mcp-integration.md) [maintain-verification-skill](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
 
 ### 应降级：`how`、`architect`、`teach`
 
