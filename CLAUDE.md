@@ -22,7 +22,7 @@ skills/local/
 
 ## 保持 Matt 的边界
 
-保持 `skills/matt/` 下 Matt 原始 skill 的分包、frontmatter、Prompt、调用策略和每个 skill 的 `agents/openai.yaml`。不要在 source tree 中平铺、重命名或重新实现 Matt 的 skill。
+除下述 ownership cutover 外，保持 `skills/matt/` 下 Matt 原始 skill 的分包、frontmatter、Prompt、调用策略和每个 skill 的 `agents/openai.yaml`。不要在 source tree 中平铺、重命名或重新实现 Matt 的 skill。
 
 来源边界：
 
@@ -31,6 +31,8 @@ skills/local/
 - `skills/local/`：本仓库直接维护的 skill。
 
 本地允许的差异包括安装器、local manifest、上游同步记录、中文解释文档与必要的 runtime 适配。
+
+当前 ownership cutover：`/teach` 归 `skills/pstack/teach/`；active source 不包含 Matt `productivity/teach/`，`ask-matt` 中对应的旧路由也已删除。Matt 原版只保留在 `refer/mattpocock-skills/`，同步时不要恢复到 active source。
 
 不要修改 `refer/` 下的上游参考内容，也不要为 OMP 和 Claude 维护两套 Prompt 流程。
 

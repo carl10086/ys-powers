@@ -1,5 +1,7 @@
 # Cursor 官方 pstack 当前版本分析
 
+> **Decision update（2026-11-26）**：本文是筛选阶段的研究结论，不是当前 active manifest。后续逐项实验已 Promotion `why`、`how` 与 `bro`，并 Experimental Promotion `teach` 与 `unslop`；`teach` 的跨 runtime 风险见 [`invocation-semantics.md`](./invocation-semantics.md) 和 [wayfinder map](https://github.com/carl10086/ys-powers/issues/106)。
+
 ## 结论先行
 
 pstack 的价值不在于 59 个 skill 的数量，而在于一套可组合的控制结构：`poteto-mode` 只负责匹配 playbook；playbook 给任务提供顺序和完成条件；principle 在触发点改变具体决策；model role 决定由谁执行；verification 决定什么才算完成；隔离、聚合和复验让 parallelism 不至于放大错误。官方把它概括为“go deep first”与“fearless parallelism”，并明确反对以 LOC 或纯 throughput 为目标。[README](https://github.com/cursor/plugins/blob/main/pstack/README.md)
