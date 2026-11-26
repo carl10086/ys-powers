@@ -12,8 +12,8 @@ Do not use it as the default review for ordinary changes.
 ## Load the owned contracts
 
 Call the Skill tool with "code-review" for the Standards and Spec baseline.
-Read and follow the installed `interrogate` and `blast-radius` skill instructions for the additional passes.
-Stop if either additional contract is unavailable.
+Read and follow the installed `interrogate`, `blast-radius`, and `arena` skill instructions for the additional passes.
+Stop if any additional contract is unavailable.
 Do not copy or rewrite any owned review contract here.
 
 ## Freeze one scope
@@ -51,6 +51,7 @@ Stop if the required isolation cannot be established.
 
 Run the loaded `interrogate` and `blast-radius` contracts against the same frozen scope and intent.
 Give them independent workspaces so one pass cannot influence the other's evidence.
+When pstack model roles are unavailable, run three fresh reviewer subagents with the runtime's available reviewer model and report that vendor diversity was not verified.
 Keep `interrogate` findings only when its coordinator reruns the exact command and confirms that the output violates the intent.
 Disable the optional `arena` escalation inside `blast-radius` for this version of `deep-review`.
 Require `blast-radius` to separate confirmed, cleared, and unproven risks.
