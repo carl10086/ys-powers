@@ -309,3 +309,7 @@ Wrapper 还会把 three-source orchestration 变成本地长期 owner。没有 i
 - 不把 collapsed model seats 宣称为 multi-model review。
 
 **最终判断：能 work，但当前没有证据证明更好。** 最小 ownership change 是 Matt baseline 加风险触发、独立、可撤回的 pstack passes。当前应先完成 leaf-level eval 与 runtime isolation，不应先建 wrapper。
+
+## Approved non-active draft
+
+The line-reviewed draft lives at [`docs/pstack/deep-review-draft/SKILL.md`](./deep-review-draft/SKILL.md). It is documentation, not an installed skill. Promotion remains blocked until `blast-radius` completes issue #111 and `interrogate` passes an independent eval.
