@@ -1,0 +1,5 @@
+interface:
+  display_name: "Unslop"
+  short_description: "Remove AI writing patterns"
+policy:
+  allow_implicit_invocation: false
