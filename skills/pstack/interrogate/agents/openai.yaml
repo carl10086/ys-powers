@@ -1,0 +1,5 @@
+interface:
+  display_name: "Interrogate"
+  short_description: "Prove behavioral failures against a change"
+policy:
+  allow_implicit_invocation: false

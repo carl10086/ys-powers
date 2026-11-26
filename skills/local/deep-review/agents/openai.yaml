@@ -1,0 +1,5 @@
+interface:
+  display_name: "Deep Review"
+  short_description: "Run standards, spec, adversarial, and blast review"
+policy:
+  allow_implicit_invocation: false

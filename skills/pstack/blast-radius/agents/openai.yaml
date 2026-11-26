@@ -1,0 +1,5 @@
+interface:
+  display_name: "Blast Radius"
+  short_description: "Prove diff-external safety facts"
+policy:
+  allow_implicit_invocation: false
