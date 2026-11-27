@@ -18,6 +18,6 @@
 - `in-your-own-words/`：原样保留 `pstack/skills/in-your-own-words/SKILL.md`，用于复述用户目标并校准理解。
 - `arena/`：原样保留 `pstack/skills/arena/SKILL.md`，为多候选和 adversarial fan-out 提供隔离与验证 phases。
 - `blast-radius/`：原样保留 `pstack/skills/blast-radius/SKILL.md`，证明 diff 外 hidden coupling 所依赖的安全事实。
-- `interrogate/`：原样保留 `pstack/skills/interrogate/SKILL.md`，只保留可由真实运行复现的行为 finding。
+- `interrogate/`：基于 `pstack/skills/interrogate/` 的本地自包含改编；不依赖完整 pstack orchestration，只保留可由真实运行复现的行为 finding。
 
 同步上游时，必须在同一个 PR 中更新 skill 文件与 pinned commit。不得把 pstack router 或整套 plugin 隐式引入本目录。
